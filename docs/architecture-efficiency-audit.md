@@ -28,12 +28,13 @@ Current/approved set:
 
 - `Kernel` — composition only;
 - `ProductContentService` — native `graha_product`/category/brand registration and canonical product route bases;
-- `TemplateService` — template routing/presentation contexts;
+- `TemplateService` — template routing/presentation contexts plus narrow WordPress-front-page shell ownership;
 - `AssetService` — single frontend asset registry/loading owner;
-- `NavigationService` — one normalized navigation tree;
-- `AdminService` — only the Graha admin wrapper, native-screen links, migration entry and minimal presentation/global settings/editor enhancements.
+- `NavigationService` — one normalized navigation tree with native-menu authority and deterministic bootstrap fallback;
+- `AdminService` — only the Graha admin wrapper, native-screen links, migration entry and minimal presentation/global settings/editor enhancements;
+- `SiteLifecycleService` — activation/deactivation lifecycle, schema-versioned structural Page provisioning, safe fresh front-page assignment and admin upgrade/retry.
 
-Optional future `SeoService` and `FormAdapter` remain within the same budget when concrete provider integration is implemented. The one-shot product migration coordinator remains lazy/non-bootable. Do not create another service merely to match Gloskin’s class list.
+Optional future `SeoService` and `FormAdapter` remain within the same budget when concrete provider integration is implemented. The one-shot product migration coordinator remains lazy/non-bootable. `SiteLifecycleService` is justified by the concrete fresh-activation/bootstrap requirement and is not a generic installer framework.
 
 ## 3. Why the native product owner is justified
 
@@ -50,13 +51,14 @@ The simplest correct architecture is better than structural symmetry.
 - hold plugin version/path/url constants or receive them;
 - register explicit services;
 - call each owner’s registration method for the relevant request profile;
-- centralize optional dependency construction.
+- centralize optional dependency construction;
+- expose narrow activation/deactivation entrypoints that delegate lifecycle effects to `SiteLifecycleService`.
 
 `Kernel` must not:
 
 - query products;
 - build page data;
-- save settings;
+- save settings during normal requests;
 - generate SEO copy;
 - render templates;
 - mutate product state;
@@ -69,7 +71,7 @@ Templates receive **small page-specific contexts**. Do not build one global payl
 
 Examples:
 
-- Home context: featured categories/brands/products/services/articles actually needed;
+- Home context: editor-owned front-page content plus product groups/services/company/RFQ destinations actually needed;
 - Product category context: current native term + paginated products + configured supporting content;
 - Product context: current `graha_product` + presentation-safe related data;
 - Article context: current post + explicit related links;
@@ -93,11 +95,12 @@ Rules:
 
 ## 7. Navigation ownership
 
-One `NavigationService` normalizes a WordPress menu or explicit fallback into a shared tree consumed by desktop and mobile renderers.
+One `NavigationService` normalizes the assigned WordPress menu into a shared tree consumed by desktop and mobile renderers. When no menu is assigned, it may provide the canonical visible Graha fallback links required to make fresh activation usable without database menu provisioning.
 
 Do not:
 
 - persist separate mobile/desktop menus;
+- provision a database menu merely for bootstrap;
 - create a UI-version navigation registry;
 - create a custom route/menu database;
 - silently synthesize SEO navigation unrelated to visible UX.
@@ -152,6 +155,7 @@ V1 target:
 - native `graha_product` posts;
 - native `graha_product_category` / `graha_product_brand` terms;
 - registered post/term meta only when necessary;
+- one small schema-version option for the approved site bootstrap lifecycle;
 - at most one small Graha global settings option if a native Page/menu/settings location cannot express the value cleanly.
 
 Do not add generic transaction, lock, rollback, readback or cache-invalidation layers around normal WordPress writes.
@@ -166,14 +170,16 @@ Prefer:
 - native `graha_product_category` and `graha_product_brand` rewrites;
 - normal WordPress rewrite behavior.
 
-Known product route bases are `/products/`, `/product/{slug}/`, `/product-category/{slug}/`, and `/brand/{slug}/`.
+Known product route bases are `/products/`, `/product/{slug}/`, `/product-category/{slug}/`, and `/brand/{slug}/`. The approved structural RFQ Page is `/request-quote/`.
+
+`TemplateService` may use one narrow `template_include` decision for the actual WordPress front page so activation immediately renders the Graha document shell. This is presentation ownership, not a virtual route engine.
 
 Avoid:
 
-- virtual route engines;
 - request claiming/proxy query flags;
 - parallel routing table in options;
-- hard-coded redirect logic scattered across templates.
+- hard-coded redirect logic scattered across templates;
+- provisioning or rewrite flushing on normal frontend requests.
 
 Legacy redirects should live in the deployment’s canonical redirect owner (approved redirect plugin/server/SEO provider) or one narrow documented implementation—not in multiple layers.
 
@@ -194,13 +200,13 @@ Do not build a general Graha admin framework or custom product CRUD. A small set
 For first-party mutations:
 
 - capability checks;
-- nonce checks;
+- nonce checks where an interactive user mutation is introduced;
 - validate/sanitize on input;
 - native persistence API;
 - escape on output;
 - do not expose mutation endpoints publicly without an explicit threat model.
 
-No security hardening layer should compensate for unclear ownership.
+Activation provisioning uses the WordPress plugin lifecycle rather than a public endpoint. Already-active schema retry is limited to authorized `admin_init` and must be idempotent.
 
 ## 15. Performance architecture
 

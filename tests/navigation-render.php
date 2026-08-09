@@ -2,10 +2,11 @@
 
 define( 'ABSPATH', __DIR__ . '/' );
 
-$GLOBALS['nav_items'] = array();
+$GLOBALS['nav_items']    = array();
+$GLOBALS['nav_location'] = 99;
 
 function get_nav_menu_locations() {
-	return array( 'graha-primary' => 99 );
+	return $GLOBALS['nav_location'] ? array( 'graha-primary' => $GLOBALS['nav_location'] ) : array();
 }
 function absint( $value ) {
 	return abs( (int) $value );
@@ -24,6 +25,7 @@ function esc_url( $url ) {
 	}
 	return htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
 }
+function home_url( $path = '/' ) { return 'https://example.test' . $path; }
 
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/NavigationService.php';
 
@@ -63,3 +65,12 @@ assert_true( false !== strpos( $html, 'rel="noopener"' ), '_blank link receives 
 assert_true( false === strpos( $html, 'javascript:' ), 'unsafe URL is not rendered as an anchor target' );
 assert_true( false !== strpos( $html, 'data-graha-nav-toggle hidden' ), 'root disclosure control is inert without JavaScript' );
 assert_true( false !== strpos( $html, 'data-graha-disclosure-toggle hidden' ), 'submenu disclosure control is inert without JavaScript' );
+
+$GLOBALS['nav_location'] = 0;
+$_SERVER['REQUEST_URI']  = '/products/';
+$tree = $service->get_primary_tree();
+assert_true( 6 === count( $tree ), 'missing native menu uses canonical Graha fallback tree' );
+assert_true( array( 'Beranda','Produk','Layanan','Tentang Kami','Request Quote','Hubungi Kami' ) === array_column( $tree, 'title' ), 'fallback navigation is deterministic and canonical' );
+assert_true( true === $tree[1]['current'], 'fallback navigation marks current route' );
+$html = $service->render_primary();
+assert_true( false !== strpos( $html, 'https://example.test/request-quote/' ), 'fallback navigation exposes Request Quote' );

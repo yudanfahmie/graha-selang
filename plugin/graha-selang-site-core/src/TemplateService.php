@@ -8,6 +8,7 @@ final class TemplateService {
 	const PREPARE_HOOK = 'graha_selang_prepare_page';
 	const RENDER_HOOK = 'graha_selang_render_page';
 	const BREADCRUMB_HOOK = 'graha_selang_render_breadcrumbs';
+	const FRONT_PAGE_HOOK = 'graha_selang_render_front_page';
 	const SOURCE_META = '_graha_source_identity';
 	const HOME_GROUP_META = '_graha_home_group';
 	const PRODUCT_POST_TYPE = 'graha_product';
@@ -34,17 +35,31 @@ final class TemplateService {
 		add_action( self::PREPARE_HOOK, array( $this, 'prepare_page' ) );
 		add_action( self::RENDER_HOOK, array( $this, 'output_page' ), 10, 2 );
 		add_action( self::BREADCRUMB_HOOK, array( $this, 'output_breadcrumbs' ), 10, 2 );
+		add_action( self::FRONT_PAGE_HOOK, array( $this, 'output_front_page' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'prepare_native_presentation' ), 20 );
+		add_filter( 'template_include', array( $this, 'resolve_native_template' ), 99 );
 		add_filter( 'the_content', array( $this, 'enhance_native_content' ), 30 );
 	}
 
 	public function prepare_native_presentation() {
 		if ( function_exists( 'is_admin' ) && is_admin() ) return;
 		if ( is_front_page() ) {
-			if ( $this->native_home_is_ready() ) $this->assets->enqueue_foundation();
+			$this->assets->enqueue_shell();
 			return;
 		}
 		if ( is_singular( array( 'page', 'post', self::PRODUCT_POST_TYPE ) ) ) $this->assets->enqueue_foundation();
+	}
+
+	/** Resolve only the actual WordPress front page to the Graha document shell. */
+	public function resolve_native_template( $template ) {
+		if ( ( function_exists( 'is_admin' ) && is_admin() ) || ! is_front_page() ) return $template;
+		$front = dirname( __DIR__ ) . '/templates/front-page.php';
+		return is_readable( $front ) ? $front : $template;
+	}
+
+	/** Output the Graha shell for the actual WordPress front page. */
+	public function output_front_page() {
+		echo $this->render_front_page_shell( $this->front_page_editor_content() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	public function enhance_native_content( $content ) {
@@ -165,20 +180,11 @@ final class TemplateService {
 
 	private function is_supported_family( $family ) { return in_array( sanitize_key( (string) $family ), self::FAMILIES, true ); }
 
-	private function native_home_is_ready() {
-		$groups = $this->get_native_home_groups();
-		if ( count( $groups ) !== count( self::HOME_GROUPS ) ) return false;
-		$contact = get_page_by_path( 'contact-us', OBJECT, 'page' );
-		$services = get_page_by_path( 'layanan-kami', OBJECT, 'page' );
-		$products_url = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
-		return $contact && 'publish' === $contact->post_status && $services && 'publish' === $services->post_status && ! empty( $products_url );
-	}
-
 	private function get_native_home_groups() {
 		if ( null !== $this->native_home_groups ) return $this->native_home_groups;
 		$this->native_home_groups = array();
 		if ( ! post_type_exists( self::PRODUCT_POST_TYPE ) ) return $this->native_home_groups;
-		$ids = get_posts( array( 'post_type'=>self::PRODUCT_POST_TYPE,'post_status'=>'publish','fields'=>'ids','numberposts'=>80,'suppress_filters'=>true,'meta_query'=>array( array( 'key'=>self::SOURCE_META,'compare'=>'EXISTS' ) ) ) );
+		$ids = get_posts( array( 'post_type'=>self::PRODUCT_POST_TYPE,'post_status'=>'publish','fields'=>'ids','numberposts'=>80,'suppress_filters'=>true ) );
 		foreach ( is_array( $ids ) ? $ids : array() as $id ) {
 			$group = (string) get_post_meta( $id, self::HOME_GROUP_META, true );
 			if ( ! isset( self::HOME_GROUPS[ $group ] ) ) continue;
@@ -190,14 +196,45 @@ final class TemplateService {
 	}
 
 	private function render_native_home_content( $content ) {
-		if ( ! $this->native_home_is_ready() ) return $content;
 		$groups = $this->get_native_home_groups();
-		$contact = get_page_by_path( 'contact-us', OBJECT, 'page' );
-		$services = get_page_by_path( 'layanan-kami', OBJECT, 'page' );
 		$products_url = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
+		if ( ! $products_url ) $products_url = home_url( '/products/' );
+		$services_url = $this->published_page_url( 'layanan-kami' );
+		$contact_url = $this->published_page_url( 'contact-us' );
+		$rfq_url = $this->published_page_url( 'request-quote' );
+		$about_url = $this->published_page_url( 'about-us' );
 		ob_start();
 		include dirname( __DIR__ ) . '/templates/native-home.php';
 		return (string) ob_get_clean();
 	}
 
+	private function published_page_url( $slug ) {
+		$page = get_page_by_path( $slug, OBJECT, 'page' );
+		if ( ! $page || 'publish' !== $page->post_status ) return '';
+		return (string) get_permalink( $page );
+	}
+
+	private function front_page_editor_content() {
+		$post_id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+		if ( ! $post_id ) return '';
+		$raw = (string) get_post_field( 'post_content', $post_id );
+		if ( '' === trim( wp_strip_all_tags( $raw ) ) ) return '';
+		remove_filter( 'the_content', array( $this, 'enhance_native_content' ), 30 );
+		$rendered = apply_filters( 'the_content', $raw );
+		add_filter( 'the_content', array( $this, 'enhance_native_content' ), 30 );
+		return wp_kses_post( (string) $rendered );
+	}
+
+	private function render_front_page_shell( $content ) {
+		$family = 'home';
+		$home_content = $this->render_native_home_content( $content );
+		$main = '<main id="graha-main" class="graha-site-main graha-site-main--home"><div class="graha-container graha-container--wide graha-stack--large"><article class="graha-page graha-page--home"><header class="graha-page-header graha-page-header--home"><p class="graha-page-header__eyebrow">' . esc_html__( 'Graha Selang', 'graha-selang' ) . '</p><h1>' . esc_html__( 'Solusi selang untuk kebutuhan industri dan hidrolik', 'graha-selang' ) . '</h1><div class="graha-page-header__lead"><p>' . esc_html__( 'Temukan jalur produk, layanan, dan konsultasi teknis melalui informasi yang dipublikasikan Graha Selang.', 'graha-selang' ) . '</p></div></header>' . $home_content . '</article></div></main>';
+		$site_name = trim( (string) get_bloginfo( 'name' ) );
+		$logo = function_exists( 'get_custom_logo' ) ? (string) get_custom_logo() : '';
+		$nav = $this->navigation->render_primary();
+		$footer = '';
+		ob_start();
+		include dirname( __DIR__ ) . '/templates/shell.php';
+		return (string) ob_get_clean();
+	}
 }

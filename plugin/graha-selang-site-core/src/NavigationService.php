@@ -34,7 +34,7 @@ final class NavigationService {
 
 	/**
 	 * Resolve the assigned native menu into one normalized desktop/mobile tree.
-	 * Empty assignment intentionally returns an empty tree.
+	 * No assignment uses the deterministic Graha bootstrap fallback.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */
@@ -43,7 +43,7 @@ final class NavigationService {
 		$menu_id   = isset( $locations[ self::PRIMARY_LOCATION ] ) ? absint( $locations[ self::PRIMARY_LOCATION ] ) : 0;
 
 		if ( ! $menu_id ) {
-			return array();
+			return $this->fallback_tree();
 		}
 
 		$items = wp_get_nav_menu_items( $menu_id );
@@ -110,7 +110,6 @@ final class NavigationService {
 
 	/**
 	 * Render crawlable navigation markup from the normalized tree.
-	 * No menu assignment means no invented fallback links.
 	 *
 	 * @param array<string, mixed> $args Optional render arguments.
 	 * @return string
@@ -187,5 +186,46 @@ final class NavigationService {
 		</ul>
 		<?php
 		return (string) ob_get_clean();
+	}
+
+	/** @return array<int, array<string, mixed>> */
+	private function fallback_tree() {
+		$items = array(
+			array( 100001, 'Beranda', '/' ),
+			array( 100002, 'Produk', '/products/' ),
+			array( 100003, 'Layanan', '/layanan-kami/' ),
+			array( 100004, 'Tentang Kami', '/about-us/' ),
+			array( 100005, 'Request Quote', '/request-quote/' ),
+			array( 100006, 'Hubungi Kami', '/contact-us/' ),
+		);
+		$tree = array();
+		foreach ( $items as $item ) {
+			$tree[] = array(
+				'id'       => $item[0],
+				'parent'   => 0,
+				'title'    => $item[1],
+				'url'      => home_url( $item[2] ),
+				'target'   => '',
+				'rel'      => '',
+				'current'  => $this->path_is_active( $item[2] ),
+				'ancestor' => false,
+				'children' => array(),
+			);
+		}
+		return $tree;
+	}
+
+	/** @param string $path Canonical path. @return bool */
+	private function path_is_active( $path ) {
+		$current = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+		$current = (string) strtok( $current, '?' );
+		$target  = parse_url( home_url( $path ), PHP_URL_PATH );
+		$target  = is_string( $target ) ? $target : $path;
+		$current = '/' . ltrim( $current, '/' );
+		$target  = '/' . ltrim( $target, '/' );
+		if ( '/' === $target ) {
+			return '/' === rtrim( $current, '/' ) . '/' || '/' === $current;
+		}
+		return 0 === strpos( rtrim( $current, '/' ) . '/', rtrim( $target, '/' ) . '/' );
 	}
 }
