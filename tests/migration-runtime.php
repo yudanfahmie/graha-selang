@@ -67,7 +67,7 @@ class WC_Product_Simple {
 	}
 }
 
-require_once dirname( __DIR__ ) . '/src/ProductCatalogMigration.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/ProductCatalogMigration.php';
 
 function assert_true( $condition, $message ) {
 	if ( ! $condition ) { fwrite( STDERR, "FAIL: {$message}\n" ); exit( 1 ); }

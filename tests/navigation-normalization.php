@@ -1,7 +1,7 @@
 <?php
 
 define( 'ABSPATH', __DIR__ . '/' );
-require_once dirname( __DIR__ ) . '/src/NavigationService.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/NavigationService.php';
 
 function assert_true( $condition, $message ) {
 	if ( ! $condition ) {

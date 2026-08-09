@@ -42,8 +42,8 @@ function wp_enqueue_script( $handle ) { $GLOBALS['enqueued'][] = $handle; }
 function wp_localize_script( $handle, $object, $data ) { $GLOBALS['localized'] = $data; }
 function plugin_dir_url( $file ) { return 'https://example.test/plugin/'; }
 
-require_once dirname( __DIR__ ) . '/src/AssetService.php';
-require_once dirname( __DIR__ ) . '/src/AdminService.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/AssetService.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/AdminService.php';
 
 function assert_true( $condition, $message ) {
 	if ( ! $condition ) { fwrite( STDERR, "FAIL: {$message}\n" ); exit( 1 ); }
@@ -56,7 +56,7 @@ class FakeMigration {
 	public function execute() { return $this->result; }
 }
 
-$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/graha-selang.php', '0.4.0' );
+$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/plugin/graha-selang-site-core/graha-selang.php', '0.4.0' );
 $admin  = new \GrahaSelang\AdminService( $assets );
 $admin->register();
 assert_true( isset( $GLOBALS['actions']['wp_ajax_graha_selang_run_product_catalog_migration'] ), 'authenticated migration AJAX hook registered' );

@@ -6,7 +6,8 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / 'src'
+PLUGIN = ROOT / 'plugin' / 'graha-selang-site-core'
+SRC = PLUGIN / 'src'
 
 def fail(message):
     print(f'FAIL: {message}', file=sys.stderr)
@@ -17,11 +18,23 @@ def check(condition, message):
         fail(message)
     print(f'PASS: {message}')
 
-production_files = [ROOT / 'graha-selang.php']
+check(PLUGIN.is_dir(), 'deployable plugin directory exists')
+check((PLUGIN / 'graha-selang.php').is_file(), 'plugin entrypoint exists under deployable plugin directory')
+for stale in ('graha-selang.php', 'src', 'assets', 'templates', 'migration-runtime'):
+    check(not (ROOT / stale).exists(), f'no stale root runtime path: {stale}')
+check((ROOT / 'migration-source').is_dir(), 'repository migration source archive remains at repo root')
+check(not (PLUGIN / 'migration-source').exists(), 'repository migration source is excluded from deployable plugin')
+check((PLUGIN / 'migration-runtime' / 'product-catalog-v1').is_dir(), 'disposable migration runtime remains inside deployable plugin')
+cpanel = (ROOT / '.cpanel.yml').read_text(encoding='utf-8')
+check('plugin/graha-selang-site-core/.' in cpanel, 'cPanel deploy source is deployable plugin only')
+check('/wp-content/plugins/graha-selang-site-core/' in cpanel, 'cPanel deploy destination remains graha-selang-site-core')
+check('plugin/gloskin-site-core' not in cpanel, 'cPanel deployment contains no stale gloskin plugin source')
+
+production_files = [PLUGIN / 'graha-selang.php']
 production_files += sorted(SRC.glob('*.php'))
-production_files += sorted((ROOT / 'templates').glob('*.php'))
-production_files += sorted((ROOT / 'assets').rglob('*.css'))
-production_files += sorted((ROOT / 'assets').rglob('*.js'))
+production_files += sorted((PLUGIN / 'templates').glob('*.php'))
+production_files += sorted((PLUGIN / 'assets').rglob('*.css'))
+production_files += sorted((PLUGIN / 'assets').rglob('*.js'))
 texts = {path: path.read_text(encoding='utf-8') for path in production_files}
 php_text = '\n'.join(text for path, text in texts.items() if path.suffix == '.php')
 runtime_text = '\n'.join(texts.values())
@@ -71,7 +84,7 @@ check('_graha_source_identity' in template and '_graha_home_group' in template, 
 check(re.search(r"'numberposts'\s*=>\s*80", template) is not None, 'native Home product query is bounded')
 check('migration-source/' not in template, 'public presentation never reads repository archive bundle')
 check('contact-us' in template and 'layanan-kami' in template and "wc_get_page_id( 'shop' )" in template, 'native Home activation requires real native shop/services/contact destinations')
-check('graha-priority-grid' in texts[ROOT / 'assets/css/foundation.css'], 'shared foundation preserves unequal Home hierarchy primitive')
+check('graha-priority-grid' in texts[PLUGIN / 'assets/css/foundation.css'], 'shared foundation preserves unequal Home hierarchy primitive')
 
 for label, patterns in {
     'custom database writes': [r'\$wpdb\b', r'\bdbDelta\s*\(', r'CREATE\s+TABLE'],
@@ -104,7 +117,7 @@ check(consumed is not None and cleanup_pos > consumed.start(), 'logical consumed
 check('Source identity collision' in migration and 'source identity lain' in migration, 'source identity collision guards are explicit')
 
 archive = ROOT / 'migration-source/product-catalog-v1'
-runtime = ROOT / 'migration-runtime/product-catalog-v1'
+runtime = PLUGIN / 'migration-runtime/product-catalog-v1'
 for base in (archive, runtime):
     check((base / 'manifest.json').is_file() and (base / 'products.json').is_file(), f'bundle copy present: {base.relative_to(ROOT)}')
 manifest_a = json.loads((archive / 'manifest.json').read_text(encoding='utf-8'))
@@ -133,8 +146,8 @@ traceability = (ROOT / 'docs/requirement-traceability.csv').read_text(encoding='
 for requirement_id in range(32, 41):
     check(f'REQ-{requirement_id:03d}' in traceability, f'traceability includes REQ-{requirement_id:03d}')
 
-check('setInterval(' not in texts[ROOT / 'assets/js/admin-migration.js'], 'migration screen has no polling loop')
-check("addEventListener('click'" in texts[ROOT / 'assets/js/admin-migration.js'], 'migration work starts only from explicit user action')
-check('button.disabled = true' in texts[ROOT / 'assets/js/admin-migration.js'], 'migration UI suppresses double-click while request runs')
+check('setInterval(' not in texts[PLUGIN / 'assets/js/admin-migration.js'], 'migration screen has no polling loop')
+check("addEventListener('click'" in texts[PLUGIN / 'assets/js/admin-migration.js'], 'migration work starts only from explicit user action')
+check('button.disabled = true' in texts[PLUGIN / 'assets/js/admin-migration.js'], 'migration UI suppresses double-click while request runs')
 
 print('Repository contract guards passed.')

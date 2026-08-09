@@ -25,7 +25,7 @@ function esc_url( $url ) {
 	return htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
 }
 
-require_once dirname( __DIR__ ) . '/src/NavigationService.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/NavigationService.php';
 
 function item( $id, $parent, $title, $url, $target = '' ) {
 	$item                        = new stdClass();

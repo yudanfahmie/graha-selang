@@ -19,8 +19,8 @@ php tests/migration-runtime.php
 php tests/kernel-smoke.php
 if command -v node >/dev/null 2>&1; then
   echo '== JavaScript syntax =='
-  node --check assets/js/navigation.js
-  node --check assets/js/admin-migration.js
+  node --check plugin/graha-selang-site-core/assets/js/navigation.js
+  node --check plugin/graha-selang-site-core/assets/js/admin-migration.js
 else
   echo 'SKIP: node is unavailable; JavaScript syntax not checked'
 fi

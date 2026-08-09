@@ -29,16 +29,16 @@ function get_bloginfo( $show ) { return 'name' === $show ? 'Situs Uji' : ''; }
 function home_url( $path = '/' ) { return 'https://example.test' . $path; }
 function get_custom_logo() { return ''; }
 
-require_once dirname( __DIR__ ) . '/src/AssetService.php';
-require_once dirname( __DIR__ ) . '/src/NavigationService.php';
-require_once dirname( __DIR__ ) . '/src/TemplateService.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/AssetService.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/NavigationService.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/TemplateService.php';
 
 function assert_true( $condition, $message ) {
 	if ( ! $condition ) { fwrite( STDERR, "FAIL: {$message}\n" ); exit( 1 ); }
 	echo "PASS: {$message}\n";
 }
 
-$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/graha-selang.php', '0.4.0' );
+$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/plugin/graha-selang-site-core/graha-selang.php', '0.4.0' );
 $navigation = new \GrahaSelang\NavigationService();
 $templates = new \GrahaSelang\TemplateService( $assets, $navigation );
 

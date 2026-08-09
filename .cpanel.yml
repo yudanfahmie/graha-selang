@@ -3,4 +3,4 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/markascl/graha-selang.markas.cloud/wp-content/plugins/graha-selang-site-core/
     - /bin/mkdir -p $DEPLOYPATH
-    - /bin/cp -R plugin/gloskin-site-core/. $DEPLOYPATH
+    - /bin/cp -R plugin/graha-selang-site-core/. $DEPLOYPATH

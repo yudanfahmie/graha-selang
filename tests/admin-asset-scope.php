@@ -10,9 +10,9 @@ function current_user_can( $cap ) { return false; }
 function wp_register_style( $handle ) { $GLOBALS['registered_styles'][]=$handle; }
 function wp_enqueue_style( $handle ) { $GLOBALS['enqueued_styles'][]=$handle; }
 function wp_register_script() {} function wp_enqueue_script() {}
-require_once dirname(__DIR__).'/src/AssetService.php'; require_once dirname(__DIR__).'/src/AdminService.php';
+require_once dirname(__DIR__).'/plugin/graha-selang-site-core/src/AssetService.php'; require_once dirname(__DIR__).'/plugin/graha-selang-site-core/src/AdminService.php';
 function assert_true($c,$m){if(!$c){fwrite(STDERR,"FAIL: $m\n");exit(1);}echo "PASS: $m\n";}
-$assets=new \GrahaSelang\AssetService(dirname(__DIR__).'/graha-selang.php','0.4.0');
+$assets=new \GrahaSelang\AssetService(dirname(__DIR__).'/plugin/graha-selang-site-core/graha-selang.php','0.4.0');
 $admin=new \GrahaSelang\AdminService($assets);
 $admin->register_menu();
 assert_true(1===count($GLOBALS['menu_calls']),'one root menu registered');

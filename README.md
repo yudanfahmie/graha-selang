@@ -4,6 +4,15 @@ Canonical developer handoff for the Graha Selang controlled website rebuild.
 
 This repository is the **developer-facing source of truth**. Normal implementation must not depend on reopening `yudanfahmie/project-9901`.
 
+## Repository layout
+
+The repository root is the engineering workspace. The deployable WordPress plugin is isolated at `plugin/graha-selang-site-core/`; cPanel deployment must copy only that directory into WordPress.
+
+- `plugin/graha-selang-site-core/`: deployable plugin runtime (`graha-selang.php`, `assets/`, `src/`, `templates/`, and disposable `migration-runtime/`);
+- `migration-source/`: permanent repository-only migration archive and developer/audit source; production runtime never reads it;
+- `docs/`, `tests/`, and `scripts/`: repository engineering/support material and not part of the WordPress deployment payload;
+- `.cpanel.yml`: repository-root deployment definition pointing from `plugin/graha-selang-site-core/.` to the target `wp-content/plugins/graha-selang-site-core/` directory.
+
 ## Product definition
 
 The target is a **WordPress plugin that behaves as the site presentation/page-builder layer**. It owns Graha Selang public presentation, reusable UI, route-aware templates, responsive/accessibility behavior, technical product discovery, RFQ presentation/integration, developer-side SEO/GEO-friendly structure, and safe integration with WordPress/WooCommerce.
@@ -125,7 +134,7 @@ Use a small modular monolith with one composition root and one owner per concern
 A narrow one-shot product catalog migration now lives behind the existing `AdminService` boundary. It is **not** a bootable service and never loads in normal frontend Kernel composition.
 
 - permanent source/audit copy: `migration-source/product-catalog-v1/`;
-- disposable runtime copy: `migration-runtime/product-catalog-v1/`;
+- disposable runtime copy: `plugin/graha-selang-site-core/migration-runtime/product-catalog-v1/`;
 - temporary admin child: `Graha Selang Content -> Migrasi Produk` only while the runtime bundle is pending/retryable;
 - execution: explicit authenticated `wp_ajax_*`, `manage_woocommerce`, nonce, atomic option lock;
 - persistence: native WooCommerce products + native post meta provenance only;
@@ -141,7 +150,7 @@ Run the lightweight repository gate before each push:
 ./scripts/verify.sh
 ```
 
-It performs PHP syntax checks, static architecture/security guards, navigation normalization/render checks, page/Home presentation tests, one-shot migration validation/idempotency/lock/cleanup tests, admin capability/nonce/submenu/asset checks, Kernel hook smoke checks, and JavaScript syntax validation when Node is available. These checks are repository-level verification; they do not replace activation and behavior testing on the target WordPress environment.
+It performs PHP syntax checks, static architecture/security guards, navigation normalization/render checks, page/Home presentation tests, one-shot migration validation/idempotency/lock/cleanup tests, admin capability/nonce/submenu/asset checks, Kernel hook smoke checks, deployment-structure guards, and JavaScript syntax validation when Node is available. These checks are repository-level verification; they do not replace activation and behavior testing on the target WordPress environment.
 
 ## Implementation status
 
@@ -149,4 +158,4 @@ It performs PHP syntax checks, static architecture/security guards, navigation n
 
 Native Page/Post content receives the centralized Graha presentation primitives without route takeover. The production Homepage augmentation now reads only migrated/native Woo products carrying Graha migration provenance, preserves the required two-anchor/three-support/one-specialist hierarchy, and activates only when all six product groups plus real published Woo shop, `/layanan-kami/`, and `/contact-us/` destinations are available. Otherwise WordPress native Home content remains untouched.
 
-Wave 1 is **not complete** until a real WordPress runtime verifies activation, actual admin placement/collision behavior, and representative Page/Post/Woo integration. The committed migration runtime bundle remains logically **pending until it is explicitly run on a real target WooCommerce environment**; repository simulations do not claim production import or cleanup. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`.
+Wave 1 is **not complete** until a real WordPress runtime verifies activation, actual admin placement/collision behavior, and representative Page/Post/Woo integration. The committed plugin-local migration runtime bundle remains logically **pending until it is explicitly run on a real target WooCommerce environment**; repository simulations do not claim production import or cleanup. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`.
