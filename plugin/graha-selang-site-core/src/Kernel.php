@@ -13,7 +13,7 @@ final class Kernel {
 	 * exactly one place code has to change per release. Keep both in sync;
 	 * tests/version-consistency.php guards against them drifting apart.
 	 */
-	const VERSION = '0.7.1';
+	const VERSION = '0.7.2';
 
 	/** @var string */
 	private $plugin_file;
@@ -21,38 +21,30 @@ final class Kernel {
 	/** @var array<int, object> */
 	private $services = array();
 
-	/**
-	 * @param string $plugin_file Main plugin file.
-	 */
+	/** @param string $plugin_file Main plugin file. */
 	public function __construct( $plugin_file ) {
 		$this->plugin_file = $plugin_file;
 	}
 
-	/**
-	 * Compose and register first-party owners once.
-	 *
-	 * @return void
-	 */
+	/** Compose and register first-party owners/collaborators once. */
 	public function boot() {
-		if ( ! empty( $this->services ) ) {
-			return;
-		}
+		if ( ! empty( $this->services ) ) return;
 
 		$assets     = new AssetService( $this->plugin_file, self::VERSION );
 		$navigation = new NavigationService();
+		$templates  = new TemplateService( $assets, $navigation );
 
 		$this->services = array(
 			new ProductContentService(),
 			$assets,
 			$navigation,
-			new TemplateService( $assets, $navigation ),
+			$templates,
+			new ProductPresentation( $templates, $assets ),
 			new AdminService( $assets ),
 			new SiteLifecycleService(),
 		);
 
-		foreach ( $this->services as $service ) {
-			$service->register();
-		}
+		foreach ( $this->services as $service ) $service->register();
 	}
 
 	/** Register rewrite owners before the lifecycle activation flush. */

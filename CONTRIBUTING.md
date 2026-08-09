@@ -54,13 +54,14 @@ Rules:
 2. Checkout `main`.
 3. Pull latest `origin/main`.
 4. Record/report current HEAD.
-5. Read canonical docs relevant to the task.
-6. Inspect current implementation before assuming a feature is missing.
-7. Define one coherent outcome.
-8. Identify canonical owner(s) for changed concerns.
-9. For route/content changes, check scope inventory, migration and SEO/GEO consequences.
-10. For RFQ/form changes, check provider capability, file-security/privacy and routing ownership.
-11. For any custom admin page/menu change, check `docs/admin-information-architecture.md` first.
+5. Read `CONTRIBUTING.md`.
+6. Read canonical docs relevant to the task.
+7. Inspect current implementation before assuming a feature is missing.
+8. Define one coherent outcome.
+9. Identify canonical owner(s) for changed concerns.
+10. For route/content changes, check scope inventory, migration and SEO/GEO consequences.
+11. For RFQ/form changes, check provider capability, file-security/privacy and routing ownership.
+12. For any custom admin page/menu change, check `docs/admin-information-architecture.md` first.
 
 ## Architecture efficiency contract
 
@@ -73,8 +74,12 @@ Mandatory rules:
 - one canonical owner per concern;
 - one first-party asset registry/owner;
 - native WordPress routing/storage before custom infrastructure;
-- WooCommerce remains commerce/product authority;
+- `ProductContentService` owns registration of native Graha product entities;
+- WordPress posts, terms and meta are authoritative Graha product storage;
+- `TemplateService` owns presentation only and does not become a data owner;
 - WordPress remains Pages/Posts/Media authority;
+- no WooCommerce dependency unless a future approved architecture change explicitly introduces it;
+- do not introduce commerce/cart/order behavior accidentally;
 - SEO provider owns metadata/schema/sitemap when configured for them;
 - form provider owns submission transport/spam/mail/file retention when it can satisfy the RFQ contract;
 - optional integrations are adapters;
@@ -96,7 +101,7 @@ Rules:
 
 - all Graha custom admin pages use this parent, normally through `add_submenu_page()`;
 - no separate root Graha settings/RFQ/content/helper menus;
-- keep native WordPress/WooCommerce/SEO-provider/form-provider screens in their own native menus;
+- keep native WordPress/SEO-provider/form-provider screens in their own native menus;
 - do not clone native CRUD merely to place it under the wrapper;
 - capability checks remain per-screen and are not replaced by menu visibility;
 - state-changing admin actions require capability + nonce + validation/sanitization + native persistence;
@@ -168,7 +173,7 @@ Confirmed architectural concern: `/services/` must not remain a competing servic
 
 For first-party state changes use capability checks, nonce, field-appropriate validation/sanitization, native persistence and final-context escaping.
 
-Prefer Pages, Posts, Media, registered meta, Settings API and WooCommerce APIs. Avoid direct `$wpdb` writes.
+Prefer Pages, Posts, Media, registered meta and Settings API. Native Graha products use the registered `graha_product` post type plus its registered taxonomies/meta. Avoid direct `$wpdb` writes.
 
 No public unauthenticated AJAX/REST mutation without an explicit requirement and documented threat model.
 
@@ -183,7 +188,12 @@ Do not expose editorial strings such as `Keyword utama`, `Meta Title`, `Meta Des
 - Group one coherent outcome into one commit.
 - Do not create one commit per file.
 - No probe/checkpoint/temp commits.
-- Messages are short, lowercase and action-oriented.
+- Never use generic messages such as `update`, `fix`, or `changes`.
+- Messages are short, lowercase and action-oriented, for example `stabilize branded shell and catalog surfaces`.
+- Docs/tests affected by an architectural decision ship in the same coherent commit.
+- Public CSS/JS/runtime changes require version consideration.
+- Run verification before commit.
+- Push according to this owner policy and verify remote `main` after push.
 
 ## Documentation discipline
 
@@ -198,7 +208,7 @@ Changes to ownership, services, data fields, routes, inventory counts/classifica
 5. Verify affected scope/route rows and migration decisions.
 6. Verify crawlable internal links and one H1.
 7. Verify no duplicate canonical/meta/schema owner.
-8. Verify Woo ownership.
+8. Verify native Graha product ownership remains with `ProductContentService` + WordPress posts/terms/meta.
 9. Verify RFQ security/provider boundaries when affected.
 10. Verify admin parent/submenu/capability/asset rules when affected.
 11. Verify accessibility/performance regressions on affected families.

@@ -5,18 +5,22 @@ namespace GrahaSelang;
 defined( 'ABSPATH' ) || exit;
 
 final class AssetService {
-	const TOKENS_STYLE          = 'graha-selang-tokens';
-	const FOUNDATION_STYLE      = 'graha-selang-foundation';
-	const NAVIGATION_STYLE      = 'graha-selang-navigation';
-	const SHELL_STYLE           = 'graha-selang-shell';
-	const NAVIGATION_SCRIPT     = 'graha-selang-navigation';
-	const ADMIN_OVERVIEW_STYLE  = 'graha-selang-admin-overview';
-	const ADMIN_MIGRATION_STYLE = 'graha-selang-admin-migration';
-	const ADMIN_MIGRATION_SCRIPT = 'graha-selang-admin-migration';
-	const BUNDLED_LOGO_RELATIVE_PATH = 'assets/images/graha-selang-brand-logo.svg';
+	const TOKENS_STYLE            = 'graha-selang-tokens';
+	const FOUNDATION_STYLE        = 'graha-selang-foundation';
+	const NAVIGATION_STYLE        = 'graha-selang-navigation';
+	const SHELL_STYLE             = 'graha-selang-shell';
+	const NAVIGATION_SCRIPT       = 'graha-selang-navigation';
+	const ADMIN_OVERVIEW_STYLE    = 'graha-selang-admin-overview';
+	const ADMIN_MIGRATION_STYLE   = 'graha-selang-admin-migration';
+	const ADMIN_MIGRATION_SCRIPT  = 'graha-selang-admin-migration';
+	const WORDMARK_RELATIVE_PATH  = 'assets/images/graha-selang-logo-text.svg';
+	const MARK_RELATIVE_PATH      = 'assets/images/graha-selang-logo.svg';
 
 	/** @var string */
 	private $base_url;
+
+	/** @var string */
+	private $base_path;
 
 	/** @var string */
 	private $version;
@@ -26,13 +30,15 @@ final class AssetService {
 	 * @param string $version Plugin version.
 	 */
 	public function __construct( $plugin_file, $version ) {
-		$this->base_url = plugin_dir_url( $plugin_file );
-		$this->version  = $version;
+		$this->base_url  = plugin_dir_url( $plugin_file );
+		$this->base_path = function_exists( 'plugin_dir_path' ) ? plugin_dir_path( $plugin_file ) : rtrim( dirname( $plugin_file ), '/\\' ) . '/';
+		$this->version   = $version;
 	}
 
 	/** @return void */
 	public function register() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_public_assets' ), 5 );
+		add_action( 'wp_head', array( $this, 'render_canonical_favicons' ), 10 );
 	}
 
 	/** @return void */
@@ -70,15 +76,71 @@ final class AssetService {
 		wp_enqueue_script( self::NAVIGATION_SCRIPT );
 	}
 
-	/**
-	 * URL of the bundled Graha Selang brand mark, the deterministic fallback
-	 * used whenever no WordPress Custom Logo is configured. Ships with the
-	 * plugin itself, so this is always resolvable -- never a per-site upload.
-	 *
-	 * @return string
-	 */
+	/** Canonical plugin-owned Graha wordmark URL. */
+	public function canonical_wordmark_url() {
+		return $this->base_url . self::WORDMARK_RELATIVE_PATH;
+	}
+
+	/** Canonical plugin-owned Graha mark URL. */
+	public function canonical_mark_url() {
+		return $this->base_url . self::MARK_RELATIVE_PATH;
+	}
+
+	/** Backward-compatible helper name; canonical ownership is always the wordmark. */
 	public function bundled_logo_url() {
-		return $this->base_url . self::BUNDLED_LOGO_RELATIVE_PATH;
+		return $this->canonical_wordmark_url();
+	}
+
+	/** URL for a committed canonical image derivative. */
+	public function image_url( $filename ) {
+		return $this->base_url . 'assets/images/' . ltrim( (string) $filename, '/' );
+	}
+
+	/** Filesystem path for a committed canonical image derivative. */
+	public function image_path( $filename ) {
+		return $this->base_path . 'assets/images/' . ltrim( (string) $filename, '/' );
+	}
+
+	/**
+	 * Graha owns favicon presentation while its branded presentation layer is
+	 * active. Remove WordPress' Site Icon output before its priority-99 hook,
+	 * then emit one canonical set derived from the approved Graha mark.
+	 */
+	public function render_canonical_favicons() {
+		remove_action( 'wp_head', 'wp_site_icon', 99 );
+
+		echo '<link rel="icon" type="image/svg+xml" sizes="any" href="' . esc_url( $this->canonical_mark_url() ) . '">' . "\n";
+
+		$icons = array(
+			array( 'favicon.ico', 'icon', '', 'any' ),
+			array( 'favicon-16x16.png', 'icon', 'image/png', '16x16' ),
+			array( 'favicon-32x32.png', 'icon', 'image/png', '32x32' ),
+			array( 'icon-192.png', 'icon', 'image/png', '192x192' ),
+			array( 'icon-512.png', 'icon', 'image/png', '512x512' ),
+			array( 'apple-touch-icon.png', 'apple-touch-icon', 'image/png', '180x180' ),
+		);
+		foreach ( $icons as $icon ) {
+			if ( ! file_exists( $this->image_path( $icon[0] ) ) ) continue;
+			echo '<link rel="' . esc_attr( $icon[1] ) . '"'
+				. ( '' !== $icon[2] ? ' type="' . esc_attr( $icon[2] ) . '"' : '' )
+				. ' sizes="' . esc_attr( $icon[3] ) . '" href="' . esc_url( $this->image_url( $icon[0] ) ) . '">' . "\n";
+		}
+	}
+
+	/** Small factual deployment-readiness signal for canonical brand assets. */
+	public function canonical_asset_status() {
+		$favicon_files = array( 'graha-selang-logo.svg', 'favicon.ico', 'favicon-16x16.png', 'favicon-32x32.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png' );
+		$favicons_ok = true;
+		foreach ( $favicon_files as $file ) {
+			if ( ! file_exists( $this->image_path( $file ) ) ) {
+				$favicons_ok = false;
+				break;
+			}
+		}
+		return array(
+			'wordmark' => file_exists( $this->base_path . self::WORDMARK_RELATIVE_PATH ),
+			'favicons' => $favicons_ok,
+		);
 	}
 
 	/** @return void */

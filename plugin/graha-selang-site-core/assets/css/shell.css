@@ -14,6 +14,9 @@
 	box-shadow: 0 0.25rem 1rem rgb(15 23 42 / 0.05);
 }
 
+body.admin-bar .graha-site-header { inset-block-start: 32px; }
+@media (max-width:782px) { body.admin-bar .graha-site-header { inset-block-start: 46px; } }
+
 .graha-site-header::before {
 	content: "";
 	display: block;
@@ -23,7 +26,7 @@
 
 .graha-site-header__inner {
 	display: grid;
-	grid-template-columns: 1fr auto;
+	grid-template-columns: minmax(0, 1fr);
 	align-items: center;
 	gap: var(--graha-space-3) var(--graha-space-5);
 	padding-block: var(--graha-space-3);
@@ -33,15 +36,14 @@
 	display: flex;
 	align-items: center;
 	gap: var(--graha-space-4);
-	grid-column: 1 / -1;
 	justify-content: space-between;
+	min-inline-size: 0;
 }
 
 .graha-site-identity {
 	min-inline-size: 0;
 	display: flex;
 	align-items: center;
-	gap: var(--graha-space-2);
 	font-size: var(--graha-type-xl);
 	font-weight: var(--graha-weight-bold);
 	line-height: var(--graha-leading-tight);
@@ -51,36 +53,17 @@
 .graha-site-identity a {
 	display: inline-flex;
 	align-items: center;
-	gap: var(--graha-space-2);
 	color: inherit;
 	text-decoration: none;
-}
-
-.graha-site-identity__mark {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	inline-size: 2.25rem;
-	block-size: 2.25rem;
-	border-radius: var(--graha-radius-sm);
-	background: var(--graha-color-primary);
-	color: var(--graha-color-on-primary);
-	font-size: var(--graha-type-md);
-	font-weight: var(--graha-weight-bold);
-	flex-shrink: 0;
-}
-
-.graha-site-identity .custom-logo {
-	display: block;
-	max-block-size: var(--graha-logo-max);
-	inline-size: auto;
+	max-inline-size: 100%;
 }
 
 .graha-site-identity__logo {
 	display: block;
-	max-block-size: var(--graha-logo-max);
-	inline-size: auto;
-	flex-shrink: 0;
+	inline-size: min(100%, var(--graha-logo-max));
+	max-inline-size: var(--graha-logo-max);
+	block-size: auto;
+	flex-shrink: 1;
 }
 
 .graha-site-identity__name {
@@ -143,9 +126,95 @@
 	max-inline-size: var(--graha-content-narrow);
 }
 
+.graha-page--product_archive .graha-page__content,
+.graha-page--product_category .graha-page__content,
+.graha-page--brand .graha-page__content,
+.graha-page--product_single .graha-page__content {
+	max-inline-size: none;
+}
+
 .graha-native-content {
 	max-inline-size: var(--graha-content-narrow);
 	margin-inline: auto;
+}
+
+/* Product catalog surfaces. */
+.graha-product-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--graha-space-5);
+}
+.graha-product-card {
+	min-inline-size: 0;
+	overflow: hidden;
+	border: var(--graha-border-width) solid var(--graha-color-border);
+	border-radius: var(--graha-radius-lg);
+	background: var(--graha-color-surface);
+	box-shadow: var(--graha-shadow-soft);
+}
+.graha-product-card__media {
+	display: block;
+	aspect-ratio: 4 / 3;
+	overflow: hidden;
+	background: var(--graha-color-surface-subtle);
+}
+.graha-product-card__media img {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+.graha-product-card__body { padding: var(--graha-space-5); }
+.graha-product-card__terms,
+.graha-product-single__terms {
+	margin: 0;
+	font-size: var(--graha-type-xs);
+	font-weight: var(--graha-weight-bold);
+	letter-spacing: var(--graha-tracking-wide);
+	text-transform: uppercase;
+	color: var(--graha-color-muted);
+}
+.graha-product-card__title {
+	margin: 0;
+	font-size: var(--graha-type-xl);
+}
+.graha-product-card__title a {
+	color: var(--graha-color-text);
+	text-decoration: none;
+}
+.graha-product-card__title a:hover { color: var(--graha-color-primary); }
+.graha-product-card__excerpt { color: var(--graha-color-muted); }
+.graha-product-card__link {
+	font-weight: var(--graha-weight-semibold);
+	text-underline-offset: var(--graha-link-underline-offset);
+}
+.graha-catalog-empty { max-inline-size: 42rem; }
+.graha-catalog-cta {
+	margin-block-start: var(--graha-space-7);
+	padding-block-start: var(--graha-space-6);
+	border-block-start: var(--graha-border-width) solid var(--graha-color-border);
+}
+.graha-product-single {
+	display: grid;
+	gap: var(--graha-space-6);
+}
+.graha-product-single__media {
+	max-inline-size: 56rem;
+	overflow: hidden;
+	border: var(--graha-border-width) solid var(--graha-color-border);
+	border-radius: var(--graha-radius-lg);
+	background: var(--graha-color-surface-subtle);
+}
+.graha-product-single__media img {
+	display: block;
+	max-inline-size: 100%;
+	block-size: auto;
+}
+.graha-product-single__content { margin-inline: 0; }
+.graha-page--product_archive .navigation.pagination,
+.graha-page--product_category .navigation.pagination,
+.graha-page--brand .navigation.pagination {
+	margin-block-start: var(--graha-space-6);
 }
 
 /* Contact/RFQ: the editor's authoritative content presented as a contained, deliberate card. */
@@ -168,7 +237,6 @@
 	color: var(--graha-color-muted);
 }
 
-/* About/Services: honest "next step" cards beneath the editorial body. */
 .graha-about-nextsteps,
 .graha-service-nextsteps {
 	margin-block-start: var(--graha-space-7);
@@ -270,12 +338,26 @@
 	font-size: var(--graha-type-sm);
 }
 
+@media (max-width: 68rem) {
+	.graha-site-header__nav-cta {
+		align-items: flex-start;
+	}
+}
+
 @media (max-width: 48rem) {
+	.graha-site-header__nav-cta {
+		flex-direction: column;
+		align-items: stretch;
+		gap: var(--graha-space-3);
+	}
+	.graha-site-header__cta .graha-button { inline-size: 100%; }
 	.graha-page-header {
 		padding: var(--graha-space-5) var(--graha-space-4);
 	}
-
 	.graha-footer__grid {
+		grid-template-columns: 1fr;
+	}
+	.graha-product-grid {
 		grid-template-columns: 1fr;
 	}
 }
@@ -284,22 +366,22 @@
 	.graha-footer__grid {
 		grid-template-columns: 1.2fr repeat(3, minmax(0, 1fr));
 	}
-
 	.graha-footer__brand {
 		grid-column: auto;
 	}
 }
 
-@media (min-width: 64rem) {
-	.graha-site-header__inner {
-		grid-template-columns: minmax(var(--graha-header-identity-min), auto) 1fr;
-	}
+@media (min-width: 48rem) and (max-width: 68rem) {
+	.graha-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
+@media (min-width: 68.0625rem) {
+	.graha-site-header__inner {
+		grid-template-columns: minmax(var(--graha-header-identity-min), auto) minmax(0, 1fr);
+	}
 	.graha-site-header__nav-cta {
-		grid-column: auto;
 		justify-content: flex-end;
 	}
-
 	.graha-site-header .graha-nav {
 		justify-self: end;
 	}
