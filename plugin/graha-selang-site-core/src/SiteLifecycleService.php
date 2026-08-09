@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit;
 
 /** Narrow owner for activation, structural page provisioning, and schema upgrades. */
 final class SiteLifecycleService {
-	const SCHEMA_VERSION = '1';
+	const SCHEMA_VERSION = '2';
 	const VERSION_OPTION = 'graha_selang_site_schema_version';
 
 	/** @return void */
@@ -51,7 +51,9 @@ final class SiteLifecycleService {
 	/** Deactivation intentionally leaves content/options/routes untouched. */
 	public function deactivate() {}
 
-	/** @return array<string,int> */
+	/**
+	 * @return array<string,int>
+	 */
 	private function provision_structure() {
 		$definitions = array(
 			'home'          => array( 'slug' => 'home', 'title' => 'Home' ),
@@ -68,13 +70,15 @@ final class SiteLifecycleService {
 		return $page_ids;
 	}
 
+
 	/** @param array<string,int> $page_ids Provisioned structural Page IDs. @return bool */
 	private function structure_is_complete( array $page_ids ) {
 		if ( 5 !== count( $page_ids ) ) {
 			return false;
 		}
 		foreach ( $page_ids as $page_id ) {
-			if ( (int) $page_id < 1 ) {
+			$page = (int) $page_id > 0 ? get_post( (int) $page_id ) : null;
+			if ( ! $page instanceof \WP_Post || 'page' !== $page->post_type || 'publish' !== $page->post_status ) {
 				return false;
 			}
 		}

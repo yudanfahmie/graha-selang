@@ -190,29 +190,48 @@ final class NavigationService {
 
 	/** @return array<int, array<string, mixed>> */
 	private function fallback_tree() {
-		$items = array(
-			array( 100001, 'Beranda', '/' ),
-			array( 100002, 'Produk', '/products/' ),
-			array( 100003, 'Layanan', '/layanan-kami/' ),
-			array( 100004, 'Tentang Kami', '/about-us/' ),
-			array( 100005, 'Request Quote', '/request-quote/' ),
-			array( 100006, 'Hubungi Kami', '/contact-us/' ),
+		$tree = array(
+			$this->fallback_item( 100001, 'Beranda', home_url( '/' ), '/' ),
 		);
-		$tree = array();
-		foreach ( $items as $item ) {
-			$tree[] = array(
-				'id'       => $item[0],
-				'parent'   => 0,
-				'title'    => $item[1],
-				'url'      => home_url( $item[2] ),
-				'target'   => '',
-				'rel'      => '',
-				'current'  => $this->path_is_active( $item[2] ),
-				'ancestor' => false,
-				'children' => array(),
-			);
+
+		$product_url = function_exists( 'get_post_type_archive_link' ) ? get_post_type_archive_link( 'graha_product' ) : '';
+		if ( $product_url ) {
+			$tree[] = $this->fallback_item( 100002, 'Produk', (string) $product_url, '/products/' );
+		}
+
+		$pages = array(
+			array( 100003, 'Layanan', 'layanan-kami', '/layanan-kami/' ),
+			array( 100004, 'Tentang Kami', 'about-us', '/about-us/' ),
+			array( 100005, 'Request Quote', 'request-quote', '/request-quote/' ),
+			array( 100006, 'Hubungi Kami', 'contact-us', '/contact-us/' ),
+		);
+		foreach ( $pages as $definition ) {
+			$page = get_page_by_path( $definition[2], OBJECT, 'page' );
+			if ( ! $page instanceof \WP_Post || 'publish' !== $page->post_status ) {
+				continue;
+			}
+			$url = get_permalink( $page );
+			if ( ! $url ) {
+				continue;
+			}
+			$tree[] = $this->fallback_item( $definition[0], $definition[1], (string) $url, $definition[3] );
 		}
 		return $tree;
+	}
+
+	/** @return array<string,mixed> */
+	private function fallback_item( $id, $title, $url, $path ) {
+		return array(
+			'id'       => (int) $id,
+			'parent'   => 0,
+			'title'    => (string) $title,
+			'url'      => (string) $url,
+			'target'   => '',
+			'rel'      => '',
+			'current'  => $this->path_is_active( $path ),
+			'ancestor' => false,
+			'children' => array(),
+		);
 	}
 
 	/** @param string $path Canonical path. @return bool */

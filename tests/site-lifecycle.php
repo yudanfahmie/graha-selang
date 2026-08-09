@@ -51,21 +51,40 @@ ok(2===$GLOBALS['flush_count'],'same schema admin_init performs no provisioning 
 $lifecycle->deactivate();
 ok(2===$GLOBALS['flush_count'],'deactivation does not flush rewrites');
 
+// Existing meaningful editor content is reused untouched.
 $about=get_page_by_path('about-us',OBJECT,'page');$about->post_title='Profil Perusahaan';$about->post_content='<p>Isi editor penting.</p>';
 $GLOBALS['options'][\GrahaSelang\SiteLifecycleService::VERSION_OPTION]='0';
 $lifecycle->maybe_upgrade();
 ok('Profil Perusahaan'===$about->post_title&&'<p>Isi editor penting.</p>'===$about->post_content,'schema upgrade preserves existing meaningful Page title/content');
 ok(5===count($GLOBALS['posts']),'schema upgrade reuses canonical Pages without duplicates');
 
+// Intentional existing static front page is preserved.
 $custom_id=wp_insert_post(array('post_type'=>'page','post_status'=>'publish','post_title'=>'Landing Existing','post_name'=>'landing-existing'),true);
 $GLOBALS['options']['show_on_front']='page';$GLOBALS['options']['page_on_front']=$custom_id;$GLOBALS['options'][\GrahaSelang\SiteLifecycleService::VERSION_OPTION]='0';
 $lifecycle->maybe_upgrade();
 ok($custom_id===$GLOBALS['options']['page_on_front'],'intentional existing static front Page is preserved');
 
+// Established posts-front configuration is not overwritten when site is not fresh.
 $GLOBALS['options']['show_on_front']='posts';$GLOBALS['options']['page_on_front']=0;$GLOBALS['options']['fresh_site']=0;$GLOBALS['options'][\GrahaSelang\SiteLifecycleService::VERSION_OPTION]='0';
 $lifecycle->maybe_upgrade();
 ok('posts'===$GLOBALS['options']['show_on_front']&&0===$GLOBALS['options']['page_on_front'],'established posts-front configuration is preserved');
 
+
+
+
+// Existing unpublished canonical Page is reused but does not satisfy public-ready schema.
+$GLOBALS['posts']=array();$GLOBALS['next_id']=1;$GLOBALS['options']=array('show_on_front'=>'posts','page_on_front'=>0,'fresh_site'=>0,\GrahaSelang\SiteLifecycleService::VERSION_OPTION=>'1');$GLOBALS['fail_slug']='';
+foreach(array('home','about-us','layanan-kami','contact-us','request-quote') as $slug){wp_insert_post(array('post_type'=>'page','post_status'=>'publish','post_title'=>$slug,'post_name'=>$slug),true);}
+$contact=get_page_by_path('contact-us',OBJECT,'page');$contact->post_status='private';$contact->post_content='<p>Editor-owned contact content.</p>';$before_count=count($GLOBALS['posts']);$before_flush=$GLOBALS['flush_count'];
+$lifecycle->maybe_upgrade();
+ok($before_count===count($GLOBALS['posts']),'unpublished canonical Page is reused without duplicate insertion');
+ok('private'===$contact->post_status&&'<p>Editor-owned contact content.</p>'===$contact->post_content,'unpublished editor-owned Page is not silently published or overwritten');
+ok('1'===$GLOBALS['options'][\GrahaSelang\SiteLifecycleService::VERSION_OPTION],'unpublished required Page does not mark bootstrap schema complete');
+ok($before_flush===$GLOBALS['flush_count'],'incomplete public bootstrap does not flush upgrade rewrites');
+$contact->post_status='publish';$lifecycle->maybe_upgrade();
+ok(\GrahaSelang\SiteLifecycleService::SCHEMA_VERSION===$GLOBALS['options'][\GrahaSelang\SiteLifecycleService::VERSION_OPTION],'bootstrap upgrade completes after editor publishes required Page');
+
+// Incomplete schema provisioning remains retryable and does not claim completion.
 $GLOBALS['posts']=array();$GLOBALS['next_id']=1;$GLOBALS['options']=array('show_on_front'=>'posts','page_on_front'=>0,'fresh_site'=>1,\GrahaSelang\SiteLifecycleService::VERSION_OPTION=>'0');$GLOBALS['fail_slug']='contact-us';$before_flush=$GLOBALS['flush_count'];
 $lifecycle->maybe_upgrade();
 ok('0'===$GLOBALS['options'][\GrahaSelang\SiteLifecycleService::VERSION_OPTION],'failed schema provisioning does not mark lifecycle complete');

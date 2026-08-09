@@ -16,8 +16,10 @@ php tests/native-presentation.php
 php tests/admin-asset-scope.php
 php tests/product-content-service.php
 php tests/site-lifecycle.php
+php tests/bootstrap-pages.php
 php tests/migration-admin.php
 php tests/migration-runtime.php
+php tests/migration-immutability.php
 php tests/kernel-smoke.php
 if command -v node >/dev/null 2>&1; then
   echo '== JavaScript syntax =='

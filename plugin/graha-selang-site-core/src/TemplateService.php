@@ -44,7 +44,7 @@ final class TemplateService {
 	public function prepare_native_presentation() {
 		if ( function_exists( 'is_admin' ) && is_admin() ) return;
 		if ( is_front_page() ) {
-			$this->assets->enqueue_shell();
+			if ( $this->is_graha_static_front_page() ) $this->assets->enqueue_shell();
 			return;
 		}
 		if ( is_singular( array( 'page', 'post', self::PRODUCT_POST_TYPE ) ) ) $this->assets->enqueue_foundation();
@@ -52,7 +52,7 @@ final class TemplateService {
 
 	/** Resolve only the actual WordPress front page to the Graha document shell. */
 	public function resolve_native_template( $template ) {
-		if ( ( function_exists( 'is_admin' ) && is_admin() ) || ! is_front_page() ) return $template;
+		if ( ( function_exists( 'is_admin' ) && is_admin() ) || ! $this->is_graha_static_front_page() ) return $template;
 		$front = dirname( __DIR__ ) . '/templates/front-page.php';
 		return is_readable( $front ) ? $front : $template;
 	}
@@ -64,7 +64,8 @@ final class TemplateService {
 
 	public function enhance_native_content( $content ) {
 		if ( ( function_exists( 'is_admin' ) && is_admin() ) || ! in_the_loop() || ! is_main_query() ) return $content;
-		if ( is_front_page() ) return $this->render_native_home_content( $content );
+		if ( is_front_page() ) return $this->is_graha_static_front_page() ? $this->render_native_home_content( $content ) : $content;
+		if ( is_singular( 'page' ) ) $content = $this->bootstrap_page_fallback( $content );
 		if ( is_singular( array( 'page', 'post', self::PRODUCT_POST_TYPE ) ) ) return '<div class="graha-ui graha-native-content graha-stack">' . $this->render_native_breadcrumbs() . wp_kses_post( $content ) . '</div>';
 		return $content;
 	}
@@ -179,6 +180,52 @@ final class TemplateService {
 	}
 
 	private function is_supported_family( $family ) { return in_array( sanitize_key( (string) $family ), self::FAMILIES, true ); }
+
+	private function is_graha_static_front_page() {
+		if ( ! is_front_page() || 'page' !== (string) get_option( 'show_on_front', 'posts' ) ) return false;
+		$front_id = absint( get_option( 'page_on_front', 0 ) );
+		if ( $front_id < 1 ) return false;
+		$home = get_page_by_path( 'home', OBJECT, 'page' );
+		return $home instanceof \WP_Post && 'publish' === $home->post_status && (int) $home->ID === $front_id;
+	}
+
+	private function bootstrap_page_fallback( $content ) {
+		if ( $this->has_meaningful_content( $content ) ) return $content;
+		$post_id = function_exists( 'get_the_ID' ) ? (int) get_the_ID() : 0;
+		$slug = $post_id ? (string) get_post_field( 'post_name', $post_id ) : '';
+		if ( ! in_array( $slug, array( 'about-us', 'layanan-kami', 'contact-us', 'request-quote' ), true ) ) return $content;
+
+		$products_url = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
+		$services_url = $this->published_page_url( 'layanan-kami' );
+		$contact_url = $this->published_page_url( 'contact-us' );
+		$rfq_url = $this->published_page_url( 'request-quote' );
+		ob_start();
+		?><div class="graha-bootstrap-page graha-stack"><?php
+		if ( 'about-us' === $slug ) : ?>
+			<section><h2><?php echo esc_html__( 'Tentang Graha Selang', 'graha-selang' ); ?></h2><p><?php echo esc_html__( 'Graha Selang menyajikan jalur informasi untuk produk selang industri dan hidrolik, layanan, serta konsultasi kebutuhan teknis.', 'graha-selang' ); ?></p><?php echo $this->render_public_links( array( array( 'Produk', $products_url ), array( 'Layanan', $services_url ), array( 'Hubungi Kami', $contact_url ) ) ); // phpcs:ignore ?></section>
+		<?php elseif ( 'layanan-kami' === $slug ) : ?>
+			<section><h2><?php echo esc_html__( 'Layanan dan kapabilitas', 'graha-selang' ); ?></h2><p><?php echo esc_html__( 'Jelajahi informasi crimping dan assembly, custom fitting/coupling/flange, konsultasi pemilihan produk, serta penilaian repair/replacement yang dipublikasikan Graha Selang.', 'graha-selang' ); ?></p><?php echo $this->render_public_links( array( array( 'Request Quote', $rfq_url ), array( 'Hubungi Kami', $contact_url ) ) ); // phpcs:ignore ?></section>
+		<?php elseif ( 'contact-us' === $slug ) : ?>
+			<section><h2><?php echo esc_html__( 'Hubungi Graha Selang', 'graha-selang' ); ?></h2><p><?php echo esc_html__( 'Untuk kebutuhan produk atau aplikasi, gunakan jalur konsultasi teknis yang tersedia. Kanal kontak langsung mengikuti informasi yang dipublikasikan Graha Selang.', 'graha-selang' ); ?></p><?php echo $this->render_public_links( array( array( 'Request Quote', $rfq_url ) ) ); // phpcs:ignore ?></section>
+		<?php else : ?>
+			<section><h2><?php echo esc_html__( 'Konsultasi kebutuhan teknis', 'graha-selang' ); ?></h2><p><?php echo esc_html__( 'Gunakan halaman ini untuk memulai pembahasan kebutuhan produk atau aplikasi. Jika jalur permintaan teknis belum tersedia, gunakan halaman Hubungi Kami.', 'graha-selang' ); ?></p><?php echo $this->render_public_links( array( array( 'Hubungi Kami', $contact_url ), array( 'Produk', $products_url ) ) ); // phpcs:ignore ?></section>
+		<?php endif; ?></div><?php
+		return (string) ob_get_clean();
+	}
+
+	private function has_meaningful_content( $content ) {
+		if ( '' !== trim( html_entity_decode( wp_strip_all_tags( (string) $content ), ENT_QUOTES, 'UTF-8' ) ) ) return true;
+		return 1 === preg_match( '/<(?:img|picture|video|audio|iframe|form|figure|table|ul|ol)\b|\[[a-z][^\]]*\]/i', (string) $content );
+	}
+
+	private function render_public_links( array $links ) {
+		$items = array();
+		foreach ( $links as $link ) {
+			if ( ! is_array( $link ) || empty( $link[0] ) || empty( $link[1] ) ) continue;
+			$items[] = '<a href="' . esc_url( (string) $link[1] ) . '">' . esc_html( (string) $link[0] ) . '</a>';
+		}
+		return empty( $items ) ? '' : '<p class="graha-bootstrap-page__links">' . implode( ' · ', $items ) . '</p>';
+	}
 
 	private function get_native_home_groups() {
 		if ( null !== $this->native_home_groups ) return $this->native_home_groups;

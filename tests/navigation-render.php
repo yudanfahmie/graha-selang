@@ -1,6 +1,10 @@
 <?php
 
 define( 'ABSPATH', __DIR__ . '/' );
+define( 'OBJECT', 'OBJECT' );
+
+class WP_Post { public $ID; public $post_name; public $post_status='publish'; public function __construct($id,$slug){$this->ID=$id;$this->post_name=$slug;} }
+$GLOBALS['fallback_pages']=array();
 
 $GLOBALS['nav_items']    = array();
 $GLOBALS['nav_location'] = 99;
@@ -26,6 +30,9 @@ function esc_url( $url ) {
 	return htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
 }
 function home_url( $path = '/' ) { return 'https://example.test' . $path; }
+function get_post_type_archive_link( $type ) { return 'graha_product' === $type ? 'https://example.test/products/' : ''; }
+function get_page_by_path( $slug, $output = OBJECT, $type = 'page' ) { return $GLOBALS['fallback_pages'][ $slug ] ?? null; }
+function get_permalink( $page ) { return 'https://example.test/' . $page->post_name . '/'; }
 
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/NavigationService.php';
 
@@ -66,6 +73,7 @@ assert_true( false === strpos( $html, 'javascript:' ), 'unsafe URL is not render
 assert_true( false !== strpos( $html, 'data-graha-nav-toggle hidden' ), 'root disclosure control is inert without JavaScript' );
 assert_true( false !== strpos( $html, 'data-graha-disclosure-toggle hidden' ), 'submenu disclosure control is inert without JavaScript' );
 
+foreach ( array( 'layanan-kami','about-us','request-quote','contact-us' ) as $i => $slug ) { $GLOBALS['fallback_pages'][ $slug ] = new WP_Post( 20 + $i, $slug ); }
 $GLOBALS['nav_location'] = 0;
 $_SERVER['REQUEST_URI']  = '/products/';
 $tree = $service->get_primary_tree();
@@ -74,3 +82,7 @@ assert_true( array( 'Beranda','Produk','Layanan','Tentang Kami','Request Quote',
 assert_true( true === $tree[1]['current'], 'fallback navigation marks current route' );
 $html = $service->render_primary();
 assert_true( false !== strpos( $html, 'https://example.test/request-quote/' ), 'fallback navigation exposes Request Quote' );
+$GLOBALS['fallback_pages']['contact-us']->post_status = 'trash';
+$tree = $service->get_primary_tree();
+assert_true( ! in_array( 'Hubungi Kami', array_column( $tree, 'title' ), true ), 'trashed bootstrap destination is omitted from fallback navigation' );
+assert_true( false === strpos( $service->render_primary(), '/contact-us/' ), 'trashed bootstrap destination never renders a broken fallback link' );

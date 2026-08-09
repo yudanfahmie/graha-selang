@@ -2,18 +2,22 @@
 
 define( 'ABSPATH', __DIR__ . '/' );
 define( 'OBJECT', 'OBJECT' );
+class WP_Post { public $ID; public $post_name; public $post_status='publish'; public function __construct($id,$slug,$status='publish'){$this->ID=$id;$this->post_name=$slug;$this->post_status=$status;} }
 
 $GLOBALS['front_page']    = true;
 $GLOBALS['singular_type'] = null;
 $GLOBALS['current_id']    = 0;
 $GLOBALS['styles']        = array();
+$GLOBALS['options']       = array( 'show_on_front' => 'page', 'page_on_front' => 50 );
 $GLOBALS['products']      = array();
 $GLOBALS['pages']         = array(
+	'home'          => null,
 	'contact-us'    => (object) array( 'ID' => 201, 'post_name' => 'contact-us', 'post_status' => 'publish' ),
 	'layanan-kami'  => (object) array( 'ID' => 202, 'post_name' => 'layanan-kami', 'post_status' => 'publish' ),
 	'about-us'      => (object) array( 'ID' => 203, 'post_name' => 'about-us', 'post_status' => 'publish' ),
 	'request-quote' => (object) array( 'ID' => 204, 'post_name' => 'request-quote', 'post_status' => 'publish' ),
 );
+$GLOBALS['pages']['home'] = new WP_Post( 50, 'home' );
 $GLOBALS['statuses'] = array( 400 => 'publish', 401 => 'publish', 501 => 'publish', 601 => 'publish' );
 $GLOBALS['titles'] = array( 400 => 'Induk Halaman', 401 => 'Anak Halaman', 501 => 'Panduan Selang', 601 => 'Produk Native' );
 $GLOBALS['ancestors'] = array( 401 => array( 400 ) );
@@ -27,6 +31,7 @@ function wp_register_script() {}
 function wp_enqueue_style( $handle ) { $GLOBALS['styles'][] = $handle; }
 function wp_enqueue_script() {}
 function is_admin() { return false; }
+function get_option( $key, $default = false ) { return array_key_exists( $key, $GLOBALS['options'] ) ? $GLOBALS['options'][ $key ] : $default; }
 function is_front_page() { return $GLOBALS['front_page']; }
 function is_singular( $types = null ) {
 	$type = $GLOBALS['singular_type'];
@@ -116,6 +121,18 @@ $templates->prepare_native_presentation();
 assert_true( array( 'graha-selang-tokens', 'graha-selang-foundation', 'graha-selang-navigation', 'graha-selang-shell' ) === $GLOBALS['styles'], 'front page loads complete Graha shell style chain regardless of product readiness' );
 $resolved = $templates->resolve_native_template( '/theme/index.php' );
 assert_true( false !== strpos( $resolved, 'templates/front-page.php' ), 'front page resolves to plugin-owned document shell' );
+
+$GLOBALS['options']['show_on_front'] = 'posts';
+$GLOBALS['options']['page_on_front'] = 0;
+$templates = new \GrahaSelang\TemplateService( $assets, $nav );
+assert_true( '/theme/index.php' === $templates->resolve_native_template( '/theme/index.php' ), 'established posts-front does not resolve to Graha front-page shell' );
+$before_styles = count( $GLOBALS['styles'] );
+$templates->prepare_native_presentation();
+assert_true( $before_styles === count( $GLOBALS['styles'] ), 'established posts-front does not enqueue Graha shell assets' );
+$posts_front_content = '<article>Native posts index item.</article>';
+assert_true( $posts_front_content === $templates->enhance_native_content( $posts_front_content ), 'established posts-front content is not hijacked' );
+$GLOBALS['options']['show_on_front'] = 'page';
+$GLOBALS['options']['page_on_front'] = 50;
 
 unset( $GLOBALS['products'][6] );
 $templates = new \GrahaSelang\TemplateService( $assets, $nav );
