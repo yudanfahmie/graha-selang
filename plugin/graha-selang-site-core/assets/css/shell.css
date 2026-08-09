@@ -76,6 +76,17 @@
 	inline-size: auto;
 }
 
+.graha-site-identity__logo {
+	display: block;
+	max-block-size: var(--graha-logo-max);
+	inline-size: auto;
+	flex-shrink: 0;
+}
+
+.graha-site-identity__name {
+	white-space: nowrap;
+}
+
 .graha-site-header__cta {
 	flex-shrink: 0;
 }
@@ -135,6 +146,34 @@
 .graha-native-content {
 	max-inline-size: var(--graha-content-narrow);
 	margin-inline: auto;
+}
+
+/* Contact/RFQ: the editor's authoritative content presented as a contained, deliberate card. */
+.graha-contact-card,
+.graha-rfq-form-region {
+	padding: var(--graha-space-5) var(--graha-space-6);
+	border: var(--graha-border-width) solid var(--graha-color-border);
+	border-radius: var(--graha-radius-lg);
+	background: var(--graha-color-surface-subtle);
+}
+
+.graha-contact-alternative {
+	margin-block-start: var(--graha-space-6);
+	padding-block-start: var(--graha-space-6);
+	border-block-start: var(--graha-border-width) solid var(--graha-color-border);
+}
+
+.graha-rfq-alternative {
+	margin-block-start: var(--graha-space-5);
+	color: var(--graha-color-muted);
+}
+
+/* About/Services: honest "next step" cards beneath the editorial body. */
+.graha-about-nextsteps,
+.graha-service-nextsteps {
+	margin-block-start: var(--graha-space-7);
+	padding-block-start: var(--graha-space-6);
+	border-block-start: var(--graha-border-width) solid var(--graha-color-border);
 }
 
 .graha-site-footer {

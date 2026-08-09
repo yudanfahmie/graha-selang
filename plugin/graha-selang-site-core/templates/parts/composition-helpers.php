@@ -103,10 +103,12 @@ if ( ! function_exists( 'graha_render_button' ) ) {
 
 if ( ! function_exists( 'graha_render_discovery_grid' ) ) {
 	/**
-	 * Render the catalog entry-door grid. Doors without a live destination
-	 * render as an honest inert/sparse card instead of a fabricated link.
+	 * Render the catalog entry-door grid. A door with no live destination is
+	 * never invented and never shown as a production-looking "coming soon"
+	 * card -- it is simply omitted until a real crawlable URL exists, and
+	 * the grid gracefully reduces to however many real doors remain.
 	 *
-	 * @param array<int,array<string,string>> $doors Each: icon,title,copy,url,cta,badge.
+	 * @param array<int,array<string,string>> $doors Each: icon,title,copy,url,cta.
 	 * @return void
 	 */
 	function graha_render_discovery_grid( array $doors ) {
@@ -114,33 +116,28 @@ if ( ! function_exists( 'graha_render_discovery_grid' ) ) {
 			array_filter(
 				$doors,
 				static function ( $door ) {
-					return is_array( $door ) && ! empty( $door['title'] ) && ! empty( $door['copy'] );
+					return is_array( $door ) && ! empty( $door['title'] ) && ! empty( $door['copy'] ) && ! empty( $door['url'] );
 				}
 			)
 		);
 		if ( ! $doors ) {
 			return;
 		}
-		echo '<div class="graha-grid graha-grid--4">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$columns = (string) max( 1, min( 4, count( $doors ) ) );
+		echo '<div class="graha-grid graha-grid--' . esc_attr( $columns ) . '">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		foreach ( $doors as $door ) {
-			$url  = isset( $door['url'] ) ? trim( (string) $door['url'] ) : '';
+			$url  = trim( (string) $door['url'] );
 			$icon = isset( $door['icon'] ) ? graha_ui_icon( (string) $door['icon'] ) : '';
-			$tag  = isset( $door['badge'] ) ? trim( wp_strip_all_tags( (string) $door['badge'] ) ) : '';
-			$is_link = '' !== $url;
-			$tag_el  = $is_link ? 'a' : 'div';
-			echo '<' . $tag_el . ' class="graha-discovery-card' . ( $is_link ? '' : ' graha-discovery-card--sparse' ) . '"' . ( $is_link ? ' href="' . esc_url( $url ) . '"' : '' ) . '>';
+			echo '<a class="graha-discovery-card" href="' . esc_url( $url ) . '">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			if ( $icon ) {
 				echo '<span class="graha-discovery-card__icon">' . $icon . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
-			if ( '' !== $tag ) {
-				echo '<span class="graha-discovery-card__tag">' . esc_html( $tag ) . '</span>';
-			}
 			echo '<strong>' . esc_html( (string) $door['title'] ) . '</strong>';
 			echo '<p>' . esc_html( (string) $door['copy'] ) . '</p>';
-			if ( $is_link && ! empty( $door['cta'] ) ) {
+			if ( ! empty( $door['cta'] ) ) {
 				echo '<span class="graha-discovery-card__action">' . esc_html( (string) $door['cta'] ) . ' ' . graha_ui_icon( 'arrow' ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
-			echo '</' . $tag_el . '>';
+			echo '</a>';
 		}
 		echo '</div>';
 	}

@@ -158,4 +158,41 @@ $GLOBALS['queried_id'] = 306; ob_start(); $templates->output_static_page(); $rfq
 ok( false !== strpos( $rfq, 'graha-page--technical_rfq' ), 'Request Quote Page resolves to the technical_rfq family' );
 ok( false !== strpos( $rfq, 'https://example.test/request-quote/' ), 'static Page header exposes a working Request Quote CTA' );
 
+// Each family carries its own distinct composition marker, not merely a different graha-page--{family} CSS class.
+ok( false !== strpos( $about, 'class="graha-about-editorial' ), 'About wraps its editorial body in a distinct about-specific marker' );
+ok( false !== strpos( $about, 'class="graha-about-nextsteps"' ), 'About renders its own honest next-steps area (Layanan + Request Quote both exist)' );
+ok( false !== strpos( $service, 'class="graha-service-capability' ), 'Services wraps its body in a distinct service-specific marker' );
+ok( false !== strpos( $service, 'class="graha-service-nextsteps"' ), 'Services renders its own honest next-steps area (Produk + Request Quote both exist)' );
+ok( false !== strpos( $contact, 'class="graha-contact-card' ), 'Contact presents its content in a distinct contact-card marker' );
+ok( false !== strpos( $contact, 'class="graha-contact-alternative"' ), 'Contact offers a distinct RFQ-alternative marker, not a next-steps grid' );
+ok( false !== strpos( $rfq, 'class="graha-rfq-form-region' ), 'Request Quote wraps its body in a distinct form-region marker' );
+foreach ( array( 'graha-about-editorial', 'graha-service-capability', 'graha-contact-card', 'graha-rfq-form-region' ) as $marker ) {
+	$total = substr_count( $about, $marker ) + substr_count( $service, $marker ) + substr_count( $contact, $marker ) + substr_count( $rfq, $marker );
+	ok( 1 === $total, "composition marker '{$marker}' appears in exactly one family, not shared generically" );
+}
+
+// Request Quote: provider/editor content remains authoritative and untouched; only its container is styled.
+// No fabricated recipient/upload/CRM/provider behavior is ever introduced around it.
+$GLOBALS['queried_id'] = 306;
+$GLOBALS['posts'][306]['content'] = '<div class="wpcf7"><form action="/quote" method="post"><input type="text" name="your-name"><button type="submit">Kirim</button></form></div>';
+ob_start(); $templates->output_static_page(); $rfq_live = (string) ob_get_clean();
+$GLOBALS['posts'][306]['content'] = '';
+ok( false !== strpos( $rfq_live, 'class="wpcf7"' ) && false !== strpos( $rfq_live, '<form action="/quote"' ), 'Request Quote provider/editor markup is preserved verbatim, not replaced' );
+$wrapper_pos = strpos( $rfq_live, 'graha-rfq-form-region' );
+$form_pos = strpos( $rfq_live, 'class="wpcf7"' );
+ok( false !== $wrapper_pos && false !== $form_pos && $wrapper_pos < $form_pos, 'the form-region wrapper contains, rather than replaces, the real provider markup' );
+ok( false === strpos( $rfq_live, 'Konsultasi kebutuhan teknis' ), 'real Request Quote content suppresses the empty-state bootstrap fallback copy' );
+foreach ( array( 'upload', 'whatsapp', 'recipient', 'cc:', 'bcc:' ) as $invented ) {
+	ok( false === stripos( $rfq_live, $invented ), "Request Quote composition invents no '{$invented}' provider behavior" );
+}
+
+// Contact: real editor/contact content stays authoritative; the RFQ-alternative is additive, not a replacement.
+$GLOBALS['queried_id'] = 305;
+$GLOBALS['posts'][305]['content'] = '<p>Kantor Graha Selang buka Senin sampai Jumat.</p>';
+ob_start(); $templates->output_static_page(); $contact_live = (string) ob_get_clean();
+$GLOBALS['posts'][305]['content'] = '';
+ok( false !== strpos( $contact_live, 'Kantor Graha Selang buka Senin sampai Jumat.' ), 'real Contact editor content remains authoritative' );
+ok( false === strpos( $contact_live, 'Hubungi Graha Selang</h2>' ), 'real Contact content suppresses the empty-state bootstrap fallback heading' );
+ok( false === stripos( $contact_live, 'mailto:' ) && false === stripos( $contact_live, 'tel:' ), 'Contact composition invents no phone/email contact fact' );
+
 echo "Static Page shell routing checks passed.\n";

@@ -68,6 +68,12 @@
 	--graha-z-skip-link: 100000;
 	--graha-focus-width: 0.1875rem;
 	--graha-focus-offset: 0.1875rem;
+	/* Default focus ring for light surfaces. Dark surfaces (hero/CTA panels/
+	   footer/page-header) redeclare these two variables locally so the same
+	   one focus-visible rule in foundation.css stays sufficiently visible
+	   against navy/blue backgrounds instead of a same-hue outline. */
+	--graha-focus-color: var(--graha-color-primary);
+	--graha-focus-ring: 0 0 0 0 transparent;
 	--graha-motion-fast: 160ms;
 	--graha-motion-standard: 220ms;
 	--graha-motion-reduced: 0.01ms;

@@ -118,6 +118,15 @@ check("'meta_query'" not in template[template.find('private function get_native_
 check('migration-source/' not in template, 'public presentation never reads repository archive bundle')
 check('graha-priority-grid' in texts[PLUGIN / 'assets/css/foundation.css'], 'shared foundation preserves unequal Home hierarchy primitive')
 check('Gunakan katalog atau konsultasi teknis' in texts[PLUGIN / 'templates/native-home.php'], 'Home has deliberate zero-product state')
+
+tokens_css = texts[PLUGIN / 'assets/css/tokens.css']
+foundation_css = texts[PLUGIN / 'assets/css/foundation.css']
+check('--graha-focus-color' in tokens_css and '--graha-focus-ring' in tokens_css, 'centralized focus-ring tokens are declared once in tokens.css')
+check('var(--graha-focus-color)' in foundation_css and 'var(--graha-focus-ring)' in foundation_css, 'the single focus-visible rule consumes the centralized focus tokens')
+on_dark_focus = re.search(r'\.graha-hero,\s*\.graha-cta-panel:not\(\.graha-cta-panel--tint\),\s*\.graha-site-footer,\s*\.graha-page-header\s*{[^}]*--graha-focus-color:\s*var\(--graha-color-inverse\)', foundation_css)
+check(on_dark_focus is not None, 'dark surfaces (hero/cta-panel/footer/page-header) redeclare one centralized on-dark focus treatment')
+for banned in ('Segera hadir', 'sedang disiapkan'):
+    check(banned not in runtime_text, f'no staging/internal copy ships to production: "{banned}"')
 front = texts[PLUGIN / 'templates/front-page.php']
 check('wp_head()' in front and 'wp_footer()' in front and 'language_attributes()' in front and 'body_class(' in front, 'front-page document preserves WordPress document hooks')
 

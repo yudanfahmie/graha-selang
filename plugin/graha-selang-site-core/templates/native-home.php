@@ -7,7 +7,7 @@
 		graha_render_section_heading(
 			__( 'Cara menjelajahi Graha Selang', 'graha-selang' ),
 			__( 'Jelajahi berdasarkan kebutuhan', 'graha-selang' ),
-			__( 'Mulai dari katalog produk, kebutuhan aplikasi, brand, atau ajukan konsultasi spesifikasi langsung ke tim teknis.', 'graha-selang' )
+			__( 'Telusuri katalog produk atau ajukan konsultasi teknis langsung ke tim kami.', 'graha-selang' )
 		);
 		graha_render_discovery_grid(
 			array(
@@ -17,20 +17,6 @@
 					'copy'  => __( 'Jelajahi katalog selang industri dan hidrolik.', 'graha-selang' ),
 					'url'   => $products_url,
 					'cta'   => __( 'Lihat katalog', 'graha-selang' ),
-				),
-				array(
-					'icon'  => 'gear',
-					'title' => __( 'Aplikasi & Kebutuhan Industri', 'graha-selang' ),
-					'copy'  => __( 'Jalur khusus per aplikasi sedang disiapkan. Sampaikan kebutuhan Anda melalui konsultasi teknis.', 'graha-selang' ),
-					'url'   => '',
-					'badge' => __( 'Segera hadir', 'graha-selang' ),
-				),
-				array(
-					'icon'  => 'tag',
-					'title' => __( 'Brand', 'graha-selang' ),
-					'copy'  => __( 'Penjelajahan berdasarkan brand sedang disiapkan bersamaan dengan katalog produk.', 'graha-selang' ),
-					'url'   => '',
-					'badge' => __( 'Segera hadir', 'graha-selang' ),
 				),
 				array(
 					'icon'  => 'chat',
@@ -49,7 +35,7 @@
 		graha_render_section_heading(
 			__( 'Katalog', 'graha-selang' ),
 			__( 'Produk & solusi', 'graha-selang' ),
-			__( 'Enam kelompok produk dengan prioritas tampilan yang tidak setara: dua kategori andalan, tiga kategori pendukung, dan satu kategori spesialis.', 'graha-selang' )
+			__( 'Enam kelompok produk selang dan fitting untuk kebutuhan industri dan hidrolik Anda.', 'graha-selang' )
 		);
 		?>
 		<div class="graha-priority-grid">

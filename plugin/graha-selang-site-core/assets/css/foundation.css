@@ -46,7 +46,18 @@
 .graha-link-list a { color:inherit; text-underline-offset:var(--graha-link-underline-offset); }
 .graha-stat-list { margin:0; padding:0; list-style:none; align-items:stretch; }
 .graha-stat-list li { min-inline-size:min(100%,var(--graha-card-min)); padding:var(--graha-space-3) var(--graha-space-4); border:var(--graha-border-width) solid var(--graha-color-border); border-radius:var(--graha-radius-md); }
-.graha-ui :where(a,button,input,select,textarea,summary):focus-visible { outline:var(--graha-focus-width) solid var(--graha-color-primary); outline-offset:var(--graha-focus-offset); }
+.graha-ui :where(a,button,input,select,textarea,summary):focus-visible { outline:var(--graha-focus-width) solid var(--graha-focus-color); outline-offset:var(--graha-focus-offset); box-shadow:var(--graha-focus-ring); }
+
+/* Centralized on-dark focus treatment: a light outline plus a navy halo reads clearly against
+   navy/blue surfaces (hero, CTA panels, footer, page header) where the default primary-blue
+   outline would otherwise blend in. Every :focus-visible rule above stays the single source. */
+.graha-hero,
+.graha-cta-panel:not(.graha-cta-panel--tint),
+.graha-site-footer,
+.graha-page-header {
+	--graha-focus-color: var(--graha-color-inverse);
+	--graha-focus-ring: 0 0 0 calc(var(--graha-focus-width) + var(--graha-focus-offset) + 0.125rem) var(--graha-color-primary-dark);
+}
 .graha-media,.graha-media img,.graha-media video,.graha-media svg { max-inline-size:100%; }
 .graha-media img,.graha-media video { display:block; block-size:auto; }
 .graha-media-frame { overflow:hidden; aspect-ratio:var(--graha-media-ratio,var(--graha-media-ratio-default)); border-radius:var(--graha-radius-md); background:var(--graha-color-surface-subtle); }
@@ -103,16 +114,14 @@
 .graha-feature-card h3 { font-size:var(--graha-type-lg); }
 .graha-feature-card p { color:var(--graha-color-muted); }
 
-/* Discovery/category cards: the four catalog entry doors. */
+/* Discovery/category cards: real catalog entry doors only -- the grid reduces gracefully. */
 .graha-discovery-card { position:relative; display:flex; flex-direction:column; gap:var(--graha-space-2); padding:var(--graha-space-5); border:var(--graha-border-width) solid var(--graha-color-border); border-radius:var(--graha-radius-lg); background:var(--graha-color-surface); text-decoration:none; color:inherit; transition:box-shadow var(--graha-motion-standard) var(--graha-motion-ease), border-color var(--graha-motion-standard) var(--graha-motion-ease); }
-a.graha-discovery-card:hover { border-color:var(--graha-color-primary); box-shadow:var(--graha-shadow-elevated); }
+.graha-discovery-card:hover { border-color:var(--graha-color-primary); box-shadow:var(--graha-shadow-elevated); }
 .graha-discovery-card__icon { display:inline-flex; align-items:center; justify-content:center; inline-size:2.5rem; block-size:2.5rem; border-radius:var(--graha-radius-md); background:var(--graha-color-primary-tint); color:var(--graha-color-primary); }
 .graha-discovery-card__icon svg { inline-size:1.25rem; block-size:1.25rem; }
 .graha-discovery-card strong { font-size:var(--graha-type-lg); }
 .graha-discovery-card p { margin:0; color:var(--graha-color-muted); font-size:var(--graha-type-sm); }
 .graha-discovery-card__action { margin-block-start:auto; padding-block-start:var(--graha-space-2); font-size:var(--graha-type-sm); font-weight:var(--graha-weight-semibold); color:var(--graha-color-primary); }
-.graha-discovery-card--sparse { background:var(--graha-color-surface-subtle); border-style:dashed; color:var(--graha-color-muted); cursor:default; }
-.graha-discovery-card--sparse .graha-discovery-card__icon { background:var(--graha-color-surface-sunken); color:var(--graha-color-muted); }
 .graha-discovery-card__tag { display:inline-flex; align-self:flex-start; padding:0.125rem var(--graha-space-2); border-radius:999px; background:var(--graha-color-surface-sunken); color:var(--graha-color-muted); font-size:var(--graha-type-xs); font-weight:var(--graha-weight-semibold); }
 
 /* Trust/proof strip. */

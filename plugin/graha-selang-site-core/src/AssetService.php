@@ -13,6 +13,7 @@ final class AssetService {
 	const ADMIN_OVERVIEW_STYLE  = 'graha-selang-admin-overview';
 	const ADMIN_MIGRATION_STYLE = 'graha-selang-admin-migration';
 	const ADMIN_MIGRATION_SCRIPT = 'graha-selang-admin-migration';
+	const BUNDLED_LOGO_RELATIVE_PATH = 'assets/images/graha-selang-brand-logo.svg';
 
 	/** @var string */
 	private $base_url;
@@ -67,6 +68,17 @@ final class AssetService {
 		wp_enqueue_style( self::NAVIGATION_STYLE );
 		wp_enqueue_style( self::SHELL_STYLE );
 		wp_enqueue_script( self::NAVIGATION_SCRIPT );
+	}
+
+	/**
+	 * URL of the bundled Graha Selang brand mark, the deterministic fallback
+	 * used whenever no WordPress Custom Logo is configured. Ships with the
+	 * plugin itself, so this is always resolvable -- never a per-site upload.
+	 *
+	 * @return string
+	 */
+	public function bundled_logo_url() {
+		return $this->base_url . self::BUNDLED_LOGO_RELATIVE_PATH;
 	}
 
 	/** @return void */

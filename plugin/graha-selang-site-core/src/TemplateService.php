@@ -117,6 +117,7 @@ final class TemplateService {
 		if ( '' === $main ) return '';
 		$site_name = trim( (string) get_bloginfo( 'name' ) );
 		$logo = function_exists( 'get_custom_logo' ) ? (string) get_custom_logo() : '';
+		$brand_logo_url = $this->assets->bundled_logo_url();
 		$nav = $this->navigation->render_primary();
 		$footer = isset( $context['footer_html'] ) ? wp_kses_post( (string) $context['footer_html'] ) : '';
 		$footer_links = $this->footer_link_context();
@@ -251,10 +252,10 @@ final class TemplateService {
 	/** Short, non-factual orientation lead for a static Page family. */
 	private function static_page_lead( $family ) {
 		$map = array(
-			'about' => __( 'Profil dan kapabilitas Graha Selang sebagaimana dipublikasikan pada halaman ini.', 'graha-selang' ),
-			'service' => __( 'Cakupan layanan yang dipublikasikan Graha Selang untuk mendukung kebutuhan teknis Anda.', 'graha-selang' ),
-			'contact' => __( 'Kanal komunikasi dan konsultasi yang tersedia untuk menjangkau Graha Selang.', 'graha-selang' ),
-			'technical_rfq' => __( 'Mulai permintaan penawaran atau konsultasi kebutuhan teknis Anda.', 'graha-selang' ),
+			'about' => __( 'Profil dan kapabilitas Graha Selang.', 'graha-selang' ),
+			'service' => __( 'Layanan teknis Graha Selang untuk kebutuhan hidrolik dan industri Anda.', 'graha-selang' ),
+			'contact' => __( 'Hubungi tim Graha Selang untuk kebutuhan produk atau konsultasi teknis.', 'graha-selang' ),
+			'technical_rfq' => __( 'Ajukan permintaan penawaran atau konsultasi kebutuhan teknis Anda.', 'graha-selang' ),
 		);
 		return isset( $map[ $family ] ) ? '<p>' . esc_html( $map[ $family ] ) . '</p>' : '';
 	}
@@ -267,15 +268,96 @@ final class TemplateService {
 		if ( '' === $heading ) return '';
 		$slug = (string) get_post_field( 'post_name', $post_id );
 		$family = $this->family_for_page_slug( $slug );
-		$content_html = $this->bootstrap_page_fallback( $this->rendered_editor_content( $post_id ) );
+		$editor_html = $this->bootstrap_page_fallback( $this->rendered_editor_content( $post_id ) );
 		$context = array(
 			'heading' => $heading,
 			'eyebrow' => $this->static_page_eyebrow( $family ),
 			'lead_html' => $this->static_page_lead( $family ),
-			'content_html' => $content_html,
+			'content_html' => $this->compose_static_page_content( $family, $editor_html ),
 			'breadcrumbs' => $this->page_ancestor_breadcrumb_items( $post_id ),
 		);
 		return $this->render_page( $family, $context );
+	}
+
+	/**
+	 * Finish each of the four core page families with its own composition
+	 * instead of a single generic hero-then-content shape. The editor's own
+	 * content (or the safe bootstrap fallback when it is empty) remains the
+	 * authoritative body in every case; only the honest, real-destination
+	 * supporting area around it differs per family.
+	 *
+	 * @param string $family Presentation family.
+	 * @param string $editor_html Authoritative editor content (already sanitized).
+	 * @return string
+	 */
+	private function compose_static_page_content( $family, $editor_html ) {
+		$urls = $this->footer_link_context();
+		ob_start();
+		switch ( $family ) {
+			case 'about':
+				echo '<div class="graha-about-editorial graha-native-content graha-stack">' . $editor_html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo $this->render_family_nextsteps( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					'graha-about-nextsteps',
+					__( 'Langkah berikutnya', 'graha-selang' ),
+					array(
+						array( 'icon' => 'gear', 'title' => __( 'Layanan Kami', 'graha-selang' ), 'copy' => __( 'Lihat cakupan layanan teknis Graha Selang.', 'graha-selang' ), 'url' => $urls['services_url'], 'cta' => __( 'Lihat layanan', 'graha-selang' ) ),
+						array( 'icon' => 'chat', 'title' => __( 'Konsultasi Teknis', 'graha-selang' ), 'copy' => __( 'Diskusikan kebutuhan Anda dengan tim kami.', 'graha-selang' ), 'url' => $urls['rfq_url'], 'cta' => __( 'Request Quote', 'graha-selang' ) ),
+					)
+				);
+				break;
+			case 'service':
+				echo '<div class="graha-service-capability graha-native-content graha-stack">' . $editor_html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo $this->render_family_nextsteps( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					'graha-service-nextsteps',
+					__( 'Lanjutkan', 'graha-selang' ),
+					array(
+						array( 'icon' => 'box', 'title' => __( 'Produk', 'graha-selang' ), 'copy' => __( 'Telusuri katalog produk yang mendukung layanan kami.', 'graha-selang' ), 'url' => $urls['products_url'], 'cta' => __( 'Lihat produk', 'graha-selang' ) ),
+						array( 'icon' => 'chat', 'title' => __( 'Request Quote', 'graha-selang' ), 'copy' => __( 'Ajukan kebutuhan layanan atau produk Anda.', 'graha-selang' ), 'url' => $urls['rfq_url'], 'cta' => __( 'Buat permintaan', 'graha-selang' ) ),
+					)
+				);
+				break;
+			case 'contact':
+				echo '<div class="graha-contact-card graha-native-content graha-stack">' . $editor_html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				if ( '' !== $urls['rfq_url'] ) {
+					echo '<div class="graha-contact-alternative">';
+					graha_render_section_heading( '', __( 'Lebih suka konsultasi terarah?', 'graha-selang' ), __( 'Sampaikan kebutuhan teknis Anda melalui Request Quote.', 'graha-selang' ) );
+					graha_render_button( __( 'Ajukan Request Quote', 'graha-selang' ), $urls['rfq_url'], 'outline' );
+					echo '</div>';
+				}
+				break;
+			case 'technical_rfq':
+				echo '<div class="graha-rfq-form-region graha-native-content graha-stack">' . $editor_html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				if ( '' !== $urls['contact_url'] ) {
+					echo '<p class="graha-rfq-alternative">' . esc_html__( 'Butuh jalur lain?', 'graha-selang' ) . ' <a href="' . esc_url( $urls['contact_url'] ) . '">' . esc_html__( 'Hubungi Graha Selang', 'graha-selang' ) . '</a></p>';
+				}
+				break;
+			default:
+				echo $editor_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Honest "what next" cards for a page family: only doors that already
+	 * have a real destination render, and the whole block disappears when
+	 * none do -- never a placeholder heading over an empty grid.
+	 *
+	 * @param string $wrapper_class Distinct per-family wrapper class.
+	 * @param string $heading Section heading.
+	 * @param array<int,array<string,string>> $doors Candidate doors.
+	 * @return string
+	 */
+	private function render_family_nextsteps( $wrapper_class, $heading, array $doors ) {
+		$doors = array_values( array_filter( $doors, static function ( $door ) {
+			return is_array( $door ) && ! empty( $door['url'] );
+		} ) );
+		if ( ! $doors ) return '';
+		ob_start();
+		echo '<div class="' . esc_attr( $wrapper_class ) . '">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		graha_render_section_heading( '', $heading );
+		graha_render_discovery_grid( $doors );
+		echo '</div>';
+		return (string) ob_get_clean();
 	}
 
 	private function bootstrap_page_fallback( $content ) {
@@ -406,6 +488,7 @@ final class TemplateService {
 		$main = (string) ob_get_clean();
 		$site_name = trim( (string) get_bloginfo( 'name' ) );
 		$logo = function_exists( 'get_custom_logo' ) ? (string) get_custom_logo() : '';
+		$brand_logo_url = $this->assets->bundled_logo_url();
 		$nav = $this->navigation->render_primary();
 		$footer = '';
 		$footer_links = $this->footer_link_context();
