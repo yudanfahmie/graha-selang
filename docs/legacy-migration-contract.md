@@ -2,166 +2,127 @@
 
 ## Purpose
 
-Graha Selang is a redesign of an existing indexed WordPress/WooCommerce site. Repository preparation must therefore treat URL/content migration as part of developer correctness, not as an afterthought.
+Graha Selang is a controlled rebuild of an indexed site. URL/content migration is developer correctness, not post-launch cleanup.
 
-This document defines the engineering contract. It does not perform DNS/hosting/SEO operations.
+## 1. Frozen baseline
 
-## 1. Principle
+The brief classifies **96 legacy URLs**:
 
-**Redesign does not reset public identity.**
+- 68 product/series;
+- 18 hubs;
+- 4 applications;
+- 5 merge + permanent redirect;
+- 1 retire.
 
-Keep a legacy URL when its content intent remains valid and the native content owner can support it. Redirect only when the information architecture materially changes or a duplicate/obsolete surface is intentionally retired.
+This yields 90 retained content intents plus 6 legacy-action URLs.
 
-## 2. Pre-implementation inventory
+A fresh current-site crawl is mandatory because the site can change after the brief. The final machine-readable inventory must reconcile current crawl rows against this baseline and explain all additions/removals/classification differences.
 
-Before template/routing work is considered production-ready, export/crawl:
+## 2. Decisions
 
-- all indexable Pages;
-- Posts/articles and their permalink family;
-- Woo product URLs;
-- product-category URLs;
-- brand taxonomy URLs;
-- pagination surfaces;
-- attachment/media URLs only where externally linked/indexed relevance matters;
-- existing redirects;
-- obvious duplicate/legacy routes;
-- sitemap URLs from the authoritative provider;
-- high-value external technical-resource links that content depends on.
+Every baseline/current public URL receives exactly one final migration decision:
 
-Record HTTP status and final destination for each current URL.
+- `KEEP` — same canonical public route remains;
+- `REDIRECT` — permanent migration to closest equivalent;
+- `RETIRE` — no meaningful equivalent; correct 404/410 behavior according to deployment decision.
 
-## 3. Classification
+Temporary `REVIEW` may exist during Wave 0 but **zero REVIEW rows are allowed at launch**.
 
-Every legacy public URL receives one decision:
+## 3. Required final artifact
 
-- `KEEP` — same canonical route remains;
-- `REDIRECT` — route changes; one-hop redirect to closest equivalent;
-- `RETIRE` — content truly removed with no meaningful equivalent; use appropriate gone/not-found behavior rather than redirecting everything to Home;
-- `REVIEW` — conflict/ownership unknown, blocks launch classification but not plugin architecture.
+Wave 0 creates `docs/redirect-matrix.csv` or an equivalent machine-readable URL inventory with at least:
 
-## 4. Known observed routes
+- legacy_url;
+- current_http_status;
+- current_final_url;
+- brief_classification if matched;
+- current_content_owner/type;
+- final_decision;
+- final_url/status;
+- redirect_owner;
+- canonical_expected;
+- sitemap_expected;
+- notes/evidence.
 
-At preparation time public evidence includes:
+Do not make ordinary developers reopen the raw brief to fill this file. Compare the live crawl to `scope-inventory.csv` and canonical contracts.
 
-- `/`
-- `/about-us/`
-- `/products/`
-- `/products-2/`
-- `/product/{slug}/`
-- `/product-category/{slug}/`
-- `/brand/{slug}/`
-- `/layanan-kami/`
-- `/articles/`
-- `/blog/{post-slug}/`
-- `/contact-us/`
-- standalone evergreen/product-topic landing pages.
+## 4. Known route intentions
 
-This is not guaranteed to be the complete crawl. Implementation must obtain the full deployment inventory before launch.
+Preserve by default unless current inventory/owner instruction proves otherwise:
 
-## 5. Initial route intentions
+- `/`;
+- `/about-us/`;
+- `/products/` as the canonical product hub;
+- continuing `/product/{slug}/`;
+- continuing `/product-category/{slug}/`;
+- continuing authoritative `/brand/{slug}/`;
+- 4 retained application URLs after reconciliation;
+- `/layanan-kami/`;
+- `/articles/`;
+- existing `/blog/{post-slug}/` article family;
+- `/contact-us/`;
+- approved distinct evergreen/topic URLs.
 
-Unless owner/deployment evidence says otherwise:
+## 5. Known consolidation concerns
 
-- `/` → KEEP;
-- `/about-us/` → KEEP;
-- `/products/` → KEEP as canonical product hub/archive presentation;
-- `/products-2/` → REVIEW with expected REDIRECT to `/products/` if content intent is duplicate;
-- existing `/product/{slug}/` → KEEP where product remains;
-- existing `/product-category/{slug}/` → KEEP where category remains;
-- existing `/brand/{slug}/` → KEEP if the same authoritative taxonomy remains;
-- `/layanan-kami/` → KEEP;
-- `/articles/` → KEEP;
-- `/blog/{post-slug}/` → KEEP when that is the actual current post permalink;
-- `/contact-us/` → KEEP;
-- useful evergreen landing URLs → KEEP unless content consolidation has an explicit redirect plan.
+### `/services/` → retained service intent
+
+The brief explicitly retains `/layanan-kami/` and requires the competing `/services/` surface to be merged/redirected after useful-content reconciliation. Internal links must point directly to the retained final service URL.
+
+### `/products-2/` vs `/products/`
+
+Current public evidence exposes both. They may not remain two competing canonical product hubs. Wave 0 determines whether `/products-2/` is one of the five brief redirect rows and migrates any unique useful content before redirect/retirement.
+
+Do not guess the remaining redirect/retire row identities from URL names. Resolve them from current crawl and brief-baseline reconciliation, then record them in the final matrix. The count invariant remains 5 redirect + 1 retire for the brief baseline unless owner-approved new evidence changes the contract.
 
 ## 6. Redirect owner
 
-Use exactly one operational redirect owner for production, selected during deployment:
+Exactly one operational redirect owner in production: server/hosting, approved SEO/redirect provider, or a narrowly scoped first-party layer only if neither platform option is available.
 
-- server/hosting configuration;
-- an approved redirect/SEO plugin;
-- or one narrowly scoped first-party redirect layer if neither platform option is available.
+Do not scatter redirects across server rules, multiple plugins, PHP hooks, JS and meta refresh.
 
-Do not scatter redirects across `.htaccess`, plugin hooks, JavaScript, meta refresh and multiple plugins.
+## 7. Quality rules
 
-The Graha presentation plugin should not become a generic redirect manager.
+- one hop where practical;
+- no loops/chains;
+- closest semantic destination;
+- no blanket removed-page → Home redirects;
+- no wildcard rule without proof against the inventory;
+- internal links point directly to final routes;
+- preserved useful query parameters where needed;
+- sitemap lists canonical retained URLs only;
+- canonicals match final routes.
 
-## 7. Redirect quality rules
+## 8. Native-owner migration
 
-- one hop only where practical;
-- 301/308 permanent semantics for confirmed permanent migrations according to deployment stack;
-- destination must match user intent;
-- never redirect every missing URL to Home;
-- avoid regex/wildcards until the URL set proves the rule is safe;
-- preserve useful path specificity;
-- update internal links to final URLs so users/crawlers do not traverse redirects;
-- verify query parameters important to commerce/tracking are not accidentally broken by redirect rules.
+Products remain Woo Products; categories remain Woo terms; brands remain approved Woo brand taxonomy; articles remain Posts; application/fixed/evergreen surfaces remain Pages where appropriate; media remains Media Library.
 
-## 8. Duplicate surfaces
+No plugin shadow records are introduced for migration convenience.
 
-Known concern: `/products/` vs `/products-2/`.
+## 9. Product/category safeguards
 
-Do not render two indexable product discovery pages with substantially the same purpose. Once migration inventory confirms duplication:
+Preserve continuing slugs where practical, preserve meaningful hierarchy, eliminate accidental `Uncategorized` ownership through content cleanup rather than template hacks, identify brand taxonomy before rewrite work, and verify images/spec attributes after migration.
 
-1. choose canonical owner/route;
-2. migrate unique useful content if any;
-3. redirect duplicate URL;
-4. remove duplicate navigation/internal links;
-5. confirm sitemap only lists the canonical route;
-6. confirm no second canonical/meta/schema owner remains.
+## 10. Article safeguards
 
-## 9. Content-owner migration
+Do not cosmetically change the `/blog/{slug}/` detail family without a complete article redirect map. `/articles/` hub and article-detail permalink may legitimately differ.
 
-When moving content into native owners:
+## 11. Contact/entity safeguards
 
-- product records stay Woo products;
-- categories stay Woo product categories;
-- brands stay the approved Woo brand taxonomy;
-- articles stay Posts;
-- fixed/evergreen pages stay Pages;
-- media stays WordPress Media Library.
+Legacy contact data currently conflicts across surfaces. Select one approved canonical dataset before launch and render reused contact facts from that owner.
 
-Do not convert legacy content into plugin-specific shadow records just to simplify templates.
+## 12. Crawl-diff
 
-## 10. Product/category migration safeguards
+Wave 0 captures baseline crawl. Wave 5 compares staging/final route map. Wave 6 verifies production.
 
-- preserve product slugs when products are continuing;
-- preserve category hierarchy/slugs when still valid;
-- do not silently move products to `Uncategorized`;
-- do not create new categories merely from keyword variants;
-- brand taxonomy must be identified before rewriting brand archives;
-- verify product image/attribute/description associations after template changes.
+Acceptance:
 
-## 11. Article migration safeguards
-
-Public evidence currently shows an `/articles/` hub with article detail URLs under `/blog/`.
-
-Do not change the post permalink structure merely for visual consistency. If the deployment later chooses a new permalink, every indexed article requires an explicit redirect.
-
-## 12. NAP/contact migration
-
-Because public pages currently show inconsistent location/address wording, template migration must not propagate conflicting values globally.
-
-Before launch choose one approved canonical contact/location dataset and update all reused site surfaces from that owner.
-
-## 13. Verification
-
-For each representative and high-value migrated URL verify:
-
-- HTTP status;
-- final URL;
-- canonical output owner;
-- title/H1 topic consistency;
-- breadcrumb/internal-link destination;
-- mobile render;
-- structured data owner/no duplication;
-- no soft-404 content;
-- no redirect chain/loop;
-- old URL behavior if redirected.
-
-## 14. Migration artifact
-
-Implementation phase should create a machine-readable redirect inventory, for example `docs/redirect-matrix.csv`, once the full deployment crawl is available.
-
-Do not fabricate that file during repository preparation without the actual full URL inventory.
+- all 96 brief-baseline rows accounted for;
+- current-site additions accounted for;
+- 68/18/4 retained-intent buckets reconciled;
+- 5 brief redirect decisions resolved;
+- 1 brief retire decision resolved;
+- zero REVIEW at launch;
+- zero unintended soft 404, loop or chain;
+- no important internal link targets a redirect;
+- sitemap/canonical output aligns with final inventory.

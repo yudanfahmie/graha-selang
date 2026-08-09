@@ -1,128 +1,81 @@
 # Source and Provenance Notes
 
-## 1. Raw Graha Selang source
+## 1. Raw Graha source
 
 Private provenance repository: `yudanfahmie/project-9901`.
 
-Pinned source at repository-preparation time:
+Pinned raw source:
 
-- path: `graha-selang/Graha Selang Website Redesign & SEO Brief Jul 26.docx`
-- Git blob SHA: `bc5e29fb65a9da45ac355d0b1ca189cafbefd340`
-- size: `136040` bytes
+- `graha-selang/Graha Selang Website Redesign & SEO Brief Jul 26.docx`
+- blob SHA `bc5e29fb65a9da45ac355d0b1ca189cafbefd340`
+- size `136040` bytes.
 
-Do not copy this binary file into `yudanfahmie/graha-selang`.
+Do not copy the binary into this repository.
 
-The filename/date is provenance, not itself a guarantee that every current public-site value is approved/final.
+## 2. Owner-confirmed normalization
 
-## 2. Owner clarifications normalized into this repo
+- developer-only scope;
+- pure WordPress plugin as website-builder/presentation layer;
+- developer-side SEO/GEO-friendly structure included;
+- operational SEO/marketing excluded;
+- Gloskin is engineering-quality baseline, not a Graha product template;
+- Graha repo must be sufficient for future developers without routine raw-source reading.
 
-Owner-confirmed project rules:
+## 3. Deep-audit normalization decisions
 
-- scope is developer-only for both Gloskin and Graha Selang;
-- implementation is a pure WordPress plugin acting as website builder/presentation layer;
-- developer-side SEO/GEO-friendly web structure is in scope;
-- SEO/GEO operations/marketing are not plugin responsibilities;
-- Graha Selang repo preparation should inherit the strongest engineering lessons/state from Gloskin;
-- current task is repository preparation/rules/plans/contracts so the implementation team does not need to read raw material routinely.
+The raw brief and project audit establish the following canonical operational baseline:
 
-These rules are reflected in `developer-source-of-truth.md` and `seo-geo-engineering-contract.md`.
+- controlled rebuild, not a blank-site reset;
+- 96 legacy URLs classified as 68 product/series, 18 hubs, 4 applications, 5 merge/301, 1 retire;
+- six homepage product groups with two anchors, three supporting groups and CNG specialist;
+- four catalog entry doors: product, application/industry, brand, specification need;
+- reusable presentation coverage for Home/archive/category/product/application/brand/About/service/RFQ/guide/legal/search/404;
+- technical specs, crawl-safe selector/filter/decision tree, compatible fittings and approved resources;
+- application/specialist themes such as mining, cement/bulk, marine, dredging/slurry, drilling, oil/gas, MRO and CNG without automatic doorway-page generation;
+- technical RFQ with dynamic fields, upload capability, source context, buyer/reseller routing, contextual WhatsApp and conversion-event hooks;
+- field-performance/CWV, practical WCAG AA, crawl-diff, rollback and launch verification;
+- retained `/layanan-kami/` with competing `/services/` consolidation requirement;
+- Contact conversion priority toward buyer technical RFQ;
+- real legal destinations rather than `#` placeholders;
+- Indonesian public UI/locale and removal of English/template/editorial leaks.
 
-## 3. Engineering baseline
+These requirements now live in canonical docs/matrices; they are not left as chat knowledge.
 
-Quality baseline used during preparation:
+## 4. Why the 96-URL list is a baseline rather than copied raw rows
 
-- repository: `yudanfahmie/gloskin-site-core`
-- commit: `e36039034533d3debb51ae6092e74a311c87d55a`
+The live site can change after a brief is written. The safest developer contract is therefore:
 
-Retained principles:
+1. preserve the brief's exact classification/count invariant;
+2. run a fresh Wave-0 crawl;
+3. reconcile every live row against the baseline;
+4. document every delta;
+5. reach zero REVIEW rows before launch.
 
-- direct-main contribution discipline;
-- canonical repo documentation;
-- modular monolith/micro-kernel;
-- native platform ownership;
-- single concern owners;
-- conditional assets;
-- no speculative migration/recovery infrastructure;
-- strong accessibility/responsive verification;
-- raw-source independence.
+This avoids making a stale appendix silently override current public reality while still preventing the brief's 96-URL scope from being forgotten.
 
-Not retained:
+## 5. Public-site migration evidence observed during preparation/audit
 
-- Gloskin medical domain models;
-- Gloskin routes/page inventory;
-- Gloskin branding/assets/copy;
-- product decisions specific to skincare;
-- historical Morgen UI/runtime identifiers.
+Current public evidence has shown, among other things:
 
-## 4. Current public-site evidence snapshot
+- `/products/` and `/products-2/` both discoverable;
+- public product/category/archive routes under Woo;
+- `/articles/` hub and `/blog/{slug}/` article detail family;
+- meaningful brand/category surfaces;
+- `Uncategorized`/thin product-content cases;
+- duplicate heading/template-string issues on some surfaces;
+- inconsistent contact wording across pages;
+- external technical-resource links on some products.
 
-Observed on 2026-08-09 for migration/context only:
+These are migration evidence, not automatically approved content truth.
 
-- `https://www.grahaselang.com/`
-- `https://www.grahaselang.com/about-us/`
-- `https://www.grahaselang.com/products/`
-- `https://www.grahaselang.com/products-2/`
-- `https://www.grahaselang.com/layanan-kami/`
-- `https://www.grahaselang.com/articles/`
-- `https://www.grahaselang.com/contact-us/`
-- Woo product/category routes under `/product/` and `/product-category/`
-- observed brand archive under `/brand/hammer/`
-- observed article detail routes under `/blog/.../`
-- observed evergreen/topic landing page such as `/industrial-hose-indonesia-supplier-selang-industri-lengkap/`.
+## 6. Engineering baseline
 
-Public search evidence showed `/products/` exposing 96 product results at the time of observation. Treat counts as dynamic, not requirements.
+Use `yudanfahmie/gloskin-site-core` for proven engineering principles: canonical docs, one Kernel, single concern ownership, native platform owners, asset discipline, accessibility/responsive quality, staging verification and raw-source independence.
 
-## 5. Important migration observations
-
-### Duplicate product discovery surfaces
-
-Both `/products/` and `/products-2/` are publicly discoverable. The new build must not preserve two competing indexable product hubs.
-
-### Product taxonomy hygiene
-
-Some public product pages were observed with `Category: Uncategorized`, while others use meaningful product categories. Taxonomy cleanup is a Woo content/migration concern, not a template workaround.
-
-### Brand taxonomy
-
-A public `/brand/{slug}/` route exists. The implementation must identify the actual installed authoritative brand taxonomy/provider before registering anything.
-
-### Article permalink shape
-
-The public article hub is `/articles/`, while individual articles are observed under `/blog/{slug}/`. Do not normalize this cosmetically without a redirect inventory.
-
-### Visible SEO control notes
-
-At least one observed product page rendered editorial strings resembling `Keyword utama`, `Meta Title` and `Meta Description` in visible body content. New templates must not leak SEO-control notes into user-facing output.
-
-### Contact/NAP inconsistency
-
-Public pages expose inconsistent Surabaya/location address wording. Therefore repository docs intentionally do not hard-code a canonical NAP. Approved contact data is a launch input.
-
-### External technical resources
-
-At least one public product page links to an external Google Drive resource. This is evidence that product resources may need link presentation; it is **not** evidence for building a custom document/PDF subsystem.
-
-## 6. Source confidence rule
-
-Canonical architecture/ownership/scope decisions in this repository are firm because they come from owner instruction and baseline engineering decisions.
-
-Business values that are only observed from legacy/public content remain migration evidence until approved. Future owner/client data overrides conflicting legacy values.
-
-If a raw-only requirement is later surfaced that materially changes implementation, normalize it into this repository and update affected contracts in the same coherent change. Do not send ordinary developers back to raw files as a permanent workflow.
+Do not copy Gloskin medical domains, page inventory, styling or content.
 
 ## 7. No invented content
 
-Do not infer or fabricate:
+Do not infer company legal facts, addresses/hours/phones, certifications, pressure ratings, standards, media compatibility, brand authorization, pricing/stock, marketplace state or SEO keyword targets.
 
-- company legal facts;
-- addresses/hours/phones;
-- certifications;
-- product standards;
-- working/burst pressure;
-- media compatibility;
-- brand authorization claims;
-- pricing/stock;
-- marketplace status;
-- SEO keyword targets.
-
-Templates should provide fields/layouts/fallbacks, not invented client truth.
+Templates provide structure and graceful sparse states; approved data remains authoritative.

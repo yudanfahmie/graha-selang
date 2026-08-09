@@ -1,0 +1,31 @@
+id,requirement,canonical_owner,implementation_artifact,verification,status
+REQ-001,"Controlled rebuild; do not reset domain, valuable URLs, records, SEO/analytics history",migration_workstream,"legacy-migration-contract + Wave 0","crawl baseline; rollback; provider continuity",CANONICAL
+REQ-002,"96 legacy URLs = 68 product/series + 18 hub + 4 application + 5 merge/301 + 1 retire",migration_workstream,"scope-inventory.csv + page-matrix.csv","current crawl reconciled; every delta explained",CANONICAL
+REQ-003,"Six homepage groups with two anchors, three support, one CNG specialist",TemplateService,"Homepage template/components","visual hierarchy + crawlable links",CANONICAL
+REQ-004,"Anchor 1 Hydraulic Hose/MORGEN; Anchor 2 Industrial Hose & Assembly/HAMMER+SUNFLEX",TemplateService+content_owner,"Homepage/category presentation","approved copy; no unsupported technical claims",CANONICAL
+REQ-005,"Four discovery doors: product, application/industry, brand, specification",NavigationService+TemplateService,"navigation/hubs/selector","all four discoverable without JS-only links",CANONICAL
+REQ-006,"One indexable page = one primary intent; prevent cannibalization",SeoService+TemplateService,"route/template decisions","canonical/crawl diff; no duplicate hubs",CANONICAL
+REQ-007,"Technical product spec presentation",WooCommerceAdapter+TemplateService,"product/category/application components","rich+sparse products; populated fields only",CANONICAL
+REQ-008,"Crawl-safe product selector/filter/decision tree",WooCommerceAdapter+TemplateService,"filter/selector UI","SSR fallback; bounded query URLs; keyboard test",CANONICAL
+REQ-009,"Compatible fittings and approved technical resources/download links",WooCommerceAdapter+TemplateService,"product relationships/resources","no custom document subsystem; valid links",CANONICAL
+REQ-010,"HAMMER value / SUNFLEX premium / MORGEN hydraulic positioning",content_owner+TemplateService,"brand/category/home presentation","claims backed by approved data/datasheet",CANONICAL
+REQ-011,"4 retained application URLs; specialist themes may include mining/cement/marine/dredging/drilling/oil-gas/MRO/CNG",WordPress+TemplateService,"application page family","exact four reconciled; no auto doorway expansion",CANONICAL
+REQ-012,"Retain /layanan-kami/; consolidate competing /services/",migration_workstream+TemplateService,"service hub + redirect matrix","one final service hub; one-hop redirect when confirmed",CANONICAL
+REQ-013,"Technical RFQ is dynamic and context-sensitive",FormAdapter+TemplateService,"RFQ component/provider integration","product/application source context preserved",CANONICAL
+REQ-014,"RFQ supports secure file upload when provider/security/privacy requirements satisfied",form_provider+FormAdapter,"provider upload field/integration","MIME/size/provider controls; privacy/retention approved",CANONICAL
+REQ-015,"RFQ distinguishes buyer/end-user vs reseller/cooperation routing where configured",form_provider+FormAdapter,"conditional routing/config","routing UAT; primary buyer path",CANONICAL
+REQ-016,"Contextual WhatsApp and conversion event hooks",TemplateService+FormAdapter,"CTA/event integration","correct context; no duplicate listeners; event UAT",CANONICAL
+REQ-017,"Contact page prioritizes buyer technical RFQ",TemplateService+content_owner,"contact template/content","buyer CTA primary; cooperation secondary",CANONICAL
+REQ-018,"Public UI Indonesian; no English template leaks",TemplateService,"templates/i18n","lang/locale + string audit",CANONICAL
+REQ-019,"One intended H1 and semantic landmarks",TemplateService,"all public families","automated/manual heading/landmark check",CANONICAL
+REQ-020,"No public Keyword utama/Meta Title/Meta Description/editor prompts",TemplateService+content_owner,"rendering/sanitized content migration","public text regression scan",CANONICAL
+REQ-021,"Homepage first viewport has HTML value proposition/CTA/proof and controlled hero/LCP",TemplateService+AssetService,"homepage/hero assets","LCP image priority; dimensions; mobile first viewport",CANONICAL
+REQ-022,"Conditional assets and CWV improvement; distinguish TTFB from frontend",AssetService+deployment_owner,"asset registry/performance work","field/lab representative tests; no global unused bundles",CANONICAL
+REQ-023,"Practical WCAG AA: keyboard/focus/contrast/labels/reduced motion/~44px mobile targets",TemplateService+AssetService,"UI components","keyboard/mobile/a11y regression",CANONICAL
+REQ-024,"Legal footer links cannot be #; privacy must cover RFQ/upload",WordPress/provider+TemplateService,"legal/trust surfaces","link crawl; privacy approval; no filler",CANONICAL
+REQ-025,"One metadata/schema/sitemap owner; provider-safe integration",SeoService,"SEO adapter/provider integration","no duplicate canonical/meta/schema graph",CANONICAL
+REQ-026,"Pre/post launch crawl-diff, redirect/canonical/schema/sitemap verification",migration_workstream,"Wave 5/6 QA","crawl diff passes; 5 redirects/1 retire accounted",CANONICAL
+REQ-027,"Production noindex/robots check",SeoService+deployment_owner,"launch checklist","production indexability verified",CANONICAL
+REQ-028,"Preserve analytics/tag implementation continuity without building analytics product",TemplateService+deployment_owner,"event hooks/tag-safe templates","approved tags/events remain functional",CANONICAL
+REQ-029,"Staging-first, backup/rollback readiness",deployment_owner+LifecycleService,"Wave 0/6 deployment plan","rollback rehearsal/checklist",CANONICAL
+REQ-030,"30-day defect warranty + 30/60/90 operational monitoring handoff plan",project_handoff,"launch documentation","handoff artifact produced; operations remain outside plugin",CANONICAL

@@ -2,228 +2,155 @@
 
 ## 1. Goal
 
-Implement a production-ready Graha Selang WordPress website presentation as a standalone plugin, using this repository as the sole normal developer requirements source.
+Build the production Graha Selang presentation as a standalone WordPress plugin using this repository as the sole normal developer requirements source.
 
-This document intentionally stops at implementation planning. Repository preparation does **not** include production plugin code.
+Repository preparation does **not** include production plugin code.
 
-## 2. Baseline constraints
+## 2. Non-negotiable baseline
 
 - developer-only scope;
 - pure WordPress plugin/site-builder presentation layer;
-- native WordPress/WooCommerce ownership;
-- one composition root;
-- maximum eight bootable first-party owners in v1;
-- no custom database tables;
-- no duplicate product/catalog/admin stack;
-- developer-side SEO/GEO structure is required;
-- operational SEO/marketing is excluded;
-- legacy indexed URLs must be preserved or explicitly redirected;
-- no routine dependency on `project-9901`.
+- 96-URL migration baseline: 68 product/series + 18 hub + 4 application + 5 redirect + 1 retire;
+- one Kernel / <=8 bootable first-party owners;
+- native WordPress/Woo ownership;
+- no custom DB or duplicate catalog;
+- developer-side SEO/GEO required;
+- technical selector/filter and technical RFQ required;
+- operational SEO/marketing excluded;
+- no raw-project dependency for normal development.
 
-## 3. Phase 0 — canonical handoff
+## 3. Repository preparation — complete contract layer
 
-Status: repository preparation.
+Canonical preparation contains contribution rules, source of truth, operational requirements, scope inventory, traceability, architecture/service/data/template/page/migration/SEO contracts, implementation plan, verification and blocking inputs.
 
-Deliverables:
+Exit condition: developer can explain URL counts, product hierarchy, special RFQ/discovery requirements, owners, migration logic and acceptance tests without raw brief.
 
-- contribution rules;
-- developer source of truth;
-- architecture contract;
-- service map;
-- content/data contracts;
-- SEO/GEO engineering contract;
-- legacy migration contract;
-- page matrix;
-- prune matrix;
-- source/provenance notes;
-- verification contract;
-- implementation input list.
+## 4. Wave 0 — Preservation and deployment discovery
 
-Exit condition: a developer can understand scope/ownership/architecture without raw project files.
+Before route-sensitive code:
 
-## 4. Phase 1 — deployment discovery and migration inventory
+- capture target WP/PHP/Woo versions and active theme;
+- identify brand taxonomy/provider;
+- identify SEO provider and output ownership;
+- identify form provider and RFQ/upload/routing capability;
+- capture permalink settings, sitemap/robots/canonicals and redirect owner;
+- crawl/export the current public site;
+- reconcile current crawl against 96 baseline;
+- create final redirect/url matrix with zero unexplained rows;
+- identify current analytics/tag implementation for continuity;
+- capture approved NAP/contact/legal/brand/product inputs;
+- define backup and rollback process with deployment owner;
+- confirm commerce mode.
 
-Before writing route-sensitive production code, inspect the actual target WordPress environment.
+Exit condition: all providers/route owners known and migration matrix has no unidentified baseline row.
 
-Capture:
-
-- WordPress/PHP versions;
-- active theme (plugin must not depend on bespoke theme behavior without documenting it);
-- WooCommerce version/configuration;
-- product/category counts and hierarchy;
-- actual brand taxonomy/provider and permalink;
-- SEO provider/version;
-- form provider;
-- current permalink settings;
-- current sitemap/robots/canonical ownership;
-- full current URL crawl/export;
-- existing redirect owner/rules;
-- approved logo/fonts/brand tokens/media;
-- approved canonical NAP/contact data;
-- whether cart/checkout is enabled or inquiry/catalog behavior is intended.
-
-Create `docs/redirect-matrix.csv` only from real crawl data.
-
-Exit condition: no route/provider ownership is guessed.
-
-## 5. Phase 2 — plugin foundation
-
-Create a small plugin package, recommended path:
-
-`plugin/graha-selang-site-core/`
-
-Foundation:
-
-- tiny plugin entrypoint;
-- namespace/prefix owned by Graha Selang;
-- `Kernel` composition root;
-- explicit service registration;
-- request-profile loading;
-- activation/deactivation callbacks only for necessary rewrite flush/version handling;
-- no generic migrations.
-
-Add baseline architecture tests/static checks early.
-
-Exit condition: plugin activates/deactivates cleanly with Woo/SEO/form dependencies optional.
-
-## 6. Phase 3 — shell/navigation/assets
+## 5. Wave 1 — Design system and foundation
 
 Implement:
 
-- semantic document shell;
-- global header;
-- one shared navigation tree;
-- accessible desktop disclosures and mobile drawer;
-- footer;
-- design tokens;
-- single AssetService;
-- responsive primitives;
-- focus/reduced-motion behavior.
+- plugin entrypoint + Kernel + explicit services;
+- design tokens/responsive primitives;
+- semantic shell/header/nav/footer;
+- one navigation tree desktop/mobile;
+- accessibility baseline;
+- single conditional AssetService;
+- representative template prototypes for all families in `template-matrix.csv`;
+- Indonesian public UI/i18n baseline.
 
-Primary navigation must remain functional without JS; JS enhances disclosures/drawer rather than owning crawlable links.
+Exit: representative shell works on Page/Post/Woo routes with no fatal optional dependency.
 
-Exit condition: shell works across representative native Page/Post/Woo surfaces.
+## 6. Wave 2 — P0 foundation
 
-## 7. Phase 4 — WooCommerce presentation
+Implement highest-leverage public experience:
 
-Implement through Woo-supported templates/hooks/APIs:
-
-- canonical Products hub/archive presentation;
-- category archives;
-- authoritative brand taxonomy archives;
-- product single;
-- optional Woo search/filter UI only if required and using native queries;
-- optional cart/account chrome if commerce is active;
-- structured technical-spec presentation from populated attributes/meta;
-- related product/category/brand pathways.
-
-Do not build product CRUD or duplicate catalog storage.
-
-Exit condition: Woo admin/data remains authoritative and native commerce behavior is not broken.
-
-## 8. Phase 5 — WordPress content families
-
-Implement presentation for:
-
-- Home;
+- Home with two anchor groups, three supporting groups and CNG specialist;
+- four discovery entry doors;
 - About;
-- Services;
-- Contact;
-- Articles hub/single;
-- approved evergreen/topic landing pages;
-- external form integration/fallback.
+- `/products/` canonical discovery foundation;
+- `/layanan-kami/` Services;
+- Contact + technical RFQ foundation;
+- buyer-first conversion hierarchy;
+- contextual WhatsApp hooks;
+- initial event integration hooks;
+- homepage/LCP treatment.
 
-Use native Pages/Posts. Introduce no CPT unless a demonstrated requirement passes the architecture-change threshold.
+Exit: primary site journey works mobile/desktop and primary content is server-rendered/crawlable.
 
-Exit condition: all canonical page families render with deliberate empty states and no invented factual content.
+## 7. Wave 3 — Product/hub technical build
 
-## 9. Phase 6 — SEO/GEO engineering integration
+Implement:
 
-Implement/verify:
+- Woo archive/category/product presentation;
+- authoritative brand taxonomy presentation;
+- semantic technical specs;
+- compatible fittings/resources relationships;
+- crawl-safe selector/filter/decision tree using real attributes;
+- rich/sparse product states;
+- first migration batches across product/series + hubs;
+- RFQ source context from products/categories.
 
-- stable canonical route behavior;
-- semantic landmarks/headings;
-- visible breadcrumbs on deep content;
-- internal hub/detail links;
-- provider-safe metadata/schema ownership;
-- sitemap discoverability through authoritative provider;
-- semantic product specs;
-- clean article markup;
-- no visible editorial SEO-control notes;
-- entity/contact consistency from one approved data owner;
-- Core Web Vitals-minded assets/media.
+Exit: product discovery supports product/brand/specification journeys without a shadow catalog.
 
-Do not build campaign/keyword/backlink/reporting tooling.
+## 8. Wave 4 — Applications, specialists and content completion
 
-Exit condition: `docs/seo-geo-engineering-contract.md` checks pass on representative pages.
+Implement/migrate:
 
-## 10. Phase 7 — legacy migration/redirect integration
+- exactly the 4 retained application URLs from reconciled inventory;
+- approved specialist pathways/themes without doorway-page generation;
+- remaining hubs/products;
+- Articles/Guide templates;
+- approved evergreen/topic surfaces;
+- legal/trust destinations;
+- application-specific RFQ behavior;
+- approved workshop/project/trust proof presentation.
 
-Using the real crawl:
+Exit: 90 retained brief-baseline intents are mapped to final canonical owners/routes or owner-approved changed classification.
 
-- classify every meaningful current URL KEEP/REDIRECT/RETIRE;
-- resolve `/products-2/` duplication;
-- preserve product/category/brand/article slugs where appropriate;
-- implement redirects in the selected single redirect owner;
-- update internal links to final URLs;
-- verify canonicals/sitemaps after migration.
+## 9. Wave 5 — Migration QA
 
-Exit condition: no important legacy route is silently dropped and no redirect chain/loop exists.
+Verify:
 
-## 11. Phase 8 — staging readiness
+- all baseline/current URLs accounted for;
+- 5 brief redirect decisions + 1 retire decision resolved;
+- redirect one-hop/no-loop;
+- internal links target final routes;
+- canonical/meta/schema ownership;
+- sitemap contents;
+- no visible SEO-control notes;
+- one H1/semantic structure;
+- Indonesian UI strings;
+- RFQ upload/routing/privacy/security;
+- selector crawl behavior;
+- WCAG/keyboard/mobile;
+- asset/LCP/CWV regressions;
+- production-package/release checks;
+- crawl-diff against Wave 0.
 
-Test representative pages:
+Exit: zero migration REVIEW rows and verification contract passes on staging.
 
-- Home;
-- About;
-- Products hub;
-- large category archive + pagination;
-- brand archive;
-- product with rich specs;
-- product with sparse specs;
-- Services;
-- Articles hub;
-- article single;
-- Contact/form unavailable and available states;
-- evergreen landing;
-- optional cart/account surfaces if active;
-- 404 and search behavior;
-- redirected legacy URL.
+## 10. Wave 6 — Launch and handoff
 
-Validate mobile/tablet/desktop, keyboard behavior, PHP notices, console errors, Woo compatibility, SEO/schema duplication and major CWV regressions.
+- deploy staging-approved package;
+- verify production not accidentally noindex;
+- verify final redirects/canonical/schema/sitemap;
+- verify analytics/tag/event continuity;
+- post-launch crawl comparison;
+- verify representative URLs/404/search/RFQ on production;
+- keep rollback ready;
+- package developer documentation;
+- begin 30-day defect warranty;
+- hand a 30/60/90 monitoring plan to SEO/analytics operations (not plugin-owned recurring work).
 
-## 12. Phase 9 — launch readiness
+## 11. Implementation order rule
 
-Before production:
+Do **not** start with isolated homepage polish.
 
-- approved factual contact/NAP values present;
-- approved brand/media assets present;
-- no staging copy/media leaks;
-- redirect matrix executed/verified;
-- sitemap/canonical ownership verified;
-- analytics/SEO operational teams may attach their tools outside this plugin without plugin conflict;
-- no raw project files/secrets in repository/package;
-- plugin package reproducible from source.
+Correct sequence:
 
-## 13. Implementation order principle
+`Wave 0 preservation → Wave 1 system → Wave 2 P0 → Wave 3 product/hub → Wave 4 application/content → Wave 5 migration QA → Wave 6 launch`
 
-Do **not** start by polishing the homepage in isolation.
+## 12. Change management
 
-Correct order:
+Any material discovery changing counts, route ownership, provider capability, RFQ transport, brand taxonomy, SEO ownership, commerce mode, services model or architecture budget must update canonical docs/matrices in the same coherent commit.
 
-`ownership/provider discovery → plugin foundation → shell → Woo/content families → SEO/GEO structure → migration → staging polish`
-
-This prevents visual work from locking in wrong routes/data ownership.
-
-## 14. Change management
-
-Any implementation discovery that materially changes the model must update canonical docs in the same commit. Examples:
-
-- actual brand taxonomy differs;
-- SEO provider owns breadcrumbs differently;
-- existing services require structured records/CPT;
-- commerce is definitively catalog-only or transactional;
-- permalink migration changes route contract;
-- a new global setting/service is needed.
-
-Do not keep such decisions only in implementation code or chat.
+Do not hide requirement decisions only in code, chat or deployment memory.

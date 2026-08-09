@@ -2,343 +2,226 @@
 
 ## 1. Authority
 
-This document is the canonical developer-facing requirements source for `yudanfahmie/graha-selang`.
+This is the canonical developer-facing requirements source for `yudanfahmie/graha-selang`.
 
-A developer implementing Graha Selang should not need to inspect `yudanfahmie/project-9901` for normal work. Raw project material is provenance only and remains read-only.
+Normal developers should not need `yudanfahmie/project-9901`. Authority order:
 
-Order of authority when requirements conflict:
+1. explicit repository-owner instruction;
+2. this document + `docs/operational-requirements.md`;
+3. `docs/scope-inventory.csv` + `docs/requirement-traceability.csv`;
+4. remaining canonical repository docs/matrices;
+5. current public site only as migration evidence;
+6. Gloskin only as engineering-pattern provenance;
+7. raw Graha brief only for historical audit/new normalization.
 
-1. explicit instructions from the repository owner;
-2. this document and current canonical repository documentation;
-3. `docs/page-matrix.csv`, `docs/runtime-service-map.csv` and `docs/prune-matrix.csv`;
-4. current public Graha Selang site only as migration/evidence context;
-5. pinned Gloskin baseline only for reusable engineering patterns;
-6. raw Graha Selang source only for historical audit/new normalization, never a routine implementation dependency.
+Do not invent missing business/technical facts.
 
-Do not invent missing business data. Values marked pending remain configurable or gracefully absent until approved input arrives.
+## 2. Product and scope
 
-## 2. Owner-confirmed scope
+Graha Selang Site Core is a **developer-only WordPress plugin acting as website builder/presentation layer** for a controlled rebuild of the existing Graha Selang site.
 
-The repository scope is **developer-only**.
+Developer-side SEO/GEO friendliness, accessibility, performance, technical product discovery, migration-safe routing and RFQ presentation/integration are part of the product.
 
-The product is a **pure WordPress plugin acting as website builder/presentation layer**. The plugin should be capable of delivering the complete visitor-facing website presentation while leaving platform-owned data/business logic with WordPress and WooCommerce.
+Recurring SEO campaigns, backlinks, ranking/reporting, content operations, routine GSC/GA4/GTM/GBP management, social/media campaigns and ads are not plugin responsibilities.
 
-Developer-side SEO/GEO friendliness is included. This means the plugin must build a semantic, crawlable, stable, fast and internally connected website structure. It does not mean the plugin owns recurring SEO operations.
+## 3. Frozen operational inventory
 
-Operational SEO/marketing remains outside the plugin: content campaigns, backlink work, ranking monitoring, GSC/GA4/GBP operations, monthly reporting, media placement and similar recurring work.
+The brief baseline contains **96 legacy URLs**:
 
-## 3. Engineering baseline
+- 68 product/series;
+- 18 hubs;
+- 4 applications;
+- 5 merge + permanent redirect;
+- 1 retire.
 
-The current quality baseline is:
+The correct interpretation is **90 retained content-intent URLs + 6 legacy-action URLs**. The live site can change, so production implementation must reconcile a fresh crawl against this baseline. Every delta needs an explicit explanation; no baseline/current URL is silently dropped.
 
-- repository: `yudanfahmie/gloskin-site-core`
-- observed baseline commit at preparation time: `e36039034533d3debb51ae6092e74a311c87d55a`
+This number is independent from template-family count. See `scope-inventory.csv`, `template-matrix.csv` and `page-matrix.csv`.
 
-Reuse its engineering principles:
+## 4. Controlled-rebuild principle
 
-- canonical developer docs before code;
+Rebuild presentation, templates, UX, RFQ, responsive/accessibility and performance. Preserve or deliberately migrate domain identity, valuable routes, valid WordPress/Woo records, search equity, provider ownership and measurement continuity.
+
+Do not reset the site merely because frontend code is replaced.
+
+## 5. Engineering baseline
+
+Use the strongest engineering principles established in `yudanfahmie/gloskin-site-core`:
+
+- canonical docs before implementation;
 - one composition root;
 - one owner per concern;
-- native WordPress/WooCommerce ownership;
-- small request-oriented services;
-- single asset owner;
-- no speculative recovery/migration framework;
-- strong responsive/accessibility behavior;
-- staging and verification discipline;
-- no raw-source dependency after normalization.
+- native WordPress/Woo ownership;
+- one asset owner;
+- request-oriented loading;
+- no speculative repair/migration framework;
+- responsive/accessibility verification;
+- raw-source independence.
 
-Do **not** copy Gloskin-specific medical domains, routes, content models, branding, CSS, JS, media or page copy.
+Do not copy Gloskin medical models, routes, UI assets, CSS/JS or content.
 
-## 4. Business/site context
+## 6. Ownership boundaries
 
-Current public-site evidence identifies Graha Selang/PT Graha Selang Perkasa as an industrial hose supplier/importer/distributor serving industrial and equipment use cases. The public site currently presents hydraulic hose, industrial hose, CNG/high-pressure gas hose, ducting hose, fittings/accessories, multiple brands, service capabilities and educational articles.
+### Graha plugin owns
 
-Current public evidence also exposes service themes such as:
-
-- hose crimping and assembly;
-- custom fitting/coupling/flange work;
-- hose-selection consultation;
-- repair/replacement assessment.
-
-Treat those as migration evidence. Exact commercial claims and factual values must remain content-owned, not template-owned.
-
-## 5. Non-negotiable ownership boundaries
-
-### Graha Selang Site Core owns
-
-- global public shell;
-- header/navigation/footer presentation;
-- responsive layout primitives and design tokens;
-- page-family template selection;
-- reusable cards, grids, galleries, breadcrumbs, filters and CTA presentation where required;
-- native WordPress page/post presentation;
-- WooCommerce visual/presentation integration;
-- provider-safe form placement/integration;
-- developer-side SEO/GEO structure;
-- minimal presentation settings required by the above.
+- public shell/header/nav/footer presentation;
+- page-family selection and presentation contexts;
+- reusable site UI;
+- technical product presentation/selector/filter UI;
+- Woo presentation integration;
+- application/brand/service/article/contact/RFQ presentation;
+- asset loading;
+- developer-side SEO/GEO structure and provider compatibility;
+- conversion-event integration hooks;
+- minimal site presentation settings.
 
 ### WordPress owns
 
-- Pages;
-- Posts/articles;
-- Media Library attachments;
-- users/capabilities;
-- standard options/meta infrastructure;
-- standard permalink and rewrite infrastructure.
+Pages, Posts, Media, users/capabilities, core settings/meta and normal permalink/rewrite infrastructure.
 
 ### WooCommerce owns
 
-- products/variations;
-- product CRUD/admin;
-- product categories;
-- product attributes/specifications where modeled there;
-- product images;
-- product brand taxonomy when the installed Woo stack supplies it;
-- SKU, price and stock when commerce fields are used;
-- cart/checkout/order/account/payment behavior if enabled.
-
-Graha Selang Site Core may query and present Woo data. It must not introduce a parallel product catalog, duplicate product admin, duplicate cart/checkout, or independent payment/order logic.
+Products/variations, product CRUD/admin, categories, attributes, product media, authoritative brand taxonomy when provided by the Woo stack, SKU/price/stock, and cart/checkout/order/account/payment behavior when enabled.
 
 ### SEO provider owns
 
-When an installed SEO provider such as Rank Math/Yoast is configured to own metadata/schema/sitemaps, it is authoritative for those outputs. Graha Selang Site Core must provide clean data/HTML and compatible integration surfaces without printing competing canonicals, meta descriptions or duplicate schema graphs.
+Canonical/title/meta/robots/schema/sitemap/breadcrumb output where the configured provider is authoritative. The Graha plugin must not emit a competing graph/output layer.
 
-### External form provider owns
+### Form provider owns by default
 
-- form submission;
-- captcha/anti-spam;
-- mail delivery;
-- autoresponses;
-- submission storage when supported.
+Submission transport, spam/captcha, upload storage/retention, email/autoresponse and submission records. Graha owns RFQ context, presentation and compatible routing/configuration integration. If provider capability cannot meet the mandatory RFQ behavior, an architecture decision is required before first-party backend work.
 
-The plugin owns placement, layout and compatible success/error presentation only.
+## 7. Product hierarchy
 
-## 6. Content model
+Homepage/discovery keeps six visible groups with unequal hierarchy:
 
-Prefer the smallest native model that meets the site.
+**Anchors**
 
-Recommended v1:
+1. Hydraulic Hose / Selang Hidrolik — MORGEN-led
+2. Industrial Hose & Assembly — HAMMER value + SUNFLEX premium
 
-- native Page: Home;
-- native Page: About (`/about-us/` unless an approved migration changes it);
-- native Page: Products presentation hub if needed around Woo (`/products/`);
-- native Page: Services hub (`/layanan-kami/`);
-- native Page: Contact (`/contact-us/`);
-- native Pages: approved high-value evergreen/topic landing pages that are not product records;
-- native Posts: educational articles/news/guides;
-- WooCommerce Products: product records;
-- WooCommerce product categories: product taxonomy;
-- Woo/approved product-brand taxonomy: brand taxonomy;
-- Woo attributes/meta: structured technical specifications.
+**Core supporting**
 
-Do not add a custom product CPT or custom database table.
+3. Ducting Hose
+4. PVC Spiral/Spring/Suction Hose
+5. Fittings/Couplings/Accessories
 
-Services currently appear small enough for native Page content/sections. Introduce a service CPT only after a concrete editing/relationship requirement demonstrates that Pages are insufficient.
+**Specialist**
 
-## 7. Normalized route families
+6. CNG/high-pressure gas hose assembly
 
-Canonical route families to support/preserve during redesign:
+Large-bore is a capability/application within Industrial Hose & Assembly, not an automatic duplicate top-level catalog.
 
-- `/` — Homepage;
-- `/about-us/` — About/company;
-- `/products/` — canonical product discovery/archive surface;
-- `/product-category/{slug}/` — Woo product-category archives;
-- `/brand/{slug}/` — brand archives if this is the installed/approved brand taxonomy permalink;
-- `/product/{slug}/` — Woo product detail;
-- `/layanan-kami/` — services hub;
-- `/articles/` — article hub/current public archive;
-- `/blog/{post-slug}/` — observed article detail permalink family, unless exact legacy inventory proves another rule;
-- `/contact-us/` — contact;
-- approved evergreen SEO/topic landing pages on stable native Page permalinks;
-- Woo-managed cart/checkout/account endpoints only if commerce is enabled.
+Brand/technical claims must be evidence-backed.
 
-`docs/page-matrix.csv` is the canonical family matrix.
+## 8. Discovery architecture
 
-### Known legacy ambiguity
+Support four entry doors:
 
-The current public site exposes both `/products/` and `/products-2/`. The redesign must not keep two competing product hubs. Treat `/products/` as the intended canonical hub unless migration evidence/owner instruction says otherwise; `/products-2/` requires explicit redirect classification before launch.
+- by product;
+- by application/industry;
+- by brand;
+- by specification need.
 
-Do not casually rename indexed routes to prettier alternatives. Preserve or redirect deliberately.
+One indexable URL = one primary intent. Avoid doorway/keyword-variant duplication.
 
-## 8. Information architecture
+The specification path may use progressive selector/filter logic backed by Woo/native structured attributes. Primary catalog and links remain server-rendered/crawlable without JS.
 
-Expected primary information architecture:
+## 9. Route/content model
 
-- Products
-- Brands or product-brand discovery where approved
-- Services
-- Articles/Insights
-- About
-- Contact / Consultation
+Use native owners first:
 
-Home should expose the major product families, key brands, service capability, trust/company context, useful articles and a clear consultation/WhatsApp/contact path.
+- Home/About/Services/Contact/RFQ/legal/evergreen landing surfaces: native Pages or provider output as appropriate;
+- articles/guides: native Posts;
+- products: Woo Products;
+- product categories: Woo categories;
+- brands: installed approved Woo brand taxonomy;
+- technical specs: Woo attributes or registered product meta owned with Woo content;
+- application pages: preserve the 4 retained application-intent URLs using native Pages unless deployment evidence proves a better native owner.
 
-Navigation must use one normalized tree for desktop and mobile. Do not create separate persistence or different IA for each viewport.
+Known retained public route families include `/`, `/about-us/`, `/products/`, `/product/…/`, `/product-category/…/`, `/brand/…/`, `/layanan-kami/`, `/articles/`, `/blog/…/`, `/contact-us/` and approved evergreen/application routes.
 
-## 9. Page-family requirements
+Do not create CPTs/custom tables merely to mirror the brief.
 
-### 9.1 Homepage
+## 10. Required presentation families
 
-Support:
+Presentation coverage must exist for Home, archive, category, product, application, brand, About, Service, RFQ, Guide/Article, Legal/Trust, Search and 404. Families may share implementation components/files.
 
-1. semantic global header/navigation;
-2. clear H1/value proposition;
-3. key product-family discovery;
-4. major/featured brand discovery when content exists;
-5. service summary;
-6. company/trust summary;
-7. useful application/industry or educational pathways where approved;
-8. article preview;
-9. consultation/contact CTA;
-10. semantic global footer.
+## 11. Technical product contract
 
-Primary content must be server-rendered and useful without JavaScript.
+When data exists, templates support semantic specs, size/diameter, pressure, temperature, material/construction, standards, media compatibility, application, compatible fittings/connections, approved resources/datasheets and related discovery.
 
-### 9.2 About
+No technical field is fabricated to make a template look complete.
 
-Support approved company overview, history, capabilities, vision/mission if provided, industries served, brand/supply context, locations/contact CTA and trust evidence.
+The selector/filter/decision tree is a mandatory experience requirement, but it must use authoritative structured values and crawl-safe query behavior.
 
-Do not hard-code “since 2016”, addresses or other facts into templates; content belongs to WordPress.
+## 12. Application/specialist contract
 
-### 9.3 Products hub
+The brief identifies mining, cement/bulk, marine, dredging/slurry, drilling, oil & gas, MRO and CNG themes. The legacy baseline has **4 retained application URLs**. Do not turn all themes into eight programmatic pages automatically; additions require distinct content/intent approval.
 
-The canonical products hub is a presentation layer over WooCommerce. Support product discovery by category/brand and optional approved search/filter behavior using Woo-native queries/APIs.
+## 13. RFQ contract
 
-Do not create a second product registry.
+The technical RFQ must support context-sensitive entry, dynamic technical fields, secure provider-owned file upload where enabled, source URL/entity context, buyer vs reseller/cooperation routing where configured, contextual WhatsApp and approved conversion-event hooks.
 
-### 9.4 Product category archive
+Contact page prioritizes buyer technical RFQ; cooperation/reseller intent is secondary/routed.
 
-Support:
+See `operational-requirements.md` and `content-data-contracts.md`.
 
-- category H1/name;
-- useful approved category introduction when present;
-- breadcrumb context;
-- product grid/list;
-- pagination;
-- optional subcategory navigation;
-- optional semantic technical/application guidance owned as term/page content;
-- internal links to related brands/articles/services where explicitly configured.
+## 14. Services/trust/legal
 
-Do not inject generic SEO paragraphs into every category from template code.
+Retain `/layanan-kami/` as the service hub. `/services/` is a consolidation/redirect concern, not a second hub.
 
-### 9.5 Brand archive
+Services support crimping/assembly, custom fitting/coupling/flange, product-selection consultation and repair/replacement assessment where approved.
 
-If the installed Woo stack has an authoritative product-brand taxonomy, present that taxonomy. Support brand identity/intro, product listing, related category pathways and useful content when data exists.
+About/trust surfaces support verified workshop/capability/project evidence. Do not invent certification/importer/authorization claims.
 
-Do not register a competing `brand` taxonomy if Woo/another approved commerce extension already owns brands.
+Legal footer links may not ship as `#`; they must resolve to approved legal/provider surfaces or be removed intentionally.
 
-### 9.6 Product detail
+## 15. Public-language/semantic contract
 
-WooCommerce is authoritative. Presentation should support:
+Primary public UI is Indonesian. Use correct Indonesian document locale, one intended H1, semantic landmarks and translated UI strings. Technical English terminology may remain where natural.
 
-- product title;
-- gallery/media;
-- category and brand context;
-- concise product summary;
-- structured technical specifications/attributes;
-- standards/certification fields only when actually supplied;
-- applications/usage information;
-- downloadable/external technical resources only when approved data exists;
-- inquiry/WhatsApp/contact action or Woo purchasing action according to deployment configuration;
-- related products/content.
+Never expose internal SEO controls/prompts as public body content.
 
-Never invent working pressure, temperature, material, standard, certification, size range or compatibility.
+## 16. SEO/GEO engineering contract
 
-### 9.7 Services
+Required by construction:
 
-Support the current service themes and future approved content using native Pages/sections first. Each service block/detail should be linkable, semantic and able to carry its own approved explanatory content and CTA.
+- stable canonical routes;
+- server-rendered primary content/links;
+- one H1 and logical headings;
+- breadcrumbs on deep surfaces;
+- product/category/brand/application relationships through real anchors;
+- one metadata/schema owner;
+- semantic technical specs;
+- sitemap correctness through authoritative provider;
+- crawl-safe filters;
+- no duplicate/cannibalized URLs;
+- no hidden keyword/GEO blocks;
+- Core Web Vitals-minded asset/media behavior.
 
-### 9.8 Articles
+## 17. Performance/accessibility contract
 
-Use native WordPress Posts. Support article hub, category/tag context when useful, pagination, semantic article template, author/date when intentionally exposed, breadcrumbs, related product/category/service links based on explicit data, and accessible empty states.
+Treat mobile field performance as a launch concern. Optimize LCP/hero loading, conditional assets, responsive images, font/library payload and layout stability. Distinguish server/TTFB problems from frontend work.
 
-No automated keyword-content generator belongs in this plugin.
+Practical WCAG AA target: keyboard support, visible focus, proper labels/names, contrast, reduced motion, no hover-only controls, responsive spec tables, ~44px primary mobile targets, sticky CTA that never obscures content.
 
-### 9.9 Contact
+## 18. Migration contract
 
-Support approved location/contact data, separate contact purposes where needed (for example retail/grosir), WhatsApp/tel/email links, map/embed data and an external form integration area.
+Every baseline/current URL receives KEEP, REDIRECT or RETIRE before launch. Validate one-hop redirects, final internal links, canonicals, sitemap and crawl-diff.
 
-Public evidence currently contains inconsistent location wording across pages. Do not hard-code NAP until approved values are supplied/confirmed.
+Known duplicate concerns include `/products-2/` vs `/products/` and `/services/` vs `/layanan-kami/`.
 
-### 9.10 Evergreen SEO/topic landings
+## 19. Launch contract
 
-Existing indexed educational/commercial landing pages may be valuable independent URLs. Preserve them as native Pages when they have distinct user intent and useful content. Do not collapse every keyword landing page into a product/category URL merely to simplify templates.
+Staging-first. Preserve measurement integration, verify production not `noindex`, run pre/post crawl comparison, verify redirects/canonical/schema/sitemap, test representative route families, keep rollback ready, and hand off a 30/60/90 monitoring plan to the operations team.
 
-At the same time, avoid near-duplicate thin pages. Migration review decides KEEP/REDIRECT/RETIRE per URL.
+## 20. Missing-data rule
 
-## 10. Developer-side SEO/GEO requirements
-
-The website structure must be SEO/GEO friendly by construction:
-
-- clean, stable, human-readable canonical routes;
-- server-rendered primary text and links;
-- semantic landmarks and heading hierarchy;
-- one clear H1/page topic;
-- breadcrumbs on deep content;
-- crawlable anchor-based internal links;
-- sensible hub → category/brand → product relationships;
-- article → relevant entity/product links when editorially configured;
-- semantic product specifications using tables or definition lists where appropriate;
-- accessible images with WordPress-managed alt text;
-- no duplicate public route families for the same content;
-- metadata/schema integration that yields to the configured owner;
-- no duplicate canonical/schema output;
-- performance and layout stability that support Core Web Vitals;
-- consistent organization/entity/contact data surfaces;
-- useful visible FAQs only when approved content exists;
-- no hidden AI/GEO keyword blocks or speculative crawler hacks.
-
-See `docs/seo-geo-engineering-contract.md`.
-
-## 11. Responsive/accessibility requirements
-
-- mobile, tablet and desktop layouts must be first-class;
-- navigation/drawers must support keyboard, escape/backdrop close and focus management;
-- visible focus states;
-- semantic buttons/links;
-- no hover-only critical interaction;
-- reduced-motion support;
-- product grids/tables must remain usable on narrow viewports;
-- images must preserve dimensions/aspect ratio to limit layout shift;
-- form and Woo states must have accessible labels/messages.
-
-## 12. Performance requirements
-
-- one asset owner;
-- conditional loading by page/component need;
-- no global loading of unused feature bundles;
-- no duplicate frontend library already provided by WordPress/Woo when avoidable;
-- responsive image APIs and explicit dimensions;
-- lazy-load non-critical media;
-- avoid client-side rendering for primary indexable content;
-- deterministic asset versioning;
-- keep JavaScript small and progressive-enhancement oriented.
-
-## 13. Explicit exclusions
-
-Do not implement in v1 unless later explicitly approved:
-
-- custom product database/admin;
-- custom cart/checkout/order/payment system;
-- custom mail transport;
-- generic migration/recovery/repair framework;
-- custom analytics/GSC dashboard;
-- backlink/media/social management;
-- keyword/rank monitoring;
-- AI content generator;
-- Rank Math/Yoast proxy admin;
-- custom sitemap engine when WordPress/SEO provider already owns it;
-- speculative `llms.txt`/AI-crawler subsystem presented as a ranking guarantee;
-- custom database tables;
-- raw-project-file browser inside WordPress;
-- wholesale Gloskin/Morgen code copy.
-
-## 14. Missing data rule
-
-When business data is missing or conflicting:
+When a business/provider value is missing or conflicting:
 
 1. do not guess;
-2. keep the content field/provider editable;
-3. render a graceful fallback/omit the section;
-4. record a genuinely implementation-blocking input in `docs/implementation-inputs.md`;
-5. update canonical docs once owner-approved data arrives.
+2. keep native/provider data editable;
+3. omit/fallback gracefully;
+4. record production-blocking input in `implementation-inputs.md`;
+5. update canonical docs when approved data arrives.

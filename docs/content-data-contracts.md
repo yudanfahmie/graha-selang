@@ -3,94 +3,42 @@
 ## 1. General rules
 
 - Native WordPress/WooCommerce storage first.
-- Zero custom database tables in v1.
-- Stable WordPress/Woo IDs, not copied shadow records.
-- Never invent factual business/product data.
-- Optional fields must fail gracefully.
-- All first-party admin writes require capability/nonce/validation/sanitization.
-- Escape for the final output context.
-- Public-site legacy data is migration evidence, not automatically approved truth when values conflict.
+- Zero custom database tables in v1 by default.
+- Stable WP/Woo IDs; no shadow records.
+- Never invent business/product/technical data.
+- Optional fields fail gracefully.
+- Public legacy data is migration evidence when conflicting.
+- First-party admin writes require capability, nonce, validation/sanitization and output escaping.
 
-## 2. Site-wide settings
+## 2. Global/site settings
 
-Prefer native WordPress settings/menu/page content before a custom option.
+Prefer native Site Identity, menus, Pages and provider settings. At most one small Graha presentation/integration option if genuinely needed, containing values such as approved global WhatsApp/contact target, form identifier, logo/media reference or integration toggles.
 
-Only if needed, one small Graha settings record may contain presentation/integration values such as:
+Do not store product catalog, brand definitions, navigation trees, article data or RFQ submissions in that option.
 
-- primary consultation URL/WhatsApp target;
-- secondary contact target;
-- external form shortcode/block identifier;
-- optional global social/marketplace URLs;
-- optional logo/media attachment references when not better handled by WP custom logo/site identity;
-- approved location selector/default.
-
-Do not store product data, article data, brand definitions or navigation trees in this option.
-
-## 3. Company/About data
+## 3. Company/About
 
 Owner: native WordPress Page.
 
-Support as content, blocks or registered page meta only when structured editing is truly required:
+May contain approved overview/history, vision/mission, capability/service summary, industries/applications, brand/supply context, trust evidence, locations/contact CTA and media.
 
-- official company name/display name;
-- approved overview/history;
-- value proposition;
-- vision/mission;
-- industries/applications served;
-- capabilities/services summary;
-- brand/supply context;
-- trust/certification statements only when approved;
-- location/contact CTA;
-- approved media.
+Do not hard-code legal/company/importer/distributor/certification claims in templates.
 
-Do not hard-code “since 2016” or company claims in templates.
+## 4. Contact/location
 
-## 4. Locations/contact data
+Use one approved canonical dataset before launch. Fields may include label, address, city/postcode, phone, WhatsApp, email, map data, opening hours and audience/channel label.
 
-Public legacy evidence currently contains inconsistent address wording across pages. Therefore contact/location data requires one approved canonical owner before production launch.
-
-Recommended model for a small number of locations:
-
-- native Contact/About Page blocks or registered page meta;
-- optionally one small structured setting if reused globally.
-
-Fields when supplied:
-
-- label/location name;
-- address lines;
-- city/postcode;
-- phone;
-- WhatsApp;
-- email;
-- map URL/embed data;
-- opening hours if approved;
-- purpose/audience label such as retail/grosir where applicable.
-
-Missing values must be omitted or shown as a deliberate neutral fallback. Do not infer coordinates or normalize conflicting addresses automatically.
+Do not normalize conflicting legacy values automatically.
 
 ## 5. Products
 
 Owner: WooCommerce Product.
 
-The plugin reads/presents only.
+Supported data includes name/slug/SKU/descriptions/images/category/brand/tags/attributes and approved registered product meta. Price/stock remain Woo-owned if used.
 
-Supported standard data may include:
+### Technical fields
 
-- product name;
-- slug/permalink;
-- SKU;
-- short/long description;
-- featured/gallery images;
-- price/stock if commerce uses them;
-- product categories;
-- brand taxonomy term when available;
-- tags when editorially useful;
-- Woo attributes;
-- approved custom product meta registered by the authoritative commerce/content owner.
-
-### Technical specification model
-
-Prefer Woo attributes or clearly registered product meta for structured technical data such as:
+Prefer Woo attributes or clearly registered Woo-associated meta for populated values such as:
 
 - hose type/series;
 - material/tube/cover;
@@ -99,162 +47,119 @@ Prefer Woo attributes or clearly registered product meta for structured technica
 - working pressure;
 - burst pressure;
 - temperature range;
-- applicable standard;
+- standard;
 - bend radius;
 - media compatibility;
 - application/industry;
 - connection/fitting compatibility.
 
-These are **field capabilities**, not permission to fill missing values. Only render fields actually supplied for the product.
+Render semantic table or definition-list markup. Missing values are omitted. Do not fill specs from product-name guesses.
 
-A semantic `<table>` or `<dl>` may present populated specs. Avoid turning specification labels into repeated keyword stuffing.
+### Resources and fittings
+
+Approved product resources are links/attachment IDs with label/type/version if supplied. Do not build a parallel technical-library/PDF system.
+
+Compatible fitting/coupling relationships should use explicit Woo term/product IDs or approved structured data, not runtime keyword inference.
 
 ## 6. Product categories
 
-Owner: WooCommerce product category terms.
+Owner: Woo product category terms. Support name/slug/description/image/hierarchy and approved supporting content/related entity IDs.
 
-Fields/data when supported by Woo/registered term meta:
-
-- name;
-- slug;
-- description/introduction;
-- image;
-- parent/child hierarchy;
-- optional approved supporting content;
-- optional explicit related brand/article/service IDs.
-
-Do not create a parallel “SEO category” database.
-
-Category pages should gracefully handle empty terms and pagination.
+No parallel SEO-category database.
 
 ## 7. Brands
 
-Owner: the installed/approved Woo product-brand taxonomy.
+Owner: installed/approved Woo product-brand taxonomy. Identify actual provider/taxonomy before implementation. Never register a second brand taxonomy when one exists.
 
-Before implementation, identify the actual taxonomy slug/provider in the deployment. Reuse it.
+Brand pages may use approved name/description/logo/reference links and product membership.
 
-Possible fields:
+Brief positioning such as HAMMER value, SUNFLEX premium and MORGEN hydraulic prominence is content/presentation direction only. Technical superiority, authorization or certification claims require evidence.
 
-- brand name;
-- slug;
-- description;
-- logo/media;
-- website/reference URL when approved;
-- related products from taxonomy membership;
-- optional approved editorial content.
+## 8. Application pages
 
-Do not register a second `brand` taxonomy if one already exists.
+Default owner: native WordPress Pages.
 
-## 8. Services
+Baseline: **4 retained application-intent URLs** after migration reconciliation.
 
-Default owner: native WordPress Page content.
+Application content may include approved industry/use case, operating conditions, relevant product/category/brand IDs, technical selection factors, proof/media and RFQ CTA.
 
-Current public evidence contains service themes for:
+Specialist themes do not automatically become Pages. Create a new indexable route only for distinct approved intent/content.
 
-- crimping/assembly;
-- custom fitting/coupling/flange;
-- consultation/product selection;
-- hose repair/replacement assessment.
+## 9. Services
 
-Treat labels/copy as editable content.
+Default owner: native Page `/layanan-kami/` plus child/detail Pages only when distinct content justifies them.
 
-If service detail URLs are required, prefer child/native Pages first. A CPT is justified only if there is a demonstrated need for repeated structured service records and relationships.
+Support approved crimping/assembly, custom fitting/coupling/flange, selection consultation, repair/replacement and workshop proof.
 
-Service content may support:
+Do not preserve `/services/` as a second canonical service hub.
 
-- title;
-- summary;
-- detailed description;
-- process/capability information;
-- applications;
-- media;
-- related product/category IDs;
-- consultation CTA.
+## 10. Articles/guides
 
-## 9. Articles
+Owner: native Posts. Use title/slug/excerpt/content/featured media/author/date/categories/tags and optional explicit related product/category/brand/application IDs.
 
-Owner: native WordPress Posts.
+No keyword inference engine or AI content generator.
 
-Use standard:
+## 11. Evergreen/topic hubs
 
-- title/slug;
-- excerpt;
-- content;
-- featured image;
-- author/date if intentionally displayed;
-- categories/tags;
-- normal post status;
-- optional explicit related entity IDs via registered post meta if required.
+Owner: native Pages when migration classifies the URL KEEP and it has distinct useful intent. Avoid mass programmatic keyword pages.
 
-Do not create a parallel article repository.
+## 12. Navigation
 
-### Related content
+Owner: native WordPress menu where available. NavigationService normalizes one tree for desktop/mobile. Four discovery doors—product, application, brand, specification—must remain reachable with real anchors.
 
-Prefer explicit/editorial relationships over runtime keyword matching. For example, an article may store selected Woo product/category/brand IDs. If that feature is not required, omit it rather than building an inference engine.
-
-## 10. Evergreen/topic landing pages
-
-Owner: native WordPress Pages.
-
-Existing legacy landing pages may represent valuable search/user intent independent of Woo product records. Preserve them when migration review classifies them KEEP.
-
-Their content is ordinary approved page content. The plugin supplies presentation patterns only.
-
-Do not create hundreds of programmatic keyword pages from templates.
-
-## 11. Navigation
-
-Owner: native WordPress menu where available.
-
-`NavigationService` normalizes one menu tree for all viewport presentations.
-
-Fallback code navigation may exist for a safe initial state, but it must not become a second editable source once a WP menu is configured.
-
-## 12. Media
+## 13. Media
 
 Owner: WordPress Media Library; Woo owns product image associations.
 
-Rules:
+Use attachment IDs and responsive WP image APIs, honor editor alt data, preserve dimensions/aspect, and never use generic stock as a factual product/brand/workshop proof image.
 
-- use attachment IDs and responsive WordPress image functions;
-- honor editor-supplied alt text;
-- do not synthesize product-specific alt claims;
-- preserve image dimensions/aspect ratio;
-- generic staging fallback imagery must never impersonate a specific product/brand/location;
-- production factual media overrides fallback media.
+## 14. Technical RFQ data contract
 
-## 13. Documents/download links
+### Experience fields
 
-Current public products may link to external technical resources. This does not justify a custom document/PDF subsystem.
+The exact form schema is provider/configuration owned, but it must be capable of collecting application-specific technical information rather than only a generic message. Typical field groups may include only those approved for the selected inquiry path:
 
-Model approved resources as ordinary product/page links or registered metadata when needed:
+- contact/company identity;
+- buyer/end-user vs reseller/cooperation intent;
+- product/category/application context;
+- technical requirement fields sourced from the selected path;
+- quantity/project notes where configured;
+- attachment/upload where enabled;
+- source URL/entity ID captured by the integration;
+- consent/privacy acknowledgement where required.
 
-- label;
-- URL/attachment ID;
-- resource type;
-- optional file size/version if supplied.
+Do not fabricate mandatory technical fields that business owners have not approved; the UI must be data/config-driven enough to vary by inquiry context.
 
-Do not build signed downloads, PDF poster generation, document indexing or a technical-library database without a separate requirement.
+### Upload ownership/security
 
-## 14. Forms
+Prefer form-provider upload handling. Before enabling file upload confirm:
 
-Owner: external form provider.
+- allowed MIME/extensions;
+- size/count limits;
+- authenticated/public upload threat model as applicable;
+- malware/provider security behavior;
+- access visibility;
+- retention/deletion policy;
+- privacy wording.
 
-Graha plugin stores at most the configured form identifier and renders provider output within the site design. If the provider is unavailable, show an intentional contact fallback.
+The Graha plugin does not accept arbitrary filesystem paths or build a generic upload library.
 
-No custom mail delivery, CAPTCHA, autoresponse or submission database.
+### Routing
+
+Provider/FormAdapter configuration may route/label buyer vs reseller/cooperation leads and preserve source context. Custom email transport/submission tables are excluded unless a documented architecture change proves provider limitations.
+
+### Analytics events
+
+Event hooks may expose approved RFQ/WhatsApp/resource/selector interactions. IDs/names belong to deployment analytics configuration. Do not store an analytics reporting database.
 
 ## 15. SEO metadata/schema
 
-Metadata/schema storage belongs to WordPress/SEO/Woo providers. Graha templates must expose clean semantic source content and hooks/integration data.
+Metadata/schema storage/output belongs to WordPress/SEO/Woo providers. Graha supplies semantic source content, route context and integration hooks without a duplicate title/canonical/schema store.
 
-Never store a second copy of SEO title/description/schema fields merely to render the frontend.
+## 16. Legal/privacy
 
-## 16. Data conflict rule
+Legal content is approved WordPress/provider content. No footer legal link may point to `#` in production. Privacy must reflect actual RFQ/form/upload behavior.
 
-When two legacy/public values conflict:
+## 17. Data-conflict rule
 
-- do not choose silently;
-- mark production value pending/needs approval;
-- keep templates/data model capable of rendering the approved value later;
-- record the input in `docs/implementation-inputs.md` if it blocks release.
+When legacy/public values conflict: do not choose silently; mark production value pending; keep native/provider editing possible; record a blocking input in `implementation-inputs.md`; update canonical docs after approval.

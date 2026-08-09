@@ -1,46 +1,44 @@
 # Implementation Inputs
 
-These are **deployment/client inputs**, not architecture questions. They do not block repository preparation and must not be guessed by developers.
+These are deployment/client inputs, not unresolved architecture questions. Do not guess them.
 
-## Required before production launch
+## Required during Wave 0 / before production
 
-| Input | Why it matters | Safe implementation behavior until supplied |
+| Input | Why it matters | Safe behavior until supplied |
 |---|---|---|
-| Approved canonical company/contact/NAP data | Public legacy pages conflict on address wording | Keep one editable owner; do not hard-code conflicting legacy values |
-| Target WordPress/PHP/Woo versions | Compatibility/testing | Build to supported APIs; confirm before package/release |
-| Actual Woo brand taxonomy/provider + rewrite slug | Prevent duplicate brand model/routes | Adapter detects/reuses approved provider; do not register second taxonomy |
-| Active SEO provider and ownership settings | Prevent duplicate canonical/meta/schema/breadcrumbs | Provider-safe guards; WordPress defaults if no provider |
-| Active form provider/form ID | Contact behavior | Render contact fallback until configured |
-| Full current URL crawl + redirects | SEO-safe redesign migration | Do not fabricate redirect matrix; preserve known routes by default |
-| Approved brand assets/logo/fonts/colors | Production identity | Use neutral development tokens/placeholders; no Gloskin/Morgen assets |
-| Approved product/category/brand content cleanup | Taxonomy and thin/duplicate content | Woo data remains authoritative; templates tolerate sparse data |
-| Commerce mode: inquiry/catalog vs transactional Woo | Header/product CTA/cart surfaces | Keep architecture Woo-compatible; do not disable or invent commerce mode |
-| Approved global consultation/WhatsApp targets | CTA correctness | Omit/use editable fallback rather than guessing |
+| Fresh full current-site crawl/export | Reconcile live state against 96-URL baseline | Do not finalize redirect matrix without it |
+| Exact row mapping for current 68/18/4-equivalent content and 5 redirect/1 retire baseline | Prevent silent route loss | Use `scope-inventory.csv` count contract and mark reconciliation incomplete |
+| Approved canonical NAP/company data | Legacy contact wording conflicts | One editable owner; no hard-coded guess |
+| Target WordPress/PHP/Woo versions | Compatibility | Use supported APIs and verify release target |
+| Actual Woo brand taxonomy/provider | Prevent duplicate brand routes | Detect/reuse provider; no second taxonomy |
+| SEO provider + ownership settings | Prevent duplicate canonical/meta/schema/sitemap/breadcrumb | Provider-safe integration |
+| Form provider + RFQ conditional/upload/routing capability | Mandatory technical RFQ | Render safe fallback/prototype; architecture decision if provider insufficient |
+| RFQ upload allowed file types/size/count + retention/privacy policy | Security/legal | Upload disabled until approved |
+| Buyer vs reseller/cooperation routing rules | Correct lead handling | Present intent safely but do not invent recipient/routing |
+| Approved WhatsApp/contact targets | Contextual CTA | Omit/configurable fallback rather than guess |
+| Analytics/tag owner, current tag method, approved conversion-event names | Measurement continuity | Stable integration hooks; no reporting product |
+| Approved legal/privacy/terms/cookie destinations and consent requirement | No dead # links; RFQ upload privacy | Do not generate fake legal copy |
+| Approved logo/fonts/colors/media/workshop proof | Brand/trust | Neutral development assets only |
+| Approved product/category/brand data cleanup + datasheets | Specs/selector/claims | Sparse-state templates; no invented fields |
+| Commerce mode: inquiry/catalog vs transactional Woo | CTA/cart/account presentation | Remain Woo-compatible; do not force mode |
+| Backup/deployment/rollback owner and procedure | Controlled rebuild safety | Do not launch until defined |
 
-## Decisions that can remain implementation-time
+## Implementation-time native decisions
 
-These should be resolved from the actual environment without reopening raw project files:
+Resolve from actual deployment without raw brief:
 
-- whether a native WordPress menu already represents the intended IA;
-- whether services need child Pages or only sections on `/layanan-kami/`;
-- which Woo-supported archive/filter hooks best fit the installed version;
-- whether provider breadcrumbs should be rendered directly or consumed as data;
-- whether any existing evergreen Page needs a custom template family;
-- whether a small Graha settings page is needed after native owners are inspected.
+- WP menu structure/IA storage;
+- exact authoritative brand taxonomy slug;
+- SEO-provider breadcrumb integration;
+- specific Woo hooks for archive/filter presentation;
+- exact current 4 application routes;
+- which specialist themes deserve additional pages after approval;
+- whether service detail Pages are necessary;
+- whether Legal/RFQ needs a dedicated Page route or provider-managed surface;
+- whether one small Graha settings screen is needed.
 
 ## Architecture-change triggers
 
-Stop and update canonical docs before implementing if discovery shows a genuine need for:
+Update canonical docs before implementing a custom CPT/table/public route engine/AJAX or REST mutation/custom cache/first-party redirect engine/first-party SEO graph/custom RFQ storage-mail backend/custom commerce logic/document subsystem/more than eight services.
 
-- a custom CPT;
-- a custom database table;
-- more than eight bootable owners;
-- a custom public route/rewrite engine;
-- custom AJAX/REST mutation;
-- a custom cache;
-- a first-party redirect engine;
-- a first-party metadata/schema output layer despite an existing provider;
-- custom commerce/order/payment logic;
-- document/PDF management beyond simple approved links.
-
-The default answer to these is **not yet** until evidence demonstrates the need.
+Default answer is **not yet** until evidence proves the native/provider path cannot satisfy the canonical requirements.
