@@ -1,14 +1,14 @@
 .graha-nav__toggle,
 .graha-nav__submenu-toggle {
 	display: none;
-	min-inline-size: 2.75rem;
-	min-block-size: 2.75rem;
+	min-inline-size: var(--graha-control-min);
+	min-block-size: var(--graha-control-min);
 	align-items: center;
 	justify-content: center;
 	font: inherit;
 	background: transparent;
-	border: 1px solid currentColor;
-	border-radius: var(--graha-radius);
+	border: var(--graha-border-width) solid currentColor;
+	border-radius: var(--graha-radius-md);
 }
 
 .graha-nav__list {
@@ -29,8 +29,14 @@
 .graha-nav__link,
 .graha-nav__label {
 	display: inline-flex;
-	min-block-size: 2.75rem;
+	min-block-size: var(--graha-control-min);
 	align-items: center;
+}
+
+.graha-nav__link {
+	color: inherit;
+	text-decoration-thickness: var(--graha-link-underline-thickness);
+	text-underline-offset: var(--graha-link-underline-offset);
 }
 
 .graha-nav__submenu {

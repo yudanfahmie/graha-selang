@@ -33,7 +33,7 @@ function assert_true( $condition, $message ) {
 	echo "PASS: {$message}\n";
 }
 
-$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/graha-selang.php', '0.2.0' );
+$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/graha-selang.php', '0.3.0' );
 $admin  = new \GrahaSelang\AdminService( $assets );
 $admin->register_menu();
 

@@ -182,7 +182,7 @@ While Wave 0 remains blocked, use this safe execution order without falsely adva
 1. canonicalize the approved next-bundle requirements;
 2. finish the environment-independent portion of Wave 1 with `TemplateService`, semantic shell, centralized tokens, reusable breadcrumbs, presentation-family prototypes, accessibility and conditional asset use;
 3. build/activate the production Homepage only when real approved content and real crawlable native destinations are available;
-4. implement the one-shot migration mechanism only when an approved migration bundle/manifest/runtime prerequisites exist; never create fake bundle content to make the mechanism appear complete;
+4. implement the one-shot migration mechanism only when an approved migration bundle/manifest/runtime prerequisites exist; its admin UI must stay lightweight and run heavy validation/import only through explicit authenticated AJAX per `migration-admin-ajax-contract.md`; never create fake bundle content to make the mechanism appear complete;
 5. complete production inner-page families after real route/data/provider information is available.
 
 The one-shot content-import mechanism is distinct from the 96-URL redirect/reconciliation workstream. It must not replace or bypass Wave 0 URL reconciliation.

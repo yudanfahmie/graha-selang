@@ -33,11 +33,13 @@ final class Kernel {
 			return;
 		}
 
-		$assets = new AssetService( $this->plugin_file, $this->version );
+		$assets     = new AssetService( $this->plugin_file, $this->version );
+		$navigation = new NavigationService();
 
 		$this->services = array(
 			$assets,
-			new NavigationService(),
+			$navigation,
+			new TemplateService( $assets, $navigation ),
 			new AdminService( $assets ),
 		);
 

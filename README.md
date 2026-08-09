@@ -94,10 +94,11 @@ See `docs/admin-information-architecture.md`.
 13. `docs/legacy-migration-contract.md`
 14. `docs/implementation-plan.md`
 15. `docs/verification-contract.md`
-16. `docs/prune-matrix.csv`
-17. `docs/source-notes.md`
-18. `docs/implementation-inputs.md`
-19. `docs/developer-kickoff-prompt.md`
+16. `docs/approved-next-bundle-contract.md`
+17. `docs/prune-matrix.csv`
+18. `docs/source-notes.md`
+19. `docs/implementation-inputs.md`
+20. `docs/developer-kickoff-prompt.md`
 
 Owner instructions outrank repository docs. Material implementation discoveries must update the affected canonical docs in the same coherent change.
 
@@ -131,4 +132,4 @@ It performs PHP syntax checks, static architecture/security guards, navigation n
 
 ## Implementation status
 
-**Wave 1 environment-independent foundation is in progress.** The plugin now has one `Kernel`, `AdminService`, the canonical single `AssetService`, and a native `NavigationService`. Ringkasan admin assets are screen-scoped; public foundation/navigation assets are registered but not globally enqueued; reusable responsive/accessibility primitives and progressive navigation behavior are present without taking over public routes. Wave 1 is **not complete**: target WordPress activation/admin placement, semantic shell/template prototypes, and deployment-sensitive integration checks remain pending. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`.
+**Wave 1 environment-independent foundation is substantially implemented.** The plugin now has one `Kernel` with four active owners: `AdminService`, the canonical `AssetService`, native `NavigationService`, and opt-in `TemplateService`. Centralized neutral/system-safe design tokens, responsive/accessibility primitives, semantic shell/header/main/footer composition, one visible breadcrumb renderer, and all documented presentation-family identifiers are implemented without public route takeover. Public assets remain opt-in and admin assets remain screen-scoped. Wave 1 is **not complete** until a real WordPress runtime verifies activation, actual admin placement/collision behavior, and representative Page/Post/Woo integration. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`. Production Homepage activation/content and the one-shot migration runtime remain gated by `docs/approved-next-bundle-contract.md`. Future migration UI work must also follow `docs/migration-admin-ajax-contract.md`: lightweight page render, screen-scoped assets, and explicit authenticated AJAX for heavy validation/import.

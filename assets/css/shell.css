@@ -1,0 +1,90 @@
+.graha-site-shell {
+	min-block-size: 100vh;
+	background: var(--graha-color-surface);
+}
+
+.graha-site-header {
+	border-block-end: var(--graha-border-width) solid var(--graha-color-border);
+	background: var(--graha-color-surface);
+}
+
+.graha-site-header__inner {
+	display: grid;
+	gap: var(--graha-space-4);
+	padding-block: var(--graha-space-4);
+}
+
+.graha-site-identity {
+	min-inline-size: 0;
+	font-size: var(--graha-type-xl);
+	font-weight: var(--graha-weight-bold);
+	line-height: var(--graha-leading-tight);
+}
+
+.graha-site-identity a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.graha-site-identity .custom-logo {
+	display: block;
+	max-block-size: var(--graha-logo-max);
+	inline-size: auto;
+}
+
+.graha-site-main {
+	padding-block: var(--graha-space-6) var(--graha-space-8);
+}
+
+.graha-page-header {
+	max-inline-size: var(--graha-content-narrow);
+	margin-block-end: var(--graha-space-6);
+}
+
+.graha-page-header__eyebrow {
+	margin-block-end: var(--graha-space-2);
+	font-size: var(--graha-type-sm);
+	font-weight: var(--graha-weight-semibold);
+	color: var(--graha-color-muted);
+}
+
+.graha-page-header__lead {
+	font-size: var(--graha-type-lg);
+	color: var(--graha-color-muted);
+}
+
+.graha-page-section {
+	padding-block: var(--graha-space-6);
+}
+
+.graha-page-section + .graha-page-section {
+	border-block-start: var(--graha-border-width) solid var(--graha-color-border);
+}
+
+.graha-page-section__heading {
+	max-inline-size: var(--graha-content-narrow);
+	margin-block-end: var(--graha-space-4);
+}
+
+.graha-site-footer {
+	padding-block: var(--graha-space-6);
+	border-block-start: var(--graha-border-width) solid var(--graha-color-border);
+	background: var(--graha-color-surface-subtle);
+	color: var(--graha-color-muted);
+}
+
+.graha-site-footer__identity {
+	margin: 0;
+	font-size: var(--graha-type-sm);
+}
+
+@media (min-width: 64rem) {
+	.graha-site-header__inner {
+		grid-template-columns: minmax(var(--graha-header-identity-min), auto) 1fr;
+		align-items: center;
+	}
+
+	.graha-site-header .graha-nav {
+		justify-self: end;
+	}
+}

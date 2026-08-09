@@ -265,3 +265,17 @@ When the one-shot migration mechanism is implemented, verify:
 Wave 0 remains incomplete while the deployment inputs in `implementation-inputs.md` are missing.
 
 Wave 1 remains incomplete until a real WordPress runtime proves activation, actual admin placement/collision behavior, and representative Page/Post/Woo shell behavior. Repository-level PHP/stub/static checks must be reported as such and must not be presented as target-runtime verification.
+
+
+## 25. Migration admin AJAX assertions
+
+When the one-shot migration UI exists, additionally verify:
+
+- admin page/menu render performs no bulk import, recursive scan, full checksum pass, media sideload, or large migration query;
+- heavy validation/import is triggered only by explicit authorized action through authenticated `wp_ajax_*`;
+- no `wp_ajax_nopriv_*` migration action exists;
+- state-changing AJAX handlers enforce least-privilege capability + nonce and revalidate bundle identity/state;
+- migration CSS/JS is scoped to the temporary Graha migration child screen;
+- opening the screen does not start aggressive polling or an automatic import;
+- timeout/network retry reconciles persisted state/source identities before continuing;
+- no generic queue/framework or invented batch protocol is introduced without evidence from the real bundle.

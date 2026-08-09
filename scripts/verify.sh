@@ -18,6 +18,7 @@ python3 tests/verify_contracts.py
 echo '== PHP foundation tests =='
 php tests/navigation-normalization.php
 php tests/navigation-render.php
+php tests/template-render.php
 php tests/admin-asset-scope.php
 php tests/kernel-smoke.php
 

@@ -5,8 +5,10 @@ namespace GrahaSelang;
 defined( 'ABSPATH' ) || exit;
 
 final class AssetService {
+	const TOKENS_STYLE         = 'graha-selang-tokens';
 	const FOUNDATION_STYLE     = 'graha-selang-foundation';
 	const NAVIGATION_STYLE     = 'graha-selang-navigation';
+	const SHELL_STYLE          = 'graha-selang-shell';
 	const NAVIGATION_SCRIPT    = 'graha-selang-navigation';
 	const ADMIN_OVERVIEW_STYLE = 'graha-selang-admin-overview';
 
@@ -35,15 +37,22 @@ final class AssetService {
 	}
 
 	/**
-	 * Register the small public foundation. Enqueue remains component-owned.
+	 * Register the public design/presentation assets. Enqueue remains opt-in.
 	 *
 	 * @return void
 	 */
 	public function register_public_assets() {
 		wp_register_style(
+			self::TOKENS_STYLE,
+			$this->base_url . 'assets/css/tokens.css',
+			array(),
+			$this->version
+		);
+
+		wp_register_style(
 			self::FOUNDATION_STYLE,
 			$this->base_url . 'assets/css/foundation.css',
-			array(),
+			array( self::TOKENS_STYLE ),
 			$this->version
 		);
 
@@ -51,6 +60,13 @@ final class AssetService {
 			self::NAVIGATION_STYLE,
 			$this->base_url . 'assets/css/navigation.css',
 			array( self::FOUNDATION_STYLE ),
+			$this->version
+		);
+
+		wp_register_style(
+			self::SHELL_STYLE,
+			$this->base_url . 'assets/css/shell.css',
+			array( self::FOUNDATION_STYLE, self::NAVIGATION_STYLE ),
 			$this->version
 		);
 
@@ -64,24 +80,40 @@ final class AssetService {
 	}
 
 	/**
-	 * Enqueue only the generic Graha UI primitives requested by a live component.
+	 * Enqueue only generic Graha UI primitives requested by a live component.
 	 *
 	 * @return void
 	 */
 	public function enqueue_foundation() {
 		$this->register_public_assets();
+		wp_enqueue_style( self::TOKENS_STYLE );
 		wp_enqueue_style( self::FOUNDATION_STYLE );
 	}
 
 	/**
-	 * Enqueue navigation assets when a future presentation owner renders the nav.
+	 * Enqueue navigation assets when presentation actually renders the nav.
 	 *
 	 * @return void
 	 */
 	public function enqueue_navigation() {
 		$this->register_public_assets();
+		wp_enqueue_style( self::TOKENS_STYLE );
 		wp_enqueue_style( self::FOUNDATION_STYLE );
 		wp_enqueue_style( self::NAVIGATION_STYLE );
+		wp_enqueue_script( self::NAVIGATION_SCRIPT );
+	}
+
+	/**
+	 * Enqueue the complete semantic shell bundle on explicit presentation use.
+	 *
+	 * @return void
+	 */
+	public function enqueue_shell() {
+		$this->register_public_assets();
+		wp_enqueue_style( self::TOKENS_STYLE );
+		wp_enqueue_style( self::FOUNDATION_STYLE );
+		wp_enqueue_style( self::NAVIGATION_STYLE );
+		wp_enqueue_style( self::SHELL_STYLE );
 		wp_enqueue_script( self::NAVIGATION_SCRIPT );
 	}
 
