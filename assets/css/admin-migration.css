@@ -1,0 +1,27 @@
+.graha-admin-migration {
+	max-width: 52rem;
+}
+
+.graha-admin-migration__summary {
+	display: grid;
+	grid-template-columns: minmax(8rem, 12rem) 1fr;
+	gap: 0.5rem 1rem;
+	max-width: 44rem;
+	padding: 1rem;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+}
+
+.graha-admin-migration__summary dt {
+	font-weight: 600;
+}
+
+.graha-admin-migration__summary dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.graha-admin-migration__result {
+	margin-top: 1rem;
+	font-weight: 600;
+}

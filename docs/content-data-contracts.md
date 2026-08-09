@@ -36,6 +36,17 @@ Owner: WooCommerce Product.
 
 Supported data includes name/slug/SKU/descriptions/images/category/brand/tags/attributes and approved registered product meta. Price/stock remain Woo-owned if used.
 
+### One-shot migration provenance
+
+The product-catalog v1 importer may write only these Graha-specific provenance/presentation meta fields in addition to normal Woo product fields:
+
+- `_graha_source_identity`: deterministic stable source identity used to reconcile retries and prevent duplicate successful imports;
+- `_graha_source_bundle`: bundle ID that last reconciled the product;
+- `_graha_source_url`: observed public source URL only when that exact URL was verified;
+- `_graha_home_group`: one of the six approved Homepage presentation groups.
+
+These fields do not form a shadow catalog, do not replace Woo categories/attributes/brand taxonomy, and do not imply price, stock, technical specification, certification, media compatibility, or brand authorization. After a successful import, WooCommerce products remain the authoritative runtime product records; the repository archive remains audit evidence only.
+
 ### Technical fields
 
 Prefer Woo attributes or clearly registered Woo-associated meta for populated values such as:

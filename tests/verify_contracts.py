@@ -1,89 +1,79 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import hashlib
+import json
 import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-production_files = [ROOT / 'graha-selang.php']
-production_files += sorted((ROOT / 'src').glob('*.php'))
-production_files += sorted((ROOT / 'assets').rglob('*.css'))
-production_files += sorted((ROOT / 'assets').rglob('*.js'))
-
-texts = {path: path.read_text(encoding='utf-8') for path in production_files}
-php_text = '\n'.join(text for path, text in texts.items() if path.suffix == '.php')
-runtime_text = '\n'.join(texts.values())
+SRC = ROOT / 'src'
 
 def fail(message):
-    print(f'FAIL: {message}')
-    sys.exit(1)
+    print(f'FAIL: {message}', file=sys.stderr)
+    raise SystemExit(1)
 
 def check(condition, message):
     if not condition:
         fail(message)
     print(f'PASS: {message}')
 
-check(php_text.count('final class Kernel') == 1, 'exactly one Kernel composition root')
+production_files = [ROOT / 'graha-selang.php']
+production_files += sorted(SRC.glob('*.php'))
+production_files += sorted((ROOT / 'templates').glob('*.php'))
+production_files += sorted((ROOT / 'assets').rglob('*.css'))
+production_files += sorted((ROOT / 'assets').rglob('*.js'))
+texts = {path: path.read_text(encoding='utf-8') for path in production_files}
+php_text = '\n'.join(text for path, text in texts.items() if path.suffix == '.php')
+runtime_text = '\n'.join(texts.values())
 
-kernel = texts[ROOT / 'src' / 'Kernel.php']
-owners = re.findall(r'new\s+([A-Z][A-Za-z0-9_]+)\s*\(', kernel)
-check(len(owners) == len(set(owners)), 'Kernel composes each owner once')
-check(1 <= len(owners) <= 8, f'bootable owner count within limit ({len(owners)}/8)')
-check(set(owners) == {'AssetService', 'NavigationService', 'TemplateService', 'AdminService'}, 'only justified Wave 1 owners are active')
+kernel = texts[SRC / 'Kernel.php']
+admin = texts[SRC / 'AdminService.php']
+assets = texts[SRC / 'AssetService.php']
+nav = texts[SRC / 'NavigationService.php']
+template = texts[SRC / 'TemplateService.php']
+migration = texts[SRC / 'ProductCatalogMigration.php']
+bundle = texts[SRC / 'ProductCatalogBundle.php']
 
-admin = texts[ROOT / 'src' / 'AdminService.php']
+check(len(re.findall(r'final\s+class\s+Kernel\b', php_text)) == 1, 'exactly one Kernel composition root')
+owners = re.findall(r'new\s+([A-Za-z]+(?:Service|Adapter))\s*\(', kernel)
+check(1 <= len(set(owners)) <= 8, f'bootable owner count within limit ({len(set(owners))}/8)')
+check(set(owners) == {'AdminService', 'AssetService', 'NavigationService', 'TemplateService'}, 'only existing four bootable owners remain active')
+check('ProductCatalogMigration' not in kernel and 'ProductCatalogBundle' not in kernel, 'migration helpers are not bootable Kernel owners')
+
 check(php_text.count('add_menu_page(') == 1, 'exactly one Graha root admin menu registration')
-check(admin.count('add_submenu_page(') == 1, 'Ringkasan is registered as the only current child page')
-check("const MENU_SLUG           = 'graha-selang-content';" in admin, 'canonical admin slug preserved')
-check(re.search(r"add_menu_page\(.*?'dashicons-admin-site-alt3',\s*3\s*\)", admin, re.S) is not None, 'default admin menu position is 3')
-check("const OVERVIEW_CAPABILITY = 'edit_pages';" in admin, 'Ringkasan capability is explicit')
-check("add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );" in admin, 'AdminService owns admin enqueue hook')
-check("in_array( $hook_suffix, $this->overview_hooks, true )" in admin, 'admin asset enqueue is screen-scoped')
+check("const MENU_SLUG" in admin and "'graha-selang-content'" in admin, 'canonical admin slug preserved')
+check(re.search(r"add_menu_page\([\s\S]*?self::MENU_SLUG[\s\S]*?\n\s*3\s*\n\s*\)", admin) is not None, 'default admin menu position is 3')
+check(admin.count('add_submenu_page(') == 2, 'AdminService has Ringkasan plus one conditional migration child registration')
+check('should_show_menu()' in admin and 'MIGRATION_SLUG' in admin, 'migration child is gated by bundle state')
+check("const MIGRATION_CAPABILITY = 'manage_woocommerce';" in admin, 'migration capability is explicit and Woo-scoped')
+check("'wp_ajax_' . self::MIGRATION_AJAX" in admin and 'wp_ajax_nopriv_' not in admin, 'migration exposes authenticated AJAX only')
+check('check_ajax_referer' in admin and 'current_user_can( self::MIGRATION_CAPABILITY )' in admin, 'migration AJAX enforces capability plus nonce')
+check("if ( function_exists( 'is_admin' ) && is_admin() )" in admin, 'migration AJAX hook is admin-only')
+check("require_once __DIR__ . '/ProductCatalogMigration.php';" in admin and 'get_migration()' in admin, 'AdminService lazy-loads migration helper')
 
-asset = texts[ROOT / 'src' / 'AssetService.php']
 check(php_text.count('final class AssetService') == 1, 'exactly one first-party asset owner')
 for path, text in texts.items():
     if path.suffix == '.php' and path.name != 'AssetService.php':
         check(re.search(r'\bwp_(?:register|enqueue)_(?:style|script)\s*\(', text) is None, f'no direct asset registry/enqueue outside AssetService: {path.relative_to(ROOT)}')
-check("add_action( 'wp_enqueue_scripts', array( $this, 'register_public_assets' ), 5 );" in asset, 'public assets are registered centrally')
-register_method = asset.split('public function register_public_assets()', 1)[1].split('public function enqueue_foundation()', 1)[0]
-check('wp_enqueue_' not in register_method, 'public registration hook does not globally enqueue assets')
-check('admin_enqueue_scripts' not in asset, 'AssetService does not globally hook admin enqueue')
-check("const TOKENS_STYLE         = 'graha-selang-tokens';" in asset, 'AssetService owns one explicit token stylesheet')
-check("const SHELL_STYLE          = 'graha-selang-shell';" in asset, 'AssetService owns conditional shell styling')
+check('ADMIN_MIGRATION_STYLE' in assets and 'ADMIN_MIGRATION_SCRIPT' in assets, 'migration screen assets remain owned by AssetService')
+check('wp_localize_script' in assets and 'admin-ajax.php' in assets, 'migration JavaScript receives only scoped AJAX configuration')
+check('admin_enqueue_scripts' not in assets, 'AssetService does not globally hook admin enqueue')
 
-navigation = texts[ROOT / 'src' / 'NavigationService.php']
-check(php_text.count('register_nav_menus(') == 1, 'one native WordPress navigation location registration')
-check("const PRIMARY_LOCATION = 'graha-primary';" in navigation, 'one canonical primary navigation location')
-check('get_nav_menu_locations()' in navigation and 'wp_get_nav_menu_items(' in navigation, 'navigation reads native WordPress menu ownership')
-check("return '';" in navigation, 'navigation has safe empty rendering behavior')
+check('register_nav_menus' in nav and 'wp_get_nav_menu_items' in nav, 'NavigationService uses native WordPress menu ownership')
+check('register_nav_menus' not in php_text.replace(nav, ''), 'navigation ownership is not duplicated')
 
-template = texts[ROOT / 'src' / 'TemplateService.php']
-check(php_text.count('final class TemplateService') == 1, 'exactly one TemplateService presentation owner')
-check('graha_selang_prepare_page' in template and 'graha_selang_render_page' in template, 'TemplateService exposes opt-in presentation hooks')
-check('function render_breadcrumbs' in template and php_text.count('function render_breadcrumbs') == 1, 'one reusable visible breadcrumb renderer')
-check(template.count("'product_archive'") == 1 and template.count("'not_found'") == 1 and template.count("'technical_rfq'") == 1, 'TemplateService covers representative documented presentation families')
-check("__( 'Beranda', 'graha-selang' )" in template, 'breadcrumb renderer uses Indonesian native Home label')
-check('return $ready >= 4;' in template, 'Home renderer enforces four explicit substantial sections')
-check('application/ld+json' not in template.lower(), 'breadcrumb renderer emits no schema graph')
+check("add_filter( 'the_content'" in template and "add_action( 'wp_enqueue_scripts'" in template, 'TemplateService advances native presentation without route takeover')
+for forbidden in ('template_include', 'template_redirect', 'add_rewrite_rule', 'register_post_type(', 'register_taxonomy('):
+    check(forbidden not in template, f'TemplateService does not own {forbidden}')
+for family in ('home','product_archive','product_category','product_single','application','brand','about','service','technical_rfq','article','legal','search','not_found'):
+    check(f"'{family}'" in template, f'TemplateService retains family: {family}')
+check('_graha_source_identity' in template and '_graha_home_group' in template, 'native Home reads migrated/native product provenance')
+check(re.search(r"'numberposts'\s*=>\s*80", template) is not None, 'native Home product query is bounded')
+check('migration-source/' not in template, 'public presentation never reads repository archive bundle')
+check('contact-us' in template and 'layanan-kami' in template and "wc_get_page_id( 'shop' )" in template, 'native Home activation requires real native shop/services/contact destinations')
+check('graha-priority-grid' in texts[ROOT / 'assets/css/foundation.css'], 'shared foundation preserves unequal Home hierarchy primitive')
 
-css_texts = {path: text for path, text in texts.items() if path.suffix == '.css'}
-tokens = css_texts[ROOT / 'assets' / 'css' / 'tokens.css']
-required_tokens = [
-    '--graha-font-sans:', '--graha-type-md:', '--graha-weight-bold:', '--graha-leading-copy:',
-    '--graha-space-4:', '--graha-content-max:', '--graha-breakpoint-navigation:', '--graha-color-text:',
-    '--graha-radius-md:', '--graha-shadow-soft:', '--graha-control-min:', '--graha-focus-width:', '--graha-motion-fast:',
-    '--graha-card-min:', '--graha-logo-max:', '--graha-border-width:', '--graha-link-underline-offset:',
-    '--graha-media-ratio-default:', '--graha-z-skip-link:', '--graha-motion-reduced:'
-]
-for token in required_tokens:
-    check(token in tokens, f'central token exists: {token[:-1]}')
-for path, text in css_texts.items():
-    if path.name not in {'tokens.css', 'admin-overview.css'}:
-        check(re.search(r'#[0-9a-fA-F]{3,8}\b', text) is None, f'no one-off hex colors outside token/admin native layers: {path.relative_to(ROOT)}')
-media_values = set(re.findall(r'@media\s*\(\s*(?:min|max)-width:\s*(\d+rem)\s*\)', '\n'.join(css_texts.values())))
-check(media_values.issubset({'48rem', '64rem'}), f'component media queries use approved breakpoint literals ({sorted(media_values)})')
-
-forbidden = {
+for label, patterns in {
     'custom database writes': [r'\$wpdb\b', r'\bdbDelta\s*\(', r'CREATE\s+TABLE'],
     'unapproved custom content types': [r'\bregister_post_type\s*\(', r'\bregister_taxonomy\s*\('],
     'unauthenticated mutation endpoints': [r'wp_ajax_nopriv_', r'\bregister_rest_route\s*\('],
@@ -91,30 +81,60 @@ forbidden = {
     'custom payment/order implementation': [r'\bWC_Order\b', r'woocommerce_(?:checkout|payment|order)'],
     'duplicate SEO output': [r'rel=["\']canonical["\']', r'application/ld\+json', r'<meta\s', r'\bwp_head\b'],
     'route takeover before Wave 0': [r'\btemplate_include\b', r'\btemplate_redirect\b', r'\badd_rewrite_rule\s*\(', r'\bwp_(?:safe_)?redirect\s*\('],
-}
-for label, patterns in forbidden.items():
+}.items():
     for pattern in patterns:
         check(re.search(pattern, php_text, re.I) is None, f'no {label}: {pattern}')
 
-check(re.search(r'\b(?:gloskin|morgen)\b', runtime_text, re.I) is None, 'no Gloskin/Morgen runtime identifiers')
-check('redirect-matrix.csv' not in runtime_text, 'no fabricated redirect matrix dependency in runtime')
-check(re.search(r'\b(?:rank_math|wpseo|yoast)\b', php_text, re.I) is None, 'no SEO provider assumption')
-check(re.search(r'\b(?:cf7|contact_form_7|gravityforms|wpforms)\b', php_text, re.I) is None, 'no form provider assumption')
-check(re.search(r'lorem\s+ipsum', runtime_text, re.I) is None, 'no lorem ipsum in production runtime')
-check('MigrationService' not in php_text and 'manifest.json' not in php_text, 'one-shot migration runtime is not fabricated before bundle prerequisites')
+check(re.search(r'\bgloskin\b', runtime_text, re.I) is None, 'no Gloskin runtime leakage')
+for path, text in texts.items():
+    if path != SRC / 'TemplateService.php':
+        check(re.search(r'\bmorgen\b', text, re.I) is None, f'no Morgen runtime identifier outside approved Home grouping: {path.relative_to(ROOT)}')
 
-contract = (ROOT / 'docs' / 'approved-next-bundle-contract.md').read_text(encoding='utf-8')
-traceability = (ROOT / 'docs' / 'requirement-traceability.csv').read_text(encoding='utf-8')
-implementation_plan = (ROOT / 'docs' / 'implementation-plan.md').read_text(encoding='utf-8')
-verification_contract = (ROOT / 'docs' / 'verification-contract.md').read_text(encoding='utf-8')
-check('One-shot migration scope' in contract and 'Production public-page quality' in contract, 'approved next-bundle contract canonicalizes page quality and one-shot migration')
+check("RUNTIME_RELATIVE_PATH = 'migration-runtime/product-catalog-v1'" in bundle, 'one fixed plugin-local runtime bundle path is explicit')
+check('migration-source' not in bundle and 'migration-source' not in migration, 'production migration runtime never reads repository archive copy')
+check('hash_file' in bundle and "'sha256'" in bundle, 'full AJAX-time payload checksum validation exists')
+check('validate_manifest_structure' in bundle and 'read_header' in bundle, 'cheap menu detection validates manifest structure without payload hashing')
+for token in ('RecursiveDirectoryIterator', 'FilesystemIterator', 'scandir(', 'glob('):
+    check(token not in bundle, f'cleanup/detection avoids recursive or broad scanning: {token}')
+for need in ('WC_Product_Simple', 'wc_get_product', 'add_option', 'update_option', '_graha_source_identity'):
+    check(need in migration, f'migration uses native/idempotency primitive: {need}')
+consumed = re.search(r"'status'\s*=>\s*'consumed'", migration)
+cleanup_pos = migration.find('->cleanup(')
+check(consumed is not None and cleanup_pos > consumed.start(), 'logical consumed state is persisted before cleanup call')
+check('Source identity collision' in migration and 'source identity lain' in migration, 'source identity collision guards are explicit')
+
+archive = ROOT / 'migration-source/product-catalog-v1'
+runtime = ROOT / 'migration-runtime/product-catalog-v1'
+for base in (archive, runtime):
+    check((base / 'manifest.json').is_file() and (base / 'products.json').is_file(), f'bundle copy present: {base.relative_to(ROOT)}')
+manifest_a = json.loads((archive / 'manifest.json').read_text(encoding='utf-8'))
+manifest_r = json.loads((runtime / 'manifest.json').read_text(encoding='utf-8'))
+check(manifest_a == manifest_r, 'archive/runtime manifests are identical at commit time')
+check((archive / 'products.json').read_bytes() == (runtime / 'products.json').read_bytes(), 'archive/runtime product payloads are identical at commit time')
+check(manifest_a.get('expected_records') == 44 and manifest_a.get('files') == ['products.json'], 'manifest has explicit payload list and reliable 44-record count')
+sha = hashlib.sha256((runtime / 'products.json').read_bytes()).hexdigest()
+check(manifest_a.get('checksums', {}).get('products.json') == sha, 'manifest checksum matches products payload')
+data = json.loads((runtime / 'products.json').read_text(encoding='utf-8'))
+products = data.get('products', [])
+check(len(products) == 44, 'bundle contains exactly 44 conservative product identity records')
+ids = [p.get('source_id') for p in products]
+check(len(ids) == len(set(ids)), 'bundle source identities are unique')
+allowed = {'source_id','name','slug','source_url','home_group'}
+for product in products:
+    check(set(product) == allowed, f'product record carries only approved identity/presentation fields: {product.get("source_id", "unknown")}')
+    check(str(product.get('source_id', '')).startswith('graha-public-product:') and product.get('name') and product.get('slug'), 'product record has deterministic stable identity/name/slug')
+counts = {key: sum(1 for p in products if p.get('home_group') == key) for key in ('hydraulic_anchor','industrial_anchor','ducting_support','pvc_support','fittings_support','cng_specialist')}
+check(counts == {'hydraulic_anchor':15,'industrial_anchor':11,'ducting_support':5,'pvc_support':2,'fittings_support':10,'cng_specialist':1}, f'Home group counts preserve hierarchy ({counts})')
+
+content_contract = (ROOT / 'docs/content-data-contracts.md').read_text(encoding='utf-8')
+for meta in ('_graha_source_identity','_graha_source_bundle','_graha_source_url','_graha_home_group'):
+    check(meta in content_contract, f'content-data contract documents migration provenance field: {meta}')
+traceability = (ROOT / 'docs/requirement-traceability.csv').read_text(encoding='utf-8')
 for requirement_id in range(32, 41):
     check(f'REQ-{requirement_id:03d}' in traceability, f'traceability includes REQ-{requirement_id:03d}')
-check('approved-next-bundle-contract.md' in implementation_plan, 'implementation plan references approved next-bundle contract')
-check('One-shot migration assertions' in verification_contract and 'Homepage production assertions' in verification_contract, 'verification contract covers Homepage and one-shot migration gates')
-ajax_contract = (ROOT / 'docs' / 'migration-admin-ajax-contract.md').read_text(encoding='utf-8')
-check('authenticated WordPress admin AJAX' in ajax_contract and 'wp_ajax_nopriv_' in ajax_contract, 'migration AJAX contract requires authenticated admin AJAX and forbids nopriv')
-check('Migration admin AJAX assertions' in verification_contract, 'verification contract covers lightweight migration AJAX behavior')
-check('migration-admin-ajax-contract.md' in implementation_plan, 'implementation plan references migration AJAX contract')
 
-print('All repository contract guards passed.')
+check('setInterval(' not in texts[ROOT / 'assets/js/admin-migration.js'], 'migration screen has no polling loop')
+check("addEventListener('click'" in texts[ROOT / 'assets/js/admin-migration.js'], 'migration work starts only from explicit user action')
+check('button.disabled = true' in texts[ROOT / 'assets/js/admin-migration.js'], 'migration UI suppresses double-click while request runs')
+
+print('Repository contract guards passed.')

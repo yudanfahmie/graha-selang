@@ -1,0 +1,13 @@
+{
+  "bundle_id": "graha-product-catalog-v1-20260809",
+  "schema_version": "1",
+  "source_version": "grahaselang-public-woo-snapshot-2026-08-09",
+  "migration_type": "product-catalog",
+  "files": [
+    "products.json"
+  ],
+  "checksums": {
+    "products.json": "60cb5d3ef9b2df1db1dff33f8e78c0bfed1b4a71587a2c6d1328ba47c396f2c0"
+  },
+  "expected_records": 44
+}
