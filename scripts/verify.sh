@@ -13,6 +13,7 @@ php tests/navigation-normalization.php
 php tests/navigation-render.php
 php tests/template-render.php
 php tests/native-presentation.php
+php tests/static-page-shell.php
 php tests/admin-asset-scope.php
 php tests/product-content-service.php
 php tests/site-lifecycle.php

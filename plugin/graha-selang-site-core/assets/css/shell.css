@@ -1,29 +1,73 @@
 .graha-site-shell {
+	display: flex;
+	flex-direction: column;
 	min-block-size: 100vh;
 	background: var(--graha-color-surface);
 }
 
 .graha-site-header {
+	position: sticky;
+	inset-block-start: 0;
+	z-index: 900;
 	border-block-end: var(--graha-border-width) solid var(--graha-color-border);
 	background: var(--graha-color-surface);
+	box-shadow: 0 0.25rem 1rem rgb(15 23 42 / 0.05);
+}
+
+.graha-site-header::before {
+	content: "";
+	display: block;
+	block-size: 0.25rem;
+	background: linear-gradient(90deg, var(--graha-color-primary-dark), var(--graha-color-primary) 55%, var(--graha-color-primary-hover));
 }
 
 .graha-site-header__inner {
 	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	gap: var(--graha-space-3) var(--graha-space-5);
+	padding-block: var(--graha-space-3);
+}
+
+.graha-site-header__nav-cta {
+	display: flex;
+	align-items: center;
 	gap: var(--graha-space-4);
-	padding-block: var(--graha-space-4);
+	grid-column: 1 / -1;
+	justify-content: space-between;
 }
 
 .graha-site-identity {
 	min-inline-size: 0;
+	display: flex;
+	align-items: center;
+	gap: var(--graha-space-2);
 	font-size: var(--graha-type-xl);
 	font-weight: var(--graha-weight-bold);
 	line-height: var(--graha-leading-tight);
+	color: var(--graha-color-text);
 }
 
 .graha-site-identity a {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--graha-space-2);
 	color: inherit;
 	text-decoration: none;
+}
+
+.graha-site-identity__mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 2.25rem;
+	block-size: 2.25rem;
+	border-radius: var(--graha-radius-sm);
+	background: var(--graha-color-primary);
+	color: var(--graha-color-on-primary);
+	font-size: var(--graha-type-md);
+	font-weight: var(--graha-weight-bold);
+	flex-shrink: 0;
 }
 
 .graha-site-identity .custom-logo {
@@ -32,29 +76,47 @@
 	inline-size: auto;
 }
 
+.graha-site-header__cta {
+	flex-shrink: 0;
+}
+
 .graha-site-main {
+	flex: 1 1 auto;
 	padding-block: var(--graha-space-6) var(--graha-space-8);
 }
 
 .graha-page-header {
-	max-inline-size: var(--graha-content-narrow);
+	max-inline-size: none;
 	margin-block-end: var(--graha-space-6);
+	padding: var(--graha-space-6) var(--graha-space-6);
+	border-radius: var(--graha-radius-xl);
+	background: linear-gradient(155deg, var(--graha-color-primary-dark), var(--graha-color-primary) 78%);
+	color: var(--graha-color-inverse);
 }
 
 .graha-page-header__eyebrow {
 	margin-block-end: var(--graha-space-2);
 	font-size: var(--graha-type-sm);
 	font-weight: var(--graha-weight-semibold);
-	color: var(--graha-color-muted);
+	letter-spacing: var(--graha-tracking-wide);
+	text-transform: uppercase;
+	color: var(--graha-color-inverse-muted);
+}
+
+.graha-page-header h1 {
+	max-inline-size: var(--graha-content-narrow);
+	color: var(--graha-color-inverse);
 }
 
 .graha-page-header__lead {
+	max-inline-size: 42ch;
+	margin-block-start: var(--graha-space-3);
 	font-size: var(--graha-type-lg);
-	color: var(--graha-color-muted);
+	color: var(--graha-color-inverse-muted);
 }
 
 .graha-page-section {
-	padding-block: var(--graha-space-6);
+	padding-block: var(--graha-space-7);
 }
 
 .graha-page-section + .graha-page-section {
@@ -63,14 +125,105 @@
 
 .graha-page-section__heading {
 	max-inline-size: var(--graha-content-narrow);
-	margin-block-end: var(--graha-space-4);
+	margin-block-end: var(--graha-space-5);
+}
+
+.graha-page__content {
+	max-inline-size: var(--graha-content-narrow);
+}
+
+.graha-native-content {
+	max-inline-size: var(--graha-content-narrow);
+	margin-inline: auto;
 }
 
 .graha-site-footer {
+	border-block-start: var(--graha-border-width) solid var(--graha-color-primary-dark);
+	background: var(--graha-color-primary-dark);
+	color: var(--graha-color-inverse-muted);
+}
+
+.graha-footer__cta {
+	border-block-end: var(--graha-border-width) solid rgb(255 255 255 / 0.12);
+}
+
+.graha-footer__cta-inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--graha-space-4);
 	padding-block: var(--graha-space-6);
-	border-block-start: var(--graha-border-width) solid var(--graha-color-border);
-	background: var(--graha-color-surface-subtle);
-	color: var(--graha-color-muted);
+}
+
+.graha-footer__cta-inner h2 {
+	max-inline-size: 34ch;
+	margin-block-start: var(--graha-space-2);
+	font-size: var(--graha-type-2xl);
+	color: var(--graha-color-inverse);
+}
+
+.graha-footer__grid {
+	display: grid;
+	gap: var(--graha-space-6);
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	padding-block: var(--graha-space-7);
+}
+
+.graha-footer__brand {
+	grid-column: 1 / -1;
+	max-inline-size: 32rem;
+}
+
+.graha-footer__brand-name {
+	margin: 0 0 var(--graha-space-2);
+	font-size: var(--graha-type-xl);
+	font-weight: var(--graha-weight-bold);
+	color: var(--graha-color-inverse);
+}
+
+.graha-footer__tagline {
+	margin: 0;
+	color: var(--graha-color-inverse-muted);
+}
+
+.graha-footer__col h3 {
+	margin: 0 0 var(--graha-space-3);
+	font-size: var(--graha-type-sm);
+	font-weight: var(--graha-weight-bold);
+	letter-spacing: var(--graha-tracking-wide);
+	text-transform: uppercase;
+	color: var(--graha-color-inverse);
+}
+
+.graha-footer__col ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: var(--graha-space-2);
+}
+
+.graha-footer__col a {
+	color: var(--graha-color-inverse-muted);
+	text-decoration: none;
+}
+
+.graha-footer__col a:hover {
+	color: var(--graha-color-inverse);
+	text-decoration: underline;
+	text-underline-offset: var(--graha-link-underline-offset);
+}
+
+.graha-site-footer__bottom {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--graha-space-3);
+	padding-block: var(--graha-space-5);
+	border-block-start: var(--graha-border-width) solid rgb(255 255 255 / 0.12);
+	font-size: var(--graha-type-sm);
 }
 
 .graha-site-footer__identity {
@@ -78,10 +231,34 @@
 	font-size: var(--graha-type-sm);
 }
 
+@media (max-width: 48rem) {
+	.graha-page-header {
+		padding: var(--graha-space-5) var(--graha-space-4);
+	}
+
+	.graha-footer__grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (min-width: 48rem) {
+	.graha-footer__grid {
+		grid-template-columns: 1.2fr repeat(3, minmax(0, 1fr));
+	}
+
+	.graha-footer__brand {
+		grid-column: auto;
+	}
+}
+
 @media (min-width: 64rem) {
 	.graha-site-header__inner {
 		grid-template-columns: minmax(var(--graha-header-identity-min), auto) 1fr;
-		align-items: center;
+	}
+
+	.graha-site-header__nav-cta {
+		grid-column: auto;
+		justify-content: flex-end;
 	}
 
 	.graha-site-header .graha-nav {

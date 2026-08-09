@@ -15,7 +15,7 @@ require_once dirname(__DIR__).'/plugin/graha-selang-site-core/src/SiteLifecycleS
 require_once dirname(__DIR__).'/plugin/graha-selang-site-core/src/Kernel.php';
 $kernel=new \GrahaSelang\Kernel(dirname(__DIR__).'/plugin/graha-selang-site-core/graha-selang.php','0.6.0'); $kernel->boot();
 sort($GLOBALS['actions']); sort($GLOBALS['filters']);
-$expected=array('admin_enqueue_scripts','admin_init','admin_menu','after_setup_theme','graha_selang_prepare_page','graha_selang_render_breadcrumbs','graha_selang_render_front_page','graha_selang_render_page','init','wp_enqueue_scripts','wp_enqueue_scripts'); sort($expected);
+$expected=array('admin_enqueue_scripts','admin_init','admin_menu','after_setup_theme','graha_selang_prepare_page','graha_selang_render_breadcrumbs','graha_selang_render_front_page','graha_selang_render_page','graha_selang_render_static_page','init','wp_enqueue_scripts','wp_enqueue_scripts'); sort($expected);
 if($expected!==$GLOBALS['actions']){fwrite(STDERR,'FAIL: unexpected action hooks: '.implode(', ',$GLOBALS['actions'])."\n");exit(1);}
 $expected_filters=array('template_include','the_content');sort($expected_filters);
 if($expected_filters!==$GLOBALS['filters']){fwrite(STDERR,'FAIL: unexpected filters: '.implode(', ',$GLOBALS['filters'])."\n");exit(1);}

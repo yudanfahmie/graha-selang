@@ -1,6 +1,7 @@
 <?php
 
 define( 'ABSPATH', __DIR__ . '/' );
+define( 'OBJECT', 'OBJECT' );
 
 $GLOBALS['styles']  = array();
 $GLOBALS['scripts'] = array();
@@ -28,6 +29,9 @@ function wp_kses_post( $html ) { return (string) $html; }
 function get_bloginfo( $show ) { return 'name' === $show ? 'Situs Uji' : ''; }
 function home_url( $path = '/' ) { return 'https://example.test' . $path; }
 function get_custom_logo() { return ''; }
+function get_page_by_path( $slug, $output = OBJECT, $type = 'page' ) { return null; }
+function get_permalink( $post ) { return ''; }
+function get_post_type_archive_link( $type ) { return 'graha_product' === $type ? 'https://example.test/products/' : ''; }
 
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/AssetService.php';
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/NavigationService.php';

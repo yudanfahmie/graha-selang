@@ -4,15 +4,18 @@ namespace GrahaSelang;
 
 defined( 'ABSPATH' ) || exit;
 
+require_once dirname( __DIR__ ) . '/templates/parts/composition-helpers.php';
+
 final class TemplateService {
 	const PREPARE_HOOK = 'graha_selang_prepare_page';
 	const RENDER_HOOK = 'graha_selang_render_page';
 	const BREADCRUMB_HOOK = 'graha_selang_render_breadcrumbs';
 	const FRONT_PAGE_HOOK = 'graha_selang_render_front_page';
+	const STATIC_PAGE_HOOK = 'graha_selang_render_static_page';
 	const SOURCE_META = '_graha_source_identity';
 	const HOME_GROUP_META = '_graha_home_group';
 	const PRODUCT_POST_TYPE = 'graha_product';
-	const FAMILIES = array( 'home','product_archive','product_category','product_single','application','brand','about','service','technical_rfq','article','legal','search','not_found' );
+	const FAMILIES = array( 'home','product_archive','product_category','product_single','application','brand','about','service','contact','technical_rfq','article','legal','search','not_found' );
 	const HOME_GROUPS = array(
 		'hydraulic_anchor' => array( 'label' => 'Hydraulic Hose / MORGEN', 'priority' => 'anchor' ),
 		'industrial_anchor' => array( 'label' => 'Industrial Hose & Assembly / HAMMER + SUNFLEX', 'priority' => 'anchor' ),
@@ -20,6 +23,13 @@ final class TemplateService {
 		'pvc_support' => array( 'label' => 'PVC Spiral / Spring / Suction Hose', 'priority' => 'support' ),
 		'fittings_support' => array( 'label' => 'Fittings / Couplings / Accessories', 'priority' => 'support' ),
 		'cng_specialist' => array( 'label' => 'CNG / High-pressure Gas Hose', 'priority' => 'specialist' ),
+	);
+	/** Canonical structural Page slug -> presentation family. Unmapped Pages default to 'legal'. */
+	const STATIC_PAGE_FAMILIES = array(
+		'about-us' => 'about',
+		'layanan-kami' => 'service',
+		'contact-us' => 'contact',
+		'request-quote' => 'technical_rfq',
 	);
 
 	private $assets;
@@ -36,6 +46,7 @@ final class TemplateService {
 		add_action( self::RENDER_HOOK, array( $this, 'output_page' ), 10, 2 );
 		add_action( self::BREADCRUMB_HOOK, array( $this, 'output_breadcrumbs' ), 10, 2 );
 		add_action( self::FRONT_PAGE_HOOK, array( $this, 'output_front_page' ) );
+		add_action( self::STATIC_PAGE_HOOK, array( $this, 'output_static_page' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'prepare_native_presentation' ), 20 );
 		add_filter( 'template_include', array( $this, 'resolve_native_template' ), 99 );
 		add_filter( 'the_content', array( $this, 'enhance_native_content' ), 30 );
@@ -47,19 +58,36 @@ final class TemplateService {
 			if ( $this->is_graha_static_front_page() ) $this->assets->enqueue_shell();
 			return;
 		}
-		if ( is_singular( array( 'page', 'post', self::PRODUCT_POST_TYPE ) ) ) $this->assets->enqueue_foundation();
+		if ( is_singular( 'page' ) ) { $this->assets->enqueue_shell(); return; }
+		if ( is_singular( array( 'post', self::PRODUCT_POST_TYPE ) ) ) $this->assets->enqueue_foundation();
 	}
 
-	/** Resolve only the actual WordPress front page to the Graha document shell. */
+	/**
+	 * Resolve the real WordPress front page and any singular Page to their
+	 * plugin-owned document shells. Posts/products keep the active theme's
+	 * own template and only receive content-region enhancement.
+	 */
 	public function resolve_native_template( $template ) {
-		if ( ( function_exists( 'is_admin' ) && is_admin() ) || ! $this->is_graha_static_front_page() ) return $template;
-		$front = dirname( __DIR__ ) . '/templates/front-page.php';
-		return is_readable( $front ) ? $front : $template;
+		if ( function_exists( 'is_admin' ) && is_admin() ) return $template;
+		if ( $this->is_graha_static_front_page() ) {
+			$front = dirname( __DIR__ ) . '/templates/front-page.php';
+			return is_readable( $front ) ? $front : $template;
+		}
+		if ( ! is_front_page() && is_singular( 'page' ) ) {
+			$page_template = dirname( __DIR__ ) . '/templates/page.php';
+			return is_readable( $page_template ) ? $page_template : $template;
+		}
+		return $template;
 	}
 
 	/** Output the Graha shell for the actual WordPress front page. */
 	public function output_front_page() {
 		echo $this->render_front_page_shell( $this->front_page_editor_content() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/** Output the Graha shell for any native singular Page (About/Services/Contact/RFQ/etc). */
+	public function output_static_page() {
+		echo $this->render_static_page(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	public function enhance_native_content( $content ) {
@@ -91,6 +119,8 @@ final class TemplateService {
 		$logo = function_exists( 'get_custom_logo' ) ? (string) get_custom_logo() : '';
 		$nav = $this->navigation->render_primary();
 		$footer = isset( $context['footer_html'] ) ? wp_kses_post( (string) $context['footer_html'] ) : '';
+		$footer_links = $this->footer_link_context();
+		$rfq_url = $footer_links['rfq_url'];
 		ob_start();
 		include dirname( __DIR__ ) . '/templates/shell.php';
 		return (string) ob_get_clean();
@@ -114,19 +144,32 @@ final class TemplateService {
 		$current = trim( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
 		if ( '' === $current ) return '';
 		$items = array();
-		if ( is_singular( 'page' ) && function_exists( 'get_post_ancestors' ) ) {
-			$ancestors = array_reverse( array_map( 'intval', (array) get_post_ancestors( $post_id ) ) );
-			foreach ( $ancestors as $ancestor_id ) {
-				if ( $ancestor_id < 1 || 'publish' !== get_post_status( $ancestor_id ) ) continue;
-				$label = trim( wp_strip_all_tags( (string) get_the_title( $ancestor_id ) ) );
-				$url = get_permalink( $ancestor_id );
-				if ( '' !== $label && $url ) $items[] = array( 'label' => $label, 'url' => $url );
-			}
+		if ( is_singular( 'page' ) ) {
+			$items = $this->page_ancestor_breadcrumb_items( $post_id );
 		} elseif ( is_singular( self::PRODUCT_POST_TYPE ) ) {
 			$archive = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
 			if ( $archive ) $items[] = array( 'label' => __( 'Produk', 'graha-selang' ), 'url' => $archive );
 		}
 		return $this->render_breadcrumbs( $items, $current );
+	}
+
+	/**
+	 * Native Page ancestor trail as breadcrumb items (excludes the current page).
+	 *
+	 * @param int $post_id Current Page ID.
+	 * @return array<int,array<string,string>>
+	 */
+	private function page_ancestor_breadcrumb_items( $post_id ) {
+		$items = array();
+		if ( ! function_exists( 'get_post_ancestors' ) ) return $items;
+		$ancestors = array_reverse( array_map( 'intval', (array) get_post_ancestors( $post_id ) ) );
+		foreach ( $ancestors as $ancestor_id ) {
+			if ( $ancestor_id < 1 || 'publish' !== get_post_status( $ancestor_id ) ) continue;
+			$label = trim( wp_strip_all_tags( (string) get_the_title( $ancestor_id ) ) );
+			$url = get_permalink( $ancestor_id );
+			if ( '' !== $label && $url ) $items[] = array( 'label' => $label, 'url' => $url );
+		}
+		return $items;
 	}
 
 	private function render_main( $family, array $context, $is_home ) {
@@ -189,6 +232,52 @@ final class TemplateService {
 		return $home instanceof \WP_Post && 'publish' === $home->post_status && (int) $home->ID === $front_id;
 	}
 
+	/** Presentation family for a native Page slug; unmapped Pages get the generic 'legal' family. */
+	private function family_for_page_slug( $slug ) {
+		return isset( self::STATIC_PAGE_FAMILIES[ $slug ] ) ? self::STATIC_PAGE_FAMILIES[ $slug ] : 'legal';
+	}
+
+	/** Short, non-factual orientation kicker for a static Page family. */
+	private function static_page_eyebrow( $family ) {
+		$map = array(
+			'about' => __( 'Tentang Kami', 'graha-selang' ),
+			'service' => __( 'Layanan', 'graha-selang' ),
+			'contact' => __( 'Kontak', 'graha-selang' ),
+			'technical_rfq' => __( 'Konsultasi Teknis', 'graha-selang' ),
+		);
+		return isset( $map[ $family ] ) ? $map[ $family ] : '';
+	}
+
+	/** Short, non-factual orientation lead for a static Page family. */
+	private function static_page_lead( $family ) {
+		$map = array(
+			'about' => __( 'Profil dan kapabilitas Graha Selang sebagaimana dipublikasikan pada halaman ini.', 'graha-selang' ),
+			'service' => __( 'Cakupan layanan yang dipublikasikan Graha Selang untuk mendukung kebutuhan teknis Anda.', 'graha-selang' ),
+			'contact' => __( 'Kanal komunikasi dan konsultasi yang tersedia untuk menjangkau Graha Selang.', 'graha-selang' ),
+			'technical_rfq' => __( 'Mulai permintaan penawaran atau konsultasi kebutuhan teknis Anda.', 'graha-selang' ),
+		);
+		return isset( $map[ $family ] ) ? '<p>' . esc_html( $map[ $family ] ) . '</p>' : '';
+	}
+
+	/** Compose the branded document shell for any native singular Page. */
+	private function render_static_page() {
+		$post_id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+		if ( ! $post_id || 'publish' !== get_post_status( $post_id ) ) return '';
+		$heading = trim( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
+		if ( '' === $heading ) return '';
+		$slug = (string) get_post_field( 'post_name', $post_id );
+		$family = $this->family_for_page_slug( $slug );
+		$content_html = $this->bootstrap_page_fallback( $this->rendered_editor_content( $post_id ) );
+		$context = array(
+			'heading' => $heading,
+			'eyebrow' => $this->static_page_eyebrow( $family ),
+			'lead_html' => $this->static_page_lead( $family ),
+			'content_html' => $content_html,
+			'breadcrumbs' => $this->page_ancestor_breadcrumb_items( $post_id ),
+		);
+		return $this->render_page( $family, $context );
+	}
+
 	private function bootstrap_page_fallback( $content ) {
 		if ( $this->has_meaningful_content( $content ) ) return $content;
 		$post_id = function_exists( 'get_the_ID' ) ? (int) get_the_ID() : 0;
@@ -200,7 +289,7 @@ final class TemplateService {
 		$contact_url = $this->published_page_url( 'contact-us' );
 		$rfq_url = $this->published_page_url( 'request-quote' );
 		ob_start();
-		?><div class="graha-bootstrap-page graha-stack"><?php
+		?><div class="graha-bootstrap-page graha-sparse-state graha-stack"><?php
 		if ( 'about-us' === $slug ) : ?>
 			<section><h2><?php echo esc_html__( 'Tentang Graha Selang', 'graha-selang' ); ?></h2><p><?php echo esc_html__( 'Graha Selang menyajikan jalur informasi untuk produk selang industri dan hidrolik, layanan, serta konsultasi kebutuhan teknis.', 'graha-selang' ); ?></p><?php echo $this->render_public_links( array( array( 'Produk', $products_url ), array( 'Layanan', $services_url ), array( 'Hubungi Kami', $contact_url ) ) ); // phpcs:ignore ?></section>
 		<?php elseif ( 'layanan-kami' === $slug ) : ?>
@@ -261,8 +350,20 @@ final class TemplateService {
 		return (string) get_permalink( $page );
 	}
 
-	private function front_page_editor_content() {
-		$post_id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+	/** Real destinations only, used by the branded global footer. Empty entries are omitted, never fabricated. */
+	private function footer_link_context() {
+		return array(
+			'products_url' => (string) get_post_type_archive_link( self::PRODUCT_POST_TYPE ),
+			'services_url' => $this->published_page_url( 'layanan-kami' ),
+			'about_url'    => $this->published_page_url( 'about-us' ),
+			'contact_url'  => $this->published_page_url( 'contact-us' ),
+			'rfq_url'      => $this->published_page_url( 'request-quote' ),
+		);
+	}
+
+	/** Editor content for any native post, rendered through normal content filters, minus our own recursive enhancement. */
+	private function rendered_editor_content( $post_id ) {
+		$post_id = (int) $post_id;
 		if ( ! $post_id ) return '';
 		$raw = (string) get_post_field( 'post_content', $post_id );
 		if ( '' === trim( wp_strip_all_tags( $raw ) ) ) return '';
@@ -272,14 +373,43 @@ final class TemplateService {
 		return wp_kses_post( (string) $rendered );
 	}
 
+	private function front_page_editor_content() {
+		$post_id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+		return $this->rendered_editor_content( $post_id );
+	}
+
 	private function render_front_page_shell( $content ) {
 		$family = 'home';
 		$home_content = $this->render_native_home_content( $content );
-		$main = '<main id="graha-main" class="graha-site-main graha-site-main--home"><div class="graha-container graha-container--wide graha-stack--large"><article class="graha-page graha-page--home"><header class="graha-page-header graha-page-header--home"><p class="graha-page-header__eyebrow">' . esc_html__( 'Graha Selang', 'graha-selang' ) . '</p><h1>' . esc_html__( 'Solusi selang untuk kebutuhan industri dan hidrolik', 'graha-selang' ) . '</h1><div class="graha-page-header__lead"><p>' . esc_html__( 'Temukan jalur produk, layanan, dan konsultasi teknis melalui informasi yang dipublikasikan Graha Selang.', 'graha-selang' ) . '</p></div></header>' . $home_content . '</article></div></main>';
+		$products_url = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
+		if ( ! $products_url ) $products_url = home_url( '/products/' );
+		$rfq_url = $this->published_page_url( 'request-quote' );
+		ob_start();
+		?><main id="graha-main" class="graha-site-main graha-site-main--home">
+			<section class="graha-hero"><div class="graha-hero__grid graha-container graha-container--wide">
+				<div class="graha-hero__body">
+					<p class="graha-eyebrow graha-hero__eyebrow"><?php echo esc_html__( 'Graha Selang', 'graha-selang' ); ?></p>
+					<h1><?php echo esc_html__( 'Solusi selang industri dan hidrolik untuk kebutuhan lapangan Anda', 'graha-selang' ); ?></h1>
+					<div class="graha-hero__lead"><p><?php echo esc_html__( 'Temukan jalur produk, layanan, dan konsultasi teknis melalui informasi yang dipublikasikan Graha Selang.', 'graha-selang' ); ?></p></div>
+					<div class="graha-hero__actions">
+						<?php graha_render_button( __( 'Lihat Katalog Produk', 'graha-selang' ), $products_url, 'primary', 'graha-button--lg' ); ?>
+						<?php if ( $rfq_url ) : graha_render_button( __( 'Request Quote', 'graha-selang' ), $rfq_url, 'outline', 'graha-button--on-dark graha-button--lg' ); endif; ?>
+					</div>
+				</div>
+				<div class="graha-hero__visual"><div class="graha-media-frame--pattern">
+					<p class="graha-hero__visual-title"><?php echo esc_html__( 'Enam kelompok produk', 'graha-selang' ); ?></p>
+					<ul class="graha-hero__group-list"><?php foreach ( self::HOME_GROUPS as $group ) : ?><li><?php echo graha_ui_icon( 'check' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span><?php echo esc_html( $group['label'] ); ?></span></li><?php endforeach; ?></ul>
+				</div></div>
+			</div></section>
+			<div class="graha-container graha-container--wide graha-stack--large"><article class="graha-page graha-page--home"><?php echo $home_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></article></div>
+		</main><?php
+		$main = (string) ob_get_clean();
 		$site_name = trim( (string) get_bloginfo( 'name' ) );
 		$logo = function_exists( 'get_custom_logo' ) ? (string) get_custom_logo() : '';
 		$nav = $this->navigation->render_primary();
 		$footer = '';
+		$footer_links = $this->footer_link_context();
+		$rfq_url = $footer_links['rfq_url'];
 		ob_start();
 		include dirname( __DIR__ ) . '/templates/shell.php';
 		return (string) ob_get_clean();

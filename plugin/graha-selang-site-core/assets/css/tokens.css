@@ -1,5 +1,5 @@
 .graha-ui {
-	/* Neutral/system-safe fallbacks until approved brand tokens are supplied. */
+	/* Approved Graha Selang brand tokens: industrial hose/engineering supplier identity. */
 	--graha-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	--graha-font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
 	--graha-type-xs: 0.75rem;
@@ -16,6 +16,7 @@
 	--graha-weight-bold: 700;
 	--graha-leading-tight: 1.15;
 	--graha-leading-copy: 1.65;
+	--graha-tracking-wide: 0.08em;
 	--graha-space-0: 0;
 	--graha-space-1: 0.25rem;
 	--graha-space-2: 0.5rem;
@@ -25,6 +26,7 @@
 	--graha-space-6: 2rem;
 	--graha-space-7: 3rem;
 	--graha-space-8: 4rem;
+	--graha-space-9: 6rem;
 	--graha-content-narrow: 48rem;
 	--graha-content-max: 72rem;
 	--graha-content-wide: 80rem;
@@ -35,17 +37,30 @@
 	--graha-breakpoint-small: 36rem;
 	--graha-breakpoint-navigation: 48rem;
 	--graha-breakpoint-wide: 64rem;
-	--graha-color-text: #1f2933;
-	--graha-color-muted: #52606d;
-	--graha-color-border: #d9e2ec;
+
+	/* Identity: Graha blue + deep navy + white + industrial neutral grays. */
+	--graha-color-primary: #0000b8;
+	--graha-color-primary-hover: #000091;
+	--graha-color-primary-dark: #1a2670;
+	--graha-color-primary-tint: #eaecf9;
+	--graha-color-on-primary: #ffffff;
+	--graha-color-text: #1b2230;
+	--graha-color-muted: #565f6e;
+	--graha-color-border: #d6dae3;
+	--graha-color-border-strong: #b7bdc9;
 	--graha-color-surface: #ffffff;
-	--graha-color-surface-subtle: #f5f7fa;
+	--graha-color-surface-subtle: #f4f5f8;
+	--graha-color-surface-sunken: #eceef3;
 	--graha-color-inverse: #ffffff;
+	--graha-color-inverse-muted: #c7cbe6;
+
 	--graha-border-width: 1px;
 	--graha-radius-sm: 0.25rem;
 	--graha-radius-md: 0.5rem;
 	--graha-radius-lg: 0.75rem;
+	--graha-radius-xl: 1.25rem;
 	--graha-shadow-soft: 0 0.5rem 1.5rem rgb(15 23 42 / 0.08);
+	--graha-shadow-elevated: 0 1rem 2.5rem rgb(10 15 45 / 0.18);
 	--graha-control-min: 2.75rem;
 	--graha-link-underline-thickness: 0.08em;
 	--graha-link-underline-offset: 0.22em;

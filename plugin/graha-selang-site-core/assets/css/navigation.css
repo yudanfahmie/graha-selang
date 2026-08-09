@@ -6,15 +6,24 @@
 	align-items: center;
 	justify-content: center;
 	font: inherit;
+	font-weight: var(--graha-weight-semibold);
+	color: var(--graha-color-text);
 	background: transparent;
-	border: var(--graha-border-width) solid currentColor;
+	border: var(--graha-border-width) solid var(--graha-color-border-strong);
 	border-radius: var(--graha-radius-md);
+	cursor: pointer;
+}
+
+.graha-nav__toggle:hover,
+.graha-nav__submenu-toggle:hover {
+	border-color: var(--graha-color-primary);
+	color: var(--graha-color-primary);
 }
 
 .graha-nav__list {
 	display: flex;
 	flex-wrap: wrap;
-	gap: var(--graha-space-2) var(--graha-space-4);
+	gap: var(--graha-space-2) var(--graha-space-5);
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -31,12 +40,36 @@
 	display: inline-flex;
 	min-block-size: var(--graha-control-min);
 	align-items: center;
+	font-weight: var(--graha-weight-medium);
 }
 
 .graha-nav__link {
-	color: inherit;
-	text-decoration-thickness: var(--graha-link-underline-thickness);
-	text-underline-offset: var(--graha-link-underline-offset);
+	position: relative;
+	color: var(--graha-color-text);
+	text-decoration: none;
+}
+
+.graha-nav__link::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	inset-block-end: 0.5rem;
+	block-size: 2px;
+	background: var(--graha-color-primary);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform var(--graha-motion-fast) var(--graha-motion-ease);
+}
+
+.graha-nav__link:hover,
+.graha-nav__item.is-current > .graha-nav__row > .graha-nav__link,
+.graha-nav__item.is-ancestor > .graha-nav__row > .graha-nav__link {
+	color: var(--graha-color-primary);
+}
+
+.graha-nav__link:hover::after,
+.graha-nav__item.is-current > .graha-nav__row > .graha-nav__link::after {
+	transform: scaleX(1);
 }
 
 .graha-nav__submenu {
@@ -58,6 +91,10 @@
 	.graha-nav--enhanced .graha-nav__panel {
 		display: none;
 		margin-block-start: var(--graha-space-3);
+		padding: var(--graha-space-4);
+		border: var(--graha-border-width) solid var(--graha-color-border);
+		border-radius: var(--graha-radius-md);
+		background: var(--graha-color-surface);
 	}
 
 	.graha-nav--enhanced[data-open="true"] .graha-nav__panel {
@@ -66,7 +103,11 @@
 
 	.graha-nav--enhanced .graha-nav__list {
 		display: grid;
-		gap: var(--graha-space-2);
+		gap: var(--graha-space-1);
+	}
+
+	.graha-nav--enhanced .graha-nav__link::after {
+		display: none;
 	}
 
 	.graha-nav--enhanced .graha-nav__submenu {

@@ -8,6 +8,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
+require_once __DIR__ . '/templates/parts/composition-helpers.php';
 require_once __DIR__ . '/src/ProductContentService.php';
 require_once __DIR__ . '/src/AssetService.php';
 require_once __DIR__ . '/src/NavigationService.php';

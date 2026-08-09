@@ -17,6 +17,9 @@ foreach ( $GLOBALS['slugs'] as $id => $slug ) { $GLOBALS['pages'][ $slug ] = new
 function add_action() {}
 function add_filter() {}
 function remove_filter() {}
+function plugin_dir_url() { return 'https://example.test/plugin/'; }
+function wp_register_style() {}
+function wp_register_script() {}
 function is_admin() { return false; }
 function is_front_page() { return false; }
 function is_singular( $types = null ) { return null === $types ? true : in_array( 'page', (array) $types, true ); }
