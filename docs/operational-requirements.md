@@ -6,13 +6,15 @@ This document converts the Graha Selang redesign brief into implementation-facin
 
 The project is a **controlled rebuild of an existing indexed WordPress site**, delivered as a Graha Selang WordPress presentation/site-builder plugin. It is not a blank-slate redesign and it is not a simple visual reskin.
 
+The current product ownership decision is native WordPress: `graha_product` plus native product-category and brand taxonomies. WooCommerce is not required for Graha product activation, CRUD, migration, or rendering.
+
 ## 1. Baseline URL inventory
 
 The brief freezes the legacy scope baseline at **96 existing URLs**, classified as:
 
 | Classification | Count | Implementation meaning |
 |---|---:|---|
-| Product / series | 68 | Preserve/migrate as product or product-series intent under the authoritative Woo/content owner. |
+| Product / series | 68 | Preserve/migrate as product or product-series intent under the authoritative native product/content owner. |
 | Hub | 18 | Preserve/migrate as useful discovery/entity/topic hubs. |
 | Application | 4 | Preserve/migrate as distinct application-intent pages. |
 | Merge + permanent redirect | 5 | Consolidate content and redirect the legacy URL to the closest retained destination. |
@@ -112,6 +114,14 @@ Implementation may share composition/components between these families. The acce
 
 ## 6. Technical product experience
 
+The authoritative native product model is:
+
+- CPT `graha_product`;
+- archive `/products/`;
+- single `/product/{slug}/`;
+- hierarchical taxonomy `graha_product_category` at `/product-category/{slug}/`;
+- taxonomy `graha_product_brand` at `/brand/{slug}/`.
+
 Product/category/application presentation must be able to support, when approved data exists:
 
 - semantic technical specification table or definition list;
@@ -141,7 +151,7 @@ Rules:
 - filters are progressive enhancement and use crawl-safe query behavior;
 - do not generate uncontrolled indexable filter combinations;
 - no shadow product database;
-- WooCommerce/native taxonomy/attributes remain source of truth.
+- native `graha_product` taxonomy/meta remain source of truth.
 
 ## 7. Brand behavior
 
@@ -153,7 +163,7 @@ The brief calls for a visible brand layer and specifically distinguishes:
 
 This is a presentation/content requirement, not permission to invent specifications or authorization status. Technical differentiation must be supported by approved product facts, datasheets or use cases.
 
-The implementation must reuse the actual authoritative brand taxonomy/provider in the target Woo stack; never register a second competing brand taxonomy just to reproduce the brief.
+The implementation uses the native `graha_product_brand` taxonomy. Brand membership and descriptions must come from approved evidence; the current 44-record identity-only migration does not infer brand terms.
 
 ## 8. Applications and specialist architecture
 

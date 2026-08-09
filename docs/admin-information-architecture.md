@@ -32,23 +32,24 @@ The parent page may use the same slug as the first Overview submenu so WordPress
 
 ## Native-owner exception
 
-This rule applies to **plugin-owned custom admin pages**. It does not move or clone native/provider administration.
+This rule applies to **plugin-owned custom admin pages**. It does not replace or clone native/provider administration.
 
 Keep these in their authoritative native locations:
 
 - WordPress Pages, Posts and Media;
-- WooCommerce Products, categories, attributes, orders, customers and commerce settings;
+- standard WordPress CRUD/taxonomy screens for `graha_product`, `graha_product_category`, and `graha_product_brand`;
 - SEO-provider screens;
 - form-provider submission/configuration screens;
 - WordPress Users/Settings/Tools.
 
-Graha Selang Content may link to those native screens when useful, but it must not create parallel CRUD or proxy administration merely to make everything appear under one menu.
+`AdminService` links the native Graha product screens beneath `Graha Selang Content` using their normal WordPress admin URLs. This is navigation to native CRUD, not a custom product manager or proxy. `graha_product` therefore keeps `show_ui=true` and `show_in_menu=false` so no second Graha root menu appears.
 
 ## Capability and security rules
 
 Menu placement is not authorization.
 
 - Each child screen must declare and verify an appropriate least-privilege capability.
+- Native Graha product CRUD and the current one-shot migration use the standard `edit_posts` capability for the v1 post capability model.
 - State-changing actions require capability checks, nonce verification, validation/sanitization and native persistence.
 - Do not grant broad `manage_options` access to every child merely for convenience.
 - Do not expose sensitive provider configuration to users who only need editorial access.
@@ -60,7 +61,7 @@ The parent must remain useful for the intended admin/editor audience without wea
 - Keep labels concise and Indonesian-facing unless a provider screen is inherently external.
 - Do not create empty submenu placeholders for future ideas.
 - Keep navigation depth to one submenu level under Graha Selang Content unless an approved requirement proves deeper hierarchy is necessary.
-- Use WordPress admin conventions; do not build a SPA/admin framework for simple settings.
+- Use WordPress admin conventions; do not build a SPA/admin framework for simple settings or product CRUD.
 - Provide clear page titles, descriptions, save feedback and error states.
 - Load Graha admin CSS/JS only on Graha-owned admin screens.
 - Do not globally restyle the WordPress admin.
@@ -72,6 +73,7 @@ The parent must remain useful for the intended admin/editor audience without wea
 
 - registration of `Graha Selang Content`;
 - submenu registration for plugin-owned screens;
+- links to standard native product/category/brand screens;
 - the minimal placement/order behavior needed to keep the wrapper immediately after Dashboard;
 - routing/dispatch for Graha-owned admin pages;
 - screen-scoped admin assets/enhancements;
@@ -80,7 +82,6 @@ The parent must remain useful for the intended admin/editor audience without wea
 `AdminService` must not own:
 
 - a duplicate product/content CRUD system;
-- WooCommerce administration;
 - SEO campaign/rank administration;
 - form submission storage/mail transport;
 - generic migration/diagnostics tooling;
@@ -93,9 +94,9 @@ At minimum verify on the target WordPress admin:
 1. `Graha Selang Content` exists exactly once as a top-level plugin-owned menu.
 2. It is immediately after Dashboard in the visible sidebar.
 3. Its canonical slug is `graha-selang-content`.
-4. Every Graha plugin-owned menu page is a child of that parent.
-5. No other Graha plugin-owned top-level menu exists.
-6. Native WordPress/Woo/SEO/form-provider screens remain in their native owners.
+4. Every Graha plugin-owned custom menu page is a child of that parent.
+5. Native Products/Category/Brand links open the expected standard WordPress screens.
+6. `graha_product` does not create a second root menu.
 7. Direct URL access to each child enforces its own capability.
 8. State-changing actions enforce nonce + capability + validation.
 9. Graha admin assets do not load globally on unrelated admin screens.

@@ -95,13 +95,15 @@ Do not scatter redirects across server rules, multiple plugins, PHP hooks, JS an
 
 ## 8. Native-owner migration
 
-Products remain Woo Products; categories remain Woo terms; brands remain approved Woo brand taxonomy; articles remain Posts; application/fixed/evergreen surfaces remain Pages where appropriate; media remains Media Library.
+Products remain native `graha_product` posts; categories remain `graha_product_category` terms; brands remain `graha_product_brand` terms; articles remain Posts; application/fixed/evergreen surfaces remain Pages where appropriate; media remains Media Library.
 
-No plugin shadow records are introduced for migration convenience.
+The one-shot product importer uses stable source identity and native WordPress APIs only. No plugin shadow records or custom product database are introduced for migration convenience.
 
 ## 9. Product/category safeguards
 
-Preserve continuing slugs where practical, preserve meaningful hierarchy, eliminate accidental `Uncategorized` ownership through content cleanup rather than template hacks, identify brand taxonomy before rewrite work, and verify images/spec attributes after migration.
+Preserve continuing slugs where practical, preserve meaningful category hierarchy, assign category/brand terms only from approved evidence, eliminate accidental generic category ownership through content cleanup rather than template hacks, and verify images/spec meta after migration.
+
+The current 44-record identity-only bundle does not infer category or brand membership.
 
 ## 10. Article safeguards
 

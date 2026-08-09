@@ -61,9 +61,8 @@ Known migration concern: `/products/` and `/products-2/` currently coexist publi
 Preferred ownership order:
 
 1. configured SEO provider;
-2. WooCommerce for Woo-specific data/output where it is authoritative;
-3. WordPress core defaults;
-4. a documented Graha fallback only where no owner exists.
+2. WordPress core/native content defaults;
+3. a documented Graha fallback only where no owner exists.
 
 The plugin must not output a second:
 
@@ -80,7 +79,7 @@ When integration with Rank Math/Yoast/another provider is needed, use supported 
 
 Indexable by default only when a route contains unique, useful public content and is intended for discovery.
 
-Utility/private/transactional surfaces should follow WordPress/Woo/SEO-provider best practices and site configuration. The Graha plugin must not accidentally make internal search results, temporary previews, debug routes or empty generated views into SEO landing pages.
+Utility/private/transactional surfaces should follow WordPress/SEO-provider best practices and site configuration. The Graha plugin must not accidentally make internal search results, temporary previews, debug routes or empty generated views into SEO landing pages.
 
 Do not blanket-noindex entire content families without an explicit policy.
 
@@ -88,7 +87,7 @@ Do not blanket-noindex entire content families without an explicit policy.
 
 Use WordPress core or the configured SEO provider as sitemap authority.
 
-The Graha plugin should not build a parallel sitemap engine. If future custom public content types are added, register them correctly so the authoritative sitemap owner can discover them, or integrate through supported provider filters.
+The Graha plugin should not build a parallel sitemap engine. `graha_product`, `graha_product_category`, and `graha_product_brand` must be registered normally so the authoritative sitemap owner can discover them, or be integrated through supported provider filters where required.
 
 ## 8. Breadcrumbs
 
@@ -123,9 +122,9 @@ Do not generate large keyword-heavy link clouds. Internal links should be visibl
 
 Technical product information should be structured rather than buried in repeated prose where data exists.
 
-Render populated Woo attributes/meta with clear labels. Typical capability fields include material, reinforcement, size, pressure, temperature, standard and application, but never fabricate missing values.
+Render populated `graha_product` taxonomy/meta with clear labels. Typical capability fields include material, reinforcement, size, pressure, temperature, standard and application, but never fabricate missing values.
 
-WooCommerce remains the Product entity/data authority. Avoid a second product schema graph.
+Native `graha_product` records are the Product entity/data authority. Avoid a second product schema graph; schema output remains with the configured authoritative SEO owner.
 
 ## 11. Article/content semantics
 
@@ -157,11 +156,11 @@ Do not promise ranking or AI-answer inclusion from markup alone.
 
 Goal: **one authoritative graph**, not maximum markup quantity.
 
-Likely entity families include Organization/LocalBusiness, WebSite, BreadcrumbList, Product and Article, but ownership depends on the installed Woo/SEO stack.
+Likely entity families include Organization/LocalBusiness, WebSite, BreadcrumbList, Product and Article, but ownership depends on the configured SEO stack.
 
 Rules:
 
-- WooCommerce product schema remains Woo/provider-owned;
+- product schema remains SEO-provider/native integration owned rather than being duplicated by templates;
 - SEO provider Organization/Article/Breadcrumb schema remains provider-owned when active;
 - Graha plugin may expose clean fields/relationships to supported hooks;
 - do not hard-code duplicate JSON-LD into every template;
@@ -245,5 +244,5 @@ A page family is not complete until:
 - metadata/schema ownership has no duplication;
 - empty states do not become thin indexable junk;
 - images do not create avoidable CLS;
-- Woo/WordPress data ownership remains native;
+- WordPress/native product data ownership remains authoritative;
 - no visible SEO-control notes leak into body content.

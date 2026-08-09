@@ -9,10 +9,11 @@ Repository preparation does **not** include production plugin code.
 ## 2. Non-negotiable baseline
 
 - developer-only scope;
-- pure WordPress plugin/site-builder presentation layer;
+- WordPress plugin/site-builder presentation layer with a native Graha product content model;
 - 96-URL migration baseline: 68 product/series + 18 hub + 4 application + 5 redirect + 1 retire;
 - one Kernel / <=8 bootable first-party owners;
-- native WordPress/Woo ownership;
+- native WordPress ownership;
+- `graha_product` + native product-category/brand taxonomies own Graha product content;
 - one Graha admin wrapper: **Graha Selang Content** immediately after Dashboard;
 - all plugin-owned admin pages are submenus of that wrapper;
 - no custom DB or duplicate catalog;
@@ -31,8 +32,8 @@ Exit condition: developer can explain URL counts, product hierarchy, admin hiera
 
 Before route-sensitive code:
 
-- capture target WP/PHP/Woo versions and active theme;
-- identify brand taxonomy/provider;
+- capture target WP/PHP versions and active theme;
+- verify native product CPT/taxonomy route behavior against current public inventory;
 - identify SEO provider and output ownership;
 - identify form provider and RFQ/upload/routing capability;
 - capture permalink settings, sitemap/robots/canonicals and redirect owner;
@@ -42,20 +43,21 @@ Before route-sensitive code:
 - identify current analytics/tag implementation for continuity;
 - capture approved NAP/contact/legal/brand/product inputs;
 - define backup and rollback process with deployment owner;
-- confirm commerce mode;
 - inspect the target WordPress admin menu for position collisions that could affect the required Graha wrapper placement.
 
-Exit condition: all providers/route owners known, migration matrix has no unidentified baseline row, and admin-menu collision behavior is understood.
+Exit condition: route/provider owners are known, migration matrix has no unidentified baseline row, and admin-menu collision behavior is understood.
 
 ## 5. Wave 1 — Design system, plugin foundation and admin shell
 
 Implement:
 
 - plugin entrypoint + Kernel + explicit services;
+- native `ProductContentService` registration for `graha_product`, category and brand taxonomies;
 - `AdminService` foundation;
 - top-level admin parent **Graha Selang Content** with slug `graha-selang-content`;
 - parent rendered immediately after Dashboard, using menu position `3` by default and only a narrow order correction if the target environment causes a collision;
 - all plugin-owned custom admin screens registered as children of that parent;
+- native product/category/brand WordPress screens linked beneath the parent without custom CRUD;
 - no separate Graha root menus;
 - screen-scoped admin assets only;
 - design tokens/responsive primitives;
@@ -66,9 +68,9 @@ Implement:
 - representative template prototypes for all families in `template-matrix.csv`;
 - Indonesian public UI/i18n baseline.
 
-Do not move/clone native WordPress, WooCommerce, SEO-provider or form-provider admin screens into the Graha wrapper. Link to authoritative screens if useful.
+Do not move/clone standard WordPress CRUD, SEO-provider or form-provider screens into custom Graha implementations. Link to authoritative screens if useful.
 
-Exit: plugin activates cleanly; the admin wrapper appears once immediately after Dashboard; no other Graha root menu exists; representative shell works on Page/Post/Woo routes with no fatal optional dependency.
+Exit: plugin activates cleanly; the admin wrapper appears once immediately after Dashboard; no other Graha root menu exists; representative shell works on Page/Post/`graha_product` routes with no fatal optional dependency.
 
 ## 6. Wave 2 — P0 foundation
 
@@ -94,11 +96,11 @@ Exit: primary site journey works mobile/desktop, primary content is server-rende
 
 Implement:
 
-- Woo archive/category/product presentation;
-- authoritative brand taxonomy presentation;
+- native `graha_product` archive/category/product presentation;
+- native `graha_product_brand` presentation;
 - semantic technical specs;
 - compatible fittings/resources relationships;
-- crawl-safe selector/filter/decision tree using real attributes;
+- crawl-safe selector/filter/decision tree using real native taxonomy/meta;
 - rich/sparse product states;
 - first migration batches across product/series + hubs;
 - RFQ source context from products/categories.
@@ -169,7 +171,7 @@ If target-environment data required for Wave 0 is unavailable, do not fabricate 
 
 ## 12. Change management
 
-Any material discovery changing counts, route ownership, provider capability, RFQ transport, brand taxonomy, SEO ownership, commerce mode, services model, admin menu architecture or architecture budget must update canonical docs/matrices in the same coherent commit.
+Any material discovery changing counts, route ownership, provider capability, RFQ transport, brand/category membership, SEO ownership, services model, admin menu architecture or architecture budget must update canonical docs/matrices in the same coherent commit.
 
 Do not hide requirement decisions only in code, chat or deployment memory.
 
@@ -182,9 +184,9 @@ While Wave 0 remains blocked, use this safe execution order without falsely adva
 1. canonicalize the approved next-bundle requirements;
 2. finish the environment-independent portion of Wave 1 with `TemplateService`, semantic shell, centralized tokens, reusable breadcrumbs, presentation-family prototypes, accessibility and conditional asset use;
 3. build/activate the production Homepage only when real approved content and real crawlable native destinations are available;
-4. implement the one-shot migration mechanism only when an approved migration bundle/manifest/runtime prerequisites exist; its admin UI must stay lightweight and run heavy validation/import only through explicit authenticated AJAX per `migration-admin-ajax-contract.md`; never create fake bundle content to make the mechanism appear complete;
+4. keep the one-shot migration mechanism lightweight and run heavy validation/import only through explicit authenticated AJAX per `migration-admin-ajax-contract.md`; never create fake bundle content to make the mechanism appear complete;
 5. complete production inner-page families after real route/data/provider information is available.
 
 The one-shot content-import mechanism is distinct from the 96-URL redirect/reconciliation workstream. It must not replace or bypass Wave 0 URL reconciliation.
 
-Wave 1 may not be marked complete until activation, admin placement, representative Page/Post/Woo behavior, and the other Wave 1 exit conditions are verified in a real WordPress runtime.
+Wave 1 may not be marked complete until activation, admin placement, representative Page/Post/product behavior, and the other Wave 1 exit conditions are verified in a real WordPress runtime.

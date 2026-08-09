@@ -15,9 +15,9 @@ The repository root is the engineering workspace. The deployable WordPress plugi
 
 ## Product definition
 
-The target is a **WordPress plugin that behaves as the site presentation/page-builder layer**. It owns Graha Selang public presentation, reusable UI, route-aware templates, responsive/accessibility behavior, technical product discovery, RFQ presentation/integration, developer-side SEO/GEO-friendly structure, and safe integration with WordPress/WooCommerce.
+The target is a **WordPress plugin that behaves as the site presentation/page-builder layer**. It owns Graha Selang public presentation, reusable UI, the native Graha product content model, route-aware templates, responsive/accessibility behavior, technical product discovery, RFQ presentation/integration, developer-side SEO/GEO-friendly structure, and safe integration with WordPress/provider-owned systems.
 
-It does not replace WordPress, WooCommerce, the configured SEO provider, the configured form provider, or their business data.
+It does not replace WordPress, the configured SEO provider, the configured form provider, or their business data. WooCommerce is not required to activate, manage, migrate, or render Graha products.
 
 ## Frozen operational baseline
 
@@ -51,7 +51,7 @@ All **Graha Selang plugin-owned admin pages** must live under exactly one top-le
 - target position: immediately after Dashboard (default implementation position `3`);
 - owner: `AdminService`.
 
-No Graha-specific settings/RFQ/content-helper page may appear as a separate root sidebar menu. Native WordPress, WooCommerce, SEO-provider and form-provider screens remain in their authoritative native locations rather than being cloned or proxied.
+No Graha-specific settings/RFQ/content-helper page may appear as a separate root sidebar menu. Standard WordPress CRUD screens for Graha products/categories/brands are linked beneath this parent rather than being cloned or replaced. SEO-provider and form-provider screens remain with their authoritative owners.
 
 See `docs/admin-information-architecture.md`.
 
@@ -60,11 +60,12 @@ See `docs/admin-information-architecture.md`.
 ### In this repository
 
 - WordPress plugin architecture/bootstrap;
+- native `graha_product` content-model registration;
+- native product-category/brand taxonomy registration;
 - shell/header/navigation/footer;
 - page-family/template presentation;
-- WooCommerce presentation integration;
 - product/category/brand/application discovery;
-- technical product selector/filter presentation using authoritative data;
+- technical product selector/filter presentation using authoritative native data;
 - Services, About, Contact/RFQ and article presentation;
 - responsive behavior and accessibility;
 - performance/Core Web Vitals engineering;
@@ -127,7 +128,19 @@ Do not copy that binary into this repository. Requirements needed by developers 
 
 ## Architecture decision
 
-Use a small modular monolith with one composition root and one owner per concern. Prefer native WordPress/WooCommerce storage/routing. No custom database tables, generic migration framework, duplicate commerce stack, custom mail backend, global mega-class, or sprawling custom admin framework by default.
+Use a small modular monolith with one composition root and one owner per concern. Product persistence/routing is native WordPress through `graha_product`, `graha_product_category`, and `graha_product_brand`. No custom database tables, generic migration framework, duplicate product registry, custom mail backend, global mega-class, or sprawling custom admin framework by default.
+
+## Native product content model
+
+`ProductContentService` owns registration only:
+
+- CPT: `graha_product`;
+- archive: `/products/`;
+- single: `/product/{slug}/`;
+- hierarchical category taxonomy: `graha_product_category` at `/product-category/{slug}/`;
+- brand taxonomy: `graha_product_brand` at `/brand/{slug}/`.
+
+WordPress standard posts/terms/meta/Media Library and CRUD screens remain authoritative. `AdminService` links those native screens beneath `Graha Selang Content` without building a custom product manager.
 
 ## Product catalog migration
 
@@ -136,11 +149,12 @@ A narrow one-shot product catalog migration now lives behind the existing `Admin
 - permanent source/audit copy: `migration-source/product-catalog-v1/`;
 - disposable runtime copy: `plugin/graha-selang-site-core/migration-runtime/product-catalog-v1/`;
 - temporary admin child: `Graha Selang Content -> Migrasi Produk` only while the runtime bundle is pending/retryable;
-- execution: explicit authenticated `wp_ajax_*`, `manage_woocommerce`, nonce, atomic option lock;
-- persistence: native WooCommerce products + native post meta provenance only;
+- execution: explicit authenticated `wp_ajax_*`, native `edit_posts` capability, nonce, atomic option lock;
+- persistence: native `graha_product` posts + native post meta provenance only;
+- new identity-only products are created as drafts; existing product status is preserved;
 - consumed state is stored before cleanup; cleanup only removes the fixed runtime bundle files/directory.
 
-The committed v1 bundle contains **44 conservative current-public product identity/title records** observed on Graha Selang on 2026-08-09: 15 hydraulic-anchor, 11 industrial-anchor, 5 ducting-support, 2 PVC/suction-support, 10 fittings/accessories-support and 1 CNG specialist record. The bundle intentionally omits prices, stock, SKU, technical specifications, certifications, media, attributes and authoritative brand taxonomy. It does **not** replace the still-required 96-URL Wave 0 reconciliation.
+The committed v1 bundle contains **44 conservative current-public product identity/title records** observed on Graha Selang on 2026-08-09: 15 hydraulic-anchor, 11 industrial-anchor, 5 ducting-support, 2 PVC/suction-support, 10 fittings/accessories-support and 1 CNG specialist record. The bundle intentionally omits prices, stock, SKU, technical specifications, certifications, media, category membership and brand membership. It does **not** replace the still-required 96-URL Wave 0 reconciliation.
 
 ## Development verification
 
@@ -150,12 +164,12 @@ Run the lightweight repository gate before each push:
 ./scripts/verify.sh
 ```
 
-It performs PHP syntax checks, static architecture/security guards, navigation normalization/render checks, page/Home presentation tests, one-shot migration validation/idempotency/lock/cleanup tests, admin capability/nonce/submenu/asset checks, Kernel hook smoke checks, deployment-structure guards, and JavaScript syntax validation when Node is available. These checks are repository-level verification; they do not replace activation and behavior testing on the target WordPress environment.
+It performs PHP syntax checks, static architecture/security guards, native product content-model/route checks, navigation normalization/render checks, page/Home presentation tests, one-shot migration validation/idempotency/lock/cleanup tests, admin capability/nonce/submenu/asset checks, Kernel hook smoke checks, deployment-structure guards, and JavaScript syntax validation when Node is available. These checks are repository-level verification; they do not replace activation and behavior testing on the target WordPress environment.
 
 ## Implementation status
 
-**Wave 1 environment-independent foundation is substantially implemented and the narrow product-catalog migration path is prepared.** The plugin still has one `Kernel` with four active owners: `AdminService`, the canonical `AssetService`, native `NavigationService`, and `TemplateService`. The one-shot migration coordinator is a lazy admin helper rather than a fifth bootable owner.
+**Wave 1 environment-independent foundation is substantially implemented and the narrow product-catalog migration path is prepared.** The plugin has one `Kernel` with five active owners: `ProductContentService`, `AdminService`, the canonical `AssetService`, native `NavigationService`, and `TemplateService`. The one-shot migration coordinator remains a lazy admin helper rather than a bootable owner.
 
-Native Page/Post content receives the centralized Graha presentation primitives without route takeover. The production Homepage augmentation now reads only migrated/native Woo products carrying Graha migration provenance, preserves the required two-anchor/three-support/one-specialist hierarchy, and activates only when all six product groups plus real published Woo shop, `/layanan-kami/`, and `/contact-us/` destinations are available. Otherwise WordPress native Home content remains untouched.
+Native Page/Post/product content receives the centralized Graha presentation primitives without route takeover. The production Homepage augmentation reads only published `graha_product` records carrying Graha migration provenance, preserves the required two-anchor/three-support/one-specialist hierarchy, and activates only when all six product groups plus the native `/products/` archive, `/layanan-kami/`, and `/contact-us/` destinations are available. Otherwise WordPress native Home content remains untouched.
 
-Wave 1 is **not complete** until a real WordPress runtime verifies activation, actual admin placement/collision behavior, and representative Page/Post/Woo integration. The committed plugin-local migration runtime bundle remains logically **pending until it is explicitly run on a real target WooCommerce environment**; repository simulations do not claim production import or cleanup. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`.
+Wave 1 is **not complete** until a real WordPress runtime verifies activation, actual admin placement/collision behavior, native product/category/brand screens, route resolution, and representative Page/Post/product integration. The committed plugin-local migration runtime bundle remains logically **pending until it is explicitly run on a real target WordPress environment**; repository simulations do not claim production import or cleanup. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`.

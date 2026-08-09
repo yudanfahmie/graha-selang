@@ -44,21 +44,36 @@ admin = texts[SRC / 'AdminService.php']
 assets = texts[SRC / 'AssetService.php']
 nav = texts[SRC / 'NavigationService.php']
 template = texts[SRC / 'TemplateService.php']
+model = texts[SRC / 'ProductContentService.php']
 migration = texts[SRC / 'ProductCatalogMigration.php']
 bundle = texts[SRC / 'ProductCatalogBundle.php']
 
 check(len(re.findall(r'final\s+class\s+Kernel\b', php_text)) == 1, 'exactly one Kernel composition root')
 owners = re.findall(r'new\s+([A-Za-z]+(?:Service|Adapter))\s*\(', kernel)
 check(1 <= len(set(owners)) <= 8, f'bootable owner count within limit ({len(set(owners))}/8)')
-check(set(owners) == {'AdminService', 'AssetService', 'NavigationService', 'TemplateService'}, 'only existing four bootable owners remain active')
+check(set(owners) == {'AdminService', 'AssetService', 'NavigationService', 'TemplateService', 'ProductContentService'}, 'only approved five bootable owners remain active')
 check('ProductCatalogMigration' not in kernel and 'ProductCatalogBundle' not in kernel, 'migration helpers are not bootable Kernel owners')
+
+check("const POST_TYPE         = 'graha_product';" in model, 'graha_product is the native product CPT')
+check("'has_archive'        => 'products'" in model, 'native product archive is /products/')
+check("'rewrite'            => array( 'slug' => 'product', 'with_front' => false )" in model, 'native product single base is /product/{slug}/')
+check("const CATEGORY_TAXONOMY = 'graha_product_category';" in model and "'slug' => 'product-category'" in model, 'native product category route is explicit')
+check("const BRAND_TAXONOMY    = 'graha_product_brand';" in model and "'slug' => 'brand'" in model, 'native brand route is explicit')
+check(model.count('register_post_type(') == 1 and model.count('register_taxonomy(') == 2, 'one native product CPT and two product taxonomies are registered')
+for path, text in texts.items():
+    if path.suffix == '.php' and path != SRC / 'ProductContentService.php':
+        check('register_post_type(' not in text and 'register_taxonomy(' not in text, f'no duplicate product content-model registration: {path.relative_to(ROOT)}')
+
+for forbidden in ('WC_Product_Simple', 'wc_get_product', 'wc_get_page_id', 'manage_woocommerce', 'edit_products'):
+    check(forbidden not in runtime_text, f'no Woo-only runtime primitive: {forbidden}')
 
 check(php_text.count('add_menu_page(') == 1, 'exactly one Graha root admin menu registration')
 check("const MENU_SLUG" in admin and "'graha-selang-content'" in admin, 'canonical admin slug preserved')
 check(re.search(r"add_menu_page\([\s\S]*?self::MENU_SLUG[\s\S]*?\n\s*3\s*\n\s*\)", admin) is not None, 'default admin menu position is 3')
-check(admin.count('add_submenu_page(') == 2, 'AdminService has Ringkasan plus one conditional migration child registration')
+check(admin.count('add_submenu_page(') == 5, 'AdminService has Ringkasan, three native product links, and one conditional migration child')
+check('edit.php?post_type=graha_product' in admin and 'graha_product_category' in admin and 'graha_product_brand' in admin, 'AdminService links native product/category/brand screens')
 check('should_show_menu()' in admin and 'MIGRATION_SLUG' in admin, 'migration child is gated by bundle state')
-check("const MIGRATION_CAPABILITY = 'manage_woocommerce';" in admin, 'migration capability is explicit and Woo-scoped')
+check("const MIGRATION_CAPABILITY = 'edit_posts';" in admin, 'migration capability uses native WordPress capability')
 check("'wp_ajax_' . self::MIGRATION_AJAX" in admin and 'wp_ajax_nopriv_' not in admin, 'migration exposes authenticated AJAX only')
 check('check_ajax_referer' in admin and 'current_user_can( self::MIGRATION_CAPABILITY )' in admin, 'migration AJAX enforces capability plus nonce')
 check("if ( function_exists( 'is_admin' ) && is_admin() )" in admin, 'migration AJAX hook is admin-only')
@@ -80,20 +95,19 @@ for forbidden in ('template_include', 'template_redirect', 'add_rewrite_rule', '
     check(forbidden not in template, f'TemplateService does not own {forbidden}')
 for family in ('home','product_archive','product_category','product_single','application','brand','about','service','technical_rfq','article','legal','search','not_found'):
     check(f"'{family}'" in template, f'TemplateService retains family: {family}')
-check('_graha_source_identity' in template and '_graha_home_group' in template, 'native Home reads migrated/native product provenance')
+check("PRODUCT_POST_TYPE = 'graha_product'" in template and '_graha_source_identity' in template and '_graha_home_group' in template, 'native Home reads graha_product provenance')
 check(re.search(r"'numberposts'\s*=>\s*80", template) is not None, 'native Home product query is bounded')
 check('migration-source/' not in template, 'public presentation never reads repository archive bundle')
-check('contact-us' in template and 'layanan-kami' in template and "wc_get_page_id( 'shop' )" in template, 'native Home activation requires real native shop/services/contact destinations')
+check('contact-us' in template and 'layanan-kami' in template and 'get_post_type_archive_link( self::PRODUCT_POST_TYPE )' in template, 'native Home activation requires native product archive/services/contact destinations')
 check('graha-priority-grid' in texts[PLUGIN / 'assets/css/foundation.css'], 'shared foundation preserves unequal Home hierarchy primitive')
 
 for label, patterns in {
     'custom database writes': [r'\$wpdb\b', r'\bdbDelta\s*\(', r'CREATE\s+TABLE'],
-    'unapproved custom content types': [r'\bregister_post_type\s*\(', r'\bregister_taxonomy\s*\('],
     'unauthenticated mutation endpoints': [r'wp_ajax_nopriv_', r'\bregister_rest_route\s*\('],
     'custom mail transport': [r'\bwp_mail\s*\(', r'\bmail\s*\('],
     'custom payment/order implementation': [r'\bWC_Order\b', r'woocommerce_(?:checkout|payment|order)'],
     'duplicate SEO output': [r'rel=["\']canonical["\']', r'application/ld\+json', r'<meta\s', r'\bwp_head\b'],
-    'route takeover before Wave 0': [r'\btemplate_include\b', r'\btemplate_redirect\b', r'\badd_rewrite_rule\s*\(', r'\bwp_(?:safe_)?redirect\s*\('],
+    'route takeover': [r'\btemplate_include\b', r'\btemplate_redirect\b', r'\badd_rewrite_rule\s*\(', r'\bwp_(?:safe_)?redirect\s*\('],
 }.items():
     for pattern in patterns:
         check(re.search(pattern, php_text, re.I) is None, f'no {label}: {pattern}')
@@ -109,8 +123,9 @@ check('hash_file' in bundle and "'sha256'" in bundle, 'full AJAX-time payload ch
 check('validate_manifest_structure' in bundle and 'read_header' in bundle, 'cheap menu detection validates manifest structure without payload hashing')
 for token in ('RecursiveDirectoryIterator', 'FilesystemIterator', 'scandir(', 'glob('):
     check(token not in bundle, f'cleanup/detection avoids recursive or broad scanning: {token}')
-for need in ('WC_Product_Simple', 'wc_get_product', 'add_option', 'update_option', '_graha_source_identity'):
+for need in ('wp_insert_post', 'wp_update_post', 'get_post', 'add_option', 'update_option', '_graha_source_identity', "POST_TYPE = 'graha_product'"):
     check(need in migration, f'migration uses native/idempotency primitive: {need}')
+check("'post_status'=>'draft'" in migration, 'new identity-only products are inserted as draft')
 consumed = re.search(r"'status'\s*=>\s*'consumed'", migration)
 cleanup_pos = migration.find('->cleanup(')
 check(consumed is not None and cleanup_pos > consumed.start(), 'logical consumed state is persisted before cleanup call')
@@ -142,9 +157,11 @@ check(counts == {'hydraulic_anchor':15,'industrial_anchor':11,'ducting_support':
 content_contract = (ROOT / 'docs/content-data-contracts.md').read_text(encoding='utf-8')
 for meta in ('_graha_source_identity','_graha_source_bundle','_graha_source_url','_graha_home_group'):
     check(meta in content_contract, f'content-data contract documents migration provenance field: {meta}')
+check('graha_product' in content_contract and 'Owner: WooCommerce Product.' not in content_contract, 'content-data contract makes native graha_product authoritative')
 traceability = (ROOT / 'docs/requirement-traceability.csv').read_text(encoding='utf-8')
-for requirement_id in range(32, 41):
+for requirement_id in range(32, 42):
     check(f'REQ-{requirement_id:03d}' in traceability, f'traceability includes REQ-{requirement_id:03d}')
+check('WC_Product_Simple' not in traceability and 'graha_product' in traceability, 'traceability uses native product ownership/import primitives')
 
 check('setInterval(' not in texts[PLUGIN / 'assets/js/admin-migration.js'], 'migration screen has no polling loop')
 check("addEventListener('click'" in texts[PLUGIN / 'assets/js/admin-migration.js'], 'migration work starts only from explicit user action')

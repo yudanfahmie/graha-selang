@@ -147,7 +147,7 @@ The temporary migration screen:
 
 - is a child of `graha-selang-content` only;
 - appears only for a valid pending bundle;
-- uses an explicit least-privilege capability appropriate to the operation;
+- uses the native `edit_posts` capability for the current `graha_product` capability model;
 - requires capability and nonce for execution;
 - validates all manifest/file inputs before writes;
 - provides clear pending/running/failed/consumed feedback;
@@ -158,11 +158,11 @@ Protect against double-click execution, concurrent requests, refresh replays, pa
 
 ## 10. Native import ownership and idempotency
 
-Migration writes use authoritative platform APIs only.
+Migration writes use authoritative WordPress APIs only.
 
-WordPress owns Pages, Posts, Media, and native metadata. WooCommerce owns products, categories, attributes, product metadata, and product/media relationships.
+WordPress owns Pages, Posts, Media, the native `graha_product` records, `graha_product_category` terms, `graha_product_brand` terms, and their normal metadata/media relationships. `ProductContentService` owns registration of that product content model; it does not create a parallel database or custom CRUD layer.
 
-No shadow catalog/database is allowed.
+The one-shot product importer writes `graha_product` using `wp_insert_post`, `wp_update_post`, and post meta. New identity-only products are created as drafts, existing product publication status is preserved, and the current 44-record bundle does not infer category or brand membership because those fields are not present in verified bundle data.
 
 Use stable migration/source identities so retries do not duplicate successfully imported entities or relationships. Partial failure must remain detectable and retryable.
 
@@ -191,10 +191,10 @@ Preferred first implementation:
 - a small detector/coordinator loaded only in relevant admin requests;
 - `AdminService` owns conditional submenu registration;
 - parsing/validation is separated from write execution without becoming a generic framework;
-- native WordPress/Woo APIs own writes;
+- native WordPress APIs own writes;
 - no frontend migration runtime.
 
-If a dedicated bootable owner becomes necessary, document why native/current owners cannot satisfy the requirement, update `runtime-service-map.csv` and traceability, and remain within the `<= 8` owner budget.
+`ProductContentService` is the narrow bootable owner for native product content-model registration only. If another dedicated bootable owner becomes necessary, document why native/current owners cannot satisfy the requirement, update `runtime-service-map.csv` and traceability, and remain within the `<= 8` owner budget.
 
 ## 13. Current readiness gates
 
@@ -203,6 +203,7 @@ If a dedicated bootable owner becomes necessary, document why native/current own
 - centralized tokens/typography;
 - reusable responsive/accessibility primitives;
 - `TemplateService` presentation composition without public route takeover;
+- native `graha_product`/product-category/brand content-model registration;
 - semantic shell/header/navigation/main/footer;
 - visible breadcrumb renderer/integration boundary;
 - representative presentation-family prototypes;
@@ -211,6 +212,6 @@ If a dedicated bootable owner becomes necessary, document why native/current own
 
 ### Not ready without real inputs
 
-Production Homepage activation/content composition is not complete until real approved content and crawlable native destinations exist.
+Production Homepage activation/content composition still depends on real approved content and crawlable native destinations.
 
-One-shot migration runtime implementation is not complete until an approved source/runtime bundle, manifest contents, runtime dependencies, and writable/cleanup expectations are available. Do not create fake bundle data merely to exercise production code.
+The committed one-shot product migration mechanism still requires real WordPress runtime execution/verification. Repository simulations do not prove target import, rewrite behavior, or filesystem cleanup.

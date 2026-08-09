@@ -4,7 +4,7 @@
 
 Build Graha Selang as a **small modular WordPress plugin**, not by cloning Gloskin or Morgen and deleting unwanted modules.
 
-The architecture must preserve the quality lessons of Gloskin while starting clean for Graha Selang’s domain.
+The architecture must preserve the quality lessons of Gloskin while starting clean for Graha Selang’s domain. The current repository-owner decision makes Graha products a first-party native WordPress content model rather than a WooCommerce-owned model.
 
 ## 1. Target shape
 
@@ -13,7 +13,7 @@ Use:
 1. one tiny plugin entrypoint;
 2. one composition root (`Kernel`);
 3. a small set of explicit internal owners;
-4. native WordPress/WooCommerce storage and routing;
+4. native WordPress storage and routing;
 5. request-profile loading;
 6. provider adapters for optional integrations;
 7. complexity only after a demonstrated requirement.
@@ -24,24 +24,22 @@ Do not build network microservices. “Service” in this repository means an in
 
 Maximum: eight first-party bootable owners.
 
-Recommended set:
+Current/approved set:
 
 - `Kernel` — composition only;
+- `ProductContentService` — native `graha_product`/category/brand registration and canonical product route bases;
 - `TemplateService` — template routing/presentation contexts;
 - `AssetService` — single frontend asset registry/loading owner;
 - `NavigationService` — one normalized navigation tree;
-- `WooCommerceAdapter` — all Woo availability/query/presentation reads;
-- `SeoService` — technical SEO/GEO integration boundary and structural helpers;
-- `FormAdapter` — external form rendering/fallback;
-- `AdminService` — only minimal presentation/global settings/editor enhancements.
+- `AdminService` — only the Graha admin wrapper, native-screen links, migration entry and minimal presentation/global settings/editor enhancements.
 
-Activation/deactivation/rewrite flushing should remain narrow bootstrap/lifecycle callbacks unless future complexity justifies a dedicated owner. Do not create a ninth service merely to match Gloskin’s class list.
+Optional future `SeoService` and `FormAdapter` remain within the same budget when concrete provider integration is implemented. The one-shot product migration coordinator remains lazy/non-bootable. Do not create another service merely to match Gloskin’s class list.
 
-## 3. Why this is smaller than Gloskin
+## 3. Why the native product owner is justified
 
-Gloskin needed first-party treatment, clinic and doctor content types and relationships. Graha Selang’s core product domain is already naturally owned by WooCommerce, while company/services/articles can use native WordPress.
+The repository-owner decision explicitly replaces WooCommerce product ownership while preserving the known product/category/brand public route shapes.
 
-Therefore Graha Selang should **not** introduce a first-party product content service just to imitate the baseline repository.
+`ProductContentService` owns registration only. WordPress owns `graha_product` CRUD, posts, terms, meta, media, capabilities and normal rewrite infrastructure. Therefore Graha still does **not** introduce a custom product manager, custom product database or admin SPA.
 
 The simplest correct architecture is better than structural symmetry.
 
@@ -61,7 +59,7 @@ The simplest correct architecture is better than structural symmetry.
 - save settings;
 - generate SEO copy;
 - render templates;
-- mutate Woo state;
+- mutate product state;
 - act as a service locator exposed to templates;
 - become a `System` god object.
 
@@ -72,12 +70,12 @@ Templates receive **small page-specific contexts**. Do not build one global payl
 Examples:
 
 - Home context: featured categories/brands/products/services/articles actually needed;
-- Product category context: current term + paginated products + configured supporting content;
-- Product context: current Woo product + presentation-safe related data;
+- Product category context: current native term + paginated products + configured supporting content;
+- Product context: current `graha_product` + presentation-safe related data;
 - Article context: current post + explicit related links;
 - Contact context: approved contact settings + form integration availability.
 
-WordPress/Woo global objects may be used through documented supported APIs when they are the native owner; avoid hidden cross-template queries.
+WordPress global objects may be used through documented supported APIs when they are the native owner; avoid hidden cross-template queries.
 
 ## 6. Asset ownership
 
@@ -90,7 +88,7 @@ Rules:
 - no queue snapshot/suspend/restore machinery;
 - no post-hoc asset “repair” service;
 - no globally enqueued carousel/gallery/filter libraries when not instantiated;
-- reuse WordPress/Woo frontend dependencies where suitable;
+- reuse WordPress frontend dependencies where suitable;
 - deterministic versioning.
 
 ## 7. Navigation ownership
@@ -104,26 +102,23 @@ Do not:
 - create a custom route/menu database;
 - silently synthesize SEO navigation unrelated to visible UX.
 
-## 8. WooCommerce boundary
+## 8. Native product boundary
 
-All Woo-specific dependency checks and presentation reads live behind `WooCommerceAdapter` or supported Woo template/hook usage.
+`ProductContentService` may register normalized native content ownership for:
 
-The adapter may expose normalized reads such as:
-
-- product/category/brand queries;
-- product attributes/specifications;
-- archive/single/cart/account URLs;
-- cart status if commerce is enabled;
-- supported related-product data;
-- taxonomy mapping/availability.
+- `graha_product`;
+- `graha_product_category`;
+- `graha_product_brand`;
+- their approved archive/single/taxonomy rewrite bases.
 
 It must not own:
 
-- product CRUD;
+- product CRUD UI beyond standard WordPress screens;
+- migration execution;
 - order/payment/customer state;
 - a parallel search index;
 - duplicate brand/category persistence;
-- independent cart behavior.
+- independent commerce behavior.
 
 ## 9. SEO/GEO boundary
 
@@ -154,7 +149,8 @@ V1 target:
 
 - zero custom database tables;
 - native Pages/Posts/Media;
-- Woo products/categories/attributes/brands;
+- native `graha_product` posts;
+- native `graha_product_category` / `graha_product_brand` terms;
 - registered post/term meta only when necessary;
 - at most one small Graha global settings option if a native Page/menu/settings location cannot express the value cleanly.
 
@@ -166,8 +162,11 @@ Prefer:
 
 - WordPress Page permalinks;
 - WordPress Post permalinks;
-- Woo product/category/brand rewrites;
+- native `graha_product` archive/single rewrites;
+- native `graha_product_category` and `graha_product_brand` rewrites;
 - normal WordPress rewrite behavior.
+
+Known product route bases are `/products/`, `/product/{slug}/`, `/product-category/{slug}/`, and `/brand/{slug}/`.
 
 Avoid:
 
@@ -182,13 +181,13 @@ Legacy redirects should live in the deployment’s canonical redirect owner (app
 
 Do not prebuild a custom cache layer.
 
-Use WordPress/Woo caching semantics first. Add a cache only after profiling identifies a real expensive query, and make the same owner responsible for invalidation.
+Use WordPress caching semantics first. Add a cache only after profiling identifies a real expensive query, and make the same owner responsible for invalidation.
 
 ## 13. Admin UI
 
-Prefer native WordPress/Woo edit screens, taxonomy screens, menus and Settings API.
+Prefer native WordPress edit screens, taxonomy screens, menus and Settings API. `AdminService` may link the native Graha product/category/brand screens beneath the one Graha parent.
 
-Do not build a general Graha admin framework. A small settings page is acceptable only for genuinely global presentation/integration settings that have no better native owner.
+Do not build a general Graha admin framework or custom product CRUD. A small settings page is acceptable only for genuinely global presentation/integration settings that have no better native owner.
 
 ## 14. Security
 
@@ -199,7 +198,7 @@ For first-party mutations:
 - validate/sanitize on input;
 - native persistence API;
 - escape on output;
-- no public unauthenticated AJAX without an explicit threat model.
+- do not expose mutation endpoints publicly without an explicit threat model.
 
 No security hardening layer should compensate for unclear ownership.
 
@@ -221,7 +220,7 @@ Performance starts with architecture:
 A new service, storage layer, custom route, cache, AJAX endpoint or dependency requires documentation of:
 
 1. concrete requirement;
-2. why native WordPress/Woo cannot satisfy it;
+2. why native WordPress/current owners cannot satisfy it;
 3. canonical ownership;
 4. request/load impact;
 5. persistence/security implications;

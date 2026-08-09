@@ -14,6 +14,7 @@ php tests/navigation-render.php
 php tests/template-render.php
 php tests/native-presentation.php
 php tests/admin-asset-scope.php
+php tests/product-content-service.php
 php tests/migration-admin.php
 php tests/migration-runtime.php
 php tests/kernel-smoke.php

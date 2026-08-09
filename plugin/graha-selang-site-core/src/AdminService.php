@@ -5,12 +5,14 @@ namespace GrahaSelang;
 defined( 'ABSPATH' ) || exit;
 
 final class AdminService {
-	const MENU_SLUG            = 'graha-selang-content';
-	const OVERVIEW_CAPABILITY  = 'edit_pages';
-	const MIGRATION_CAPABILITY = 'manage_woocommerce';
-	const MIGRATION_SLUG       = 'graha-selang-product-migration';
-	const MIGRATION_AJAX       = 'graha_selang_run_product_catalog_migration';
-	const MIGRATION_NONCE      = 'graha_selang_product_catalog_migration';
+	const MENU_SLUG             = 'graha-selang-content';
+	const OVERVIEW_CAPABILITY   = 'edit_pages';
+	const PRODUCT_CAPABILITY    = 'edit_posts';
+	const TAXONOMY_CAPABILITY   = 'manage_categories';
+	const MIGRATION_CAPABILITY  = 'edit_posts';
+	const MIGRATION_SLUG        = 'graha-selang-product-migration';
+	const MIGRATION_AJAX        = 'graha_selang_run_product_catalog_migration';
+	const MIGRATION_NONCE       = 'graha_selang_product_catalog_migration';
 
 	/** @var AssetService */
 	private $assets;
@@ -69,6 +71,14 @@ final class AdminService {
 			}
 		}
 
+		if ( current_user_can( self::PRODUCT_CAPABILITY ) ) {
+			add_submenu_page( self::MENU_SLUG, 'Produk Graha', 'Produk', self::PRODUCT_CAPABILITY, 'edit.php?post_type=graha_product', '' );
+		}
+		if ( current_user_can( self::TAXONOMY_CAPABILITY ) ) {
+			add_submenu_page( self::MENU_SLUG, 'Kategori Produk', 'Kategori Produk', self::TAXONOMY_CAPABILITY, 'edit-tags.php?taxonomy=graha_product_category&post_type=graha_product', '' );
+			add_submenu_page( self::MENU_SLUG, 'Merek Produk', 'Merek', self::TAXONOMY_CAPABILITY, 'edit-tags.php?taxonomy=graha_product_brand&post_type=graha_product', '' );
+		}
+
 		$migration = current_user_can( self::MIGRATION_CAPABILITY ) ? $this->get_migration() : null;
 		if ( $migration && $migration->should_show_menu() ) {
 			$hook = add_submenu_page(
@@ -114,7 +124,7 @@ final class AdminService {
 		?>
 		<div class="wrap graha-admin-overview">
 			<h1><?php echo esc_html( 'Graha Selang Content' ); ?></h1>
-			<p class="graha-admin-overview__intro"><?php echo esc_html__( 'Kelola konten melalui layar WordPress dan WooCommerce yang tetap menjadi pemilik datanya.', 'graha-selang' ); ?></p>
+			<p class="graha-admin-overview__intro"><?php echo esc_html__( 'Kelola konten Graha melalui layar WordPress native yang tetap menjadi pemilik datanya.', 'graha-selang' ); ?></p>
 
 			<?php if ( ! empty( $summary ) && 'invalid' === $summary['detection'] ) : ?>
 				<div class="notice notice-error inline"><p><?php echo esc_html( $summary['message'] ); ?></p></div>
@@ -132,8 +142,12 @@ final class AdminService {
 				<?php if ( current_user_can( 'upload_files' ) ) : ?>
 					<a class="graha-admin-overview__card" href="<?php echo esc_url( admin_url( 'upload.php' ) ); ?>"><strong><?php echo esc_html__( 'Media', 'graha-selang' ); ?></strong><span><?php echo esc_html__( 'Gunakan Media Library untuk aset yang disetujui.', 'graha-selang' ); ?></span></a>
 				<?php endif; ?>
-				<?php if ( post_type_exists( 'product' ) && current_user_can( 'edit_products' ) ) : ?>
-					<a class="graha-admin-overview__card" href="<?php echo esc_url( admin_url( 'edit.php?post_type=product' ) ); ?>"><strong><?php echo esc_html__( 'Produk WooCommerce', 'graha-selang' ); ?></strong><span><?php echo esc_html__( 'Produk tetap dikelola melalui WooCommerce.', 'graha-selang' ); ?></span></a>
+				<?php if ( current_user_can( self::PRODUCT_CAPABILITY ) ) : ?>
+					<a class="graha-admin-overview__card" href="<?php echo esc_url( admin_url( 'edit.php?post_type=graha_product' ) ); ?>"><strong><?php echo esc_html__( 'Produk Graha', 'graha-selang' ); ?></strong><span><?php echo esc_html__( 'Kelola produk melalui editor WordPress native.', 'graha-selang' ); ?></span></a>
+				<?php endif; ?>
+				<?php if ( current_user_can( self::TAXONOMY_CAPABILITY ) ) : ?>
+					<a class="graha-admin-overview__card" href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=graha_product_category&post_type=graha_product' ) ); ?>"><strong><?php echo esc_html__( 'Kategori Produk', 'graha-selang' ); ?></strong><span><?php echo esc_html__( 'Kelola kategori produk native.', 'graha-selang' ); ?></span></a>
+					<a class="graha-admin-overview__card" href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=graha_product_brand&post_type=graha_product' ) ); ?>"><strong><?php echo esc_html__( 'Merek', 'graha-selang' ); ?></strong><span><?php echo esc_html__( 'Kelola merek produk yang telah diverifikasi.', 'graha-selang' ); ?></span></a>
 				<?php endif; ?>
 			</div>
 		</div>

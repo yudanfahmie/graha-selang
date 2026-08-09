@@ -37,6 +37,7 @@ final class Kernel {
 		$navigation = new NavigationService();
 
 		$this->services = array(
+			new ProductContentService(),
 			$assets,
 			$navigation,
 			new TemplateService( $assets, $navigation ),

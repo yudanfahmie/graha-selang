@@ -4,7 +4,7 @@ define( 'ABSPATH', __DIR__ . '/' );
 $GLOBALS['menu_calls']      = array();
 $GLOBALS['submenu_calls']   = array();
 $GLOBALS['actions']         = array();
-$GLOBALS['caps']            = array( 'edit_pages' => true, 'manage_woocommerce' => true );
+$GLOBALS['caps']            = array( 'edit_pages' => true, 'edit_posts' => true, 'manage_categories' => true );
 $GLOBALS['migration_state'] = array();
 $GLOBALS['enqueued']        = array();
 
@@ -25,7 +25,6 @@ function delete_option( $key ) { unset( $GLOBALS['migration_state'][ $key ] ); r
 function add_option( $key, $value ) { if ( isset( $GLOBALS['migration_state'][ $key ] ) ) return false; $GLOBALS['migration_state'][ $key ] = $value; return true; }
 function is_wp_error( $value ) { return $value instanceof WP_Error; }
 class WP_Error { private $message; public function __construct( $code, $message ) { $this->message = $message; } public function get_error_message() { return $this->message; } }
-function post_type_exists( $type ) { return false; }
 function admin_url( $path ) { return 'https://example.test/wp-admin/' . $path; }
 function esc_url( $value ) { return $value; }
 function esc_html__( $value ) { return $value; }
@@ -56,7 +55,7 @@ class FakeMigration {
 	public function execute() { return $this->result; }
 }
 
-$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/plugin/graha-selang-site-core/graha-selang.php', '0.4.0' );
+$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/plugin/graha-selang-site-core/graha-selang.php', '0.5.0' );
 $admin  = new \GrahaSelang\AdminService( $assets );
 $admin->register();
 assert_true( isset( $GLOBALS['actions']['wp_ajax_graha_selang_run_product_catalog_migration'] ), 'authenticated migration AJAX hook registered' );
@@ -64,16 +63,19 @@ assert_true( ! isset( $GLOBALS['actions']['wp_ajax_nopriv_graha_selang_run_produ
 
 $admin->register_menu();
 assert_true( 1 === count( $GLOBALS['menu_calls'] ), 'single canonical Graha root remains' );
-assert_true( 2 === count( $GLOBALS['submenu_calls'] ), 'valid pending bundle creates one temporary migration child' );
-$migration_hook = $GLOBALS['submenu_calls'][1][0] . '_page_' . $GLOBALS['submenu_calls'][1][4];
+assert_true( 5 === count( $GLOBALS['submenu_calls'] ), 'native product/category/brand links plus pending migration child live under Graha root' );
+assert_true( 'edit.php?post_type=graha_product' === $GLOBALS['submenu_calls'][1][4], 'native Graha product CRUD link is exposed under Graha root' );
+assert_true( false !== strpos( $GLOBALS['submenu_calls'][2][4], 'graha_product_category' ) && false !== strpos( $GLOBALS['submenu_calls'][3][4], 'graha_product_brand' ), 'native category and brand links are exposed under Graha root' );
+assert_true( 'manage_categories' === $GLOBALS['submenu_calls'][2][2] && 'manage_categories' === $GLOBALS['submenu_calls'][3][2], 'native taxonomy links use WordPress term-management capability' );
+$migration_hook = $GLOBALS['submenu_calls'][4][0] . '_page_' . $GLOBALS['submenu_calls'][4][4];
 $admin->enqueue_assets( $migration_hook );
 assert_true( in_array( 'graha-selang-admin-migration', $GLOBALS['enqueued'], true ), 'migration assets load on exact temporary screen' );
 
-$GLOBALS['caps']['manage_woocommerce'] = false;
+$GLOBALS['caps']['edit_posts'] = false;
 try { $admin->run_product_migration(); assert_true( false, 'capability should reject' ); }
-catch ( RuntimeException $error ) { assert_true( false !== strpos( $error->getMessage(), '403' ), 'migration AJAX requires capability' ); }
+catch ( RuntimeException $error ) { assert_true( false !== strpos( $error->getMessage(), '403' ), 'migration AJAX requires native edit_posts capability' ); }
 
-$GLOBALS['caps']['manage_woocommerce'] = true;
+$GLOBALS['caps']['edit_posts'] = true;
 $GLOBALS['valid_nonce'] = false;
 try { $admin->run_product_migration(); assert_true( false, 'nonce should reject' ); }
 catch ( RuntimeException $error ) { assert_true( false !== strpos( $error->getMessage(), '403' ), 'migration AJAX requires nonce' ); }
@@ -94,4 +96,4 @@ $property->setValue( $admin, null );
 $GLOBALS['migration_state'][ \GrahaSelang\ProductCatalogMigration::STATE_OPTION ] = array( 'status' => 'consumed', 'cleanup' => 'failed', 'cleanup_message' => 'read-only' );
 $GLOBALS['submenu_calls'] = array();
 $admin->register_menu();
-assert_true( 1 === count( $GLOBALS['submenu_calls'] ), 'consumed state hides temporary migration submenu even when cleanup failed' );
+assert_true( 4 === count( $GLOBALS['submenu_calls'] ), 'consumed state hides temporary migration submenu while native product links remain' );

@@ -10,6 +10,7 @@ final class TemplateService {
 	const BREADCRUMB_HOOK = 'graha_selang_render_breadcrumbs';
 	const SOURCE_META = '_graha_source_identity';
 	const HOME_GROUP_META = '_graha_home_group';
+	const PRODUCT_POST_TYPE = 'graha_product';
 	const FAMILIES = array( 'home','product_archive','product_category','product_single','application','brand','about','service','technical_rfq','article','legal','search','not_found' );
 	const HOME_GROUPS = array(
 		'hydraulic_anchor' => array( 'label' => 'Hydraulic Hose / MORGEN', 'priority' => 'anchor' ),
@@ -43,13 +44,13 @@ final class TemplateService {
 			if ( $this->native_home_is_ready() ) $this->assets->enqueue_foundation();
 			return;
 		}
-		if ( is_singular( array( 'page', 'post' ) ) ) $this->assets->enqueue_foundation();
+		if ( is_singular( array( 'page', 'post', self::PRODUCT_POST_TYPE ) ) ) $this->assets->enqueue_foundation();
 	}
 
 	public function enhance_native_content( $content ) {
 		if ( ( function_exists( 'is_admin' ) && is_admin() ) || ! in_the_loop() || ! is_main_query() ) return $content;
 		if ( is_front_page() ) return $this->render_native_home_content( $content );
-		if ( is_singular( array( 'page', 'post' ) ) ) return '<div class="graha-ui graha-native-content graha-stack">' . $this->render_native_breadcrumbs() . wp_kses_post( $content ) . '</div>';
+		if ( is_singular( array( 'page', 'post', self::PRODUCT_POST_TYPE ) ) ) return '<div class="graha-ui graha-native-content graha-stack">' . $this->render_native_breadcrumbs() . wp_kses_post( $content ) . '</div>';
 		return $content;
 	}
 
@@ -105,6 +106,9 @@ final class TemplateService {
 				$url = get_permalink( $ancestor_id );
 				if ( '' !== $label && $url ) $items[] = array( 'label' => $label, 'url' => $url );
 			}
+		} elseif ( is_singular( self::PRODUCT_POST_TYPE ) ) {
+			$archive = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
+			if ( $archive ) $items[] = array( 'label' => __( 'Produk', 'graha-selang' ), 'url' => $archive );
 		}
 		return $this->render_breadcrumbs( $items, $current );
 	}
@@ -166,15 +170,15 @@ final class TemplateService {
 		if ( count( $groups ) !== count( self::HOME_GROUPS ) ) return false;
 		$contact = get_page_by_path( 'contact-us', OBJECT, 'page' );
 		$services = get_page_by_path( 'layanan-kami', OBJECT, 'page' );
-		$shop_id = function_exists( 'wc_get_page_id' ) ? (int) wc_get_page_id( 'shop' ) : 0;
-		return $contact && 'publish' === $contact->post_status && $services && 'publish' === $services->post_status && $shop_id > 0 && 'publish' === get_post_status( $shop_id );
+		$products_url = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
+		return $contact && 'publish' === $contact->post_status && $services && 'publish' === $services->post_status && ! empty( $products_url );
 	}
 
 	private function get_native_home_groups() {
 		if ( null !== $this->native_home_groups ) return $this->native_home_groups;
 		$this->native_home_groups = array();
-		if ( ! post_type_exists( 'product' ) ) return $this->native_home_groups;
-		$ids = get_posts( array( 'post_type'=>'product','post_status'=>'publish','fields'=>'ids','numberposts'=>80,'suppress_filters'=>true,'meta_query'=>array( array( 'key'=>self::SOURCE_META,'compare'=>'EXISTS' ) ) ) );
+		if ( ! post_type_exists( self::PRODUCT_POST_TYPE ) ) return $this->native_home_groups;
+		$ids = get_posts( array( 'post_type'=>self::PRODUCT_POST_TYPE,'post_status'=>'publish','fields'=>'ids','numberposts'=>80,'suppress_filters'=>true,'meta_query'=>array( array( 'key'=>self::SOURCE_META,'compare'=>'EXISTS' ) ) ) );
 		foreach ( is_array( $ids ) ? $ids : array() as $id ) {
 			$group = (string) get_post_meta( $id, self::HOME_GROUP_META, true );
 			if ( ! isset( self::HOME_GROUPS[ $group ] ) ) continue;
@@ -190,7 +194,7 @@ final class TemplateService {
 		$groups = $this->get_native_home_groups();
 		$contact = get_page_by_path( 'contact-us', OBJECT, 'page' );
 		$services = get_page_by_path( 'layanan-kami', OBJECT, 'page' );
-		$shop_id = (int) wc_get_page_id( 'shop' );
+		$products_url = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
 		ob_start();
 		include dirname( __DIR__ ) . '/templates/native-home.php';
 		return (string) ob_get_clean();

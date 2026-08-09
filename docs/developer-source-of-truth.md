@@ -40,7 +40,7 @@ This number is independent from template-family count. See `scope-inventory.csv`
 
 ## 4. Controlled-rebuild principle
 
-Rebuild presentation, templates, UX, RFQ, responsive/accessibility and performance. Preserve or deliberately migrate domain identity, valuable routes, valid WordPress/Woo records, search equity, provider ownership and measurement continuity.
+Rebuild presentation, templates, UX, RFQ, responsive/accessibility and performance. Preserve or deliberately migrate domain identity, valuable routes, valid WordPress/native product records, search equity, provider ownership and measurement continuity.
 
 Do not reset the site merely because frontend code is replaced.
 
@@ -51,7 +51,7 @@ Use the strongest engineering principles established in `yudanfahmie/gloskin-sit
 - canonical docs before implementation;
 - one composition root;
 - one owner per concern;
-- native WordPress/Woo ownership;
+- native WordPress ownership;
 - one asset owner;
 - request-oriented loading;
 - no speculative repair/migration framework;
@@ -64,11 +64,11 @@ Do not copy Gloskin medical models, routes, UI assets, CSS/JS or content.
 
 ### Graha plugin owns
 
+- registration of the native `graha_product` content type plus product-category and brand taxonomies;
 - public shell/header/nav/footer presentation;
 - page-family selection and presentation contexts;
 - reusable site UI;
 - technical product presentation/selector/filter UI;
-- Woo presentation integration;
 - application/brand/service/article/contact/RFQ presentation;
 - asset loading;
 - developer-side SEO/GEO structure and provider compatibility;
@@ -78,11 +78,11 @@ Do not copy Gloskin medical models, routes, UI assets, CSS/JS or content.
 
 ### WordPress owns
 
-Pages, Posts, Media, users/capabilities, core settings/meta and normal permalink/rewrite infrastructure.
+Pages, Posts, Media, `graha_product` records, native product category/brand terms, users/capabilities, core settings/meta and normal permalink/rewrite infrastructure. Standard WordPress CRUD/admin screens remain authoritative; the Graha plugin does not build a second product CRUD system.
 
-### WooCommerce owns
+### Native Graha product model
 
-Products/variations, product CRUD/admin, categories, attributes, product media, authoritative brand taxonomy when provided by the Woo stack, SKU/price/stock, and cart/checkout/order/account/payment behavior when enabled.
+`ProductContentService` registers `graha_product`, `graha_product_category`, and `graha_product_brand`. Product persistence uses standard WordPress posts, terms, post meta, term meta, and Media Library relationships. WooCommerce is not required to activate, manage, migrate, or render Graha products.
 
 ### SEO provider owns
 
@@ -104,7 +104,7 @@ All **plugin-owned custom admin pages** must live beneath one top-level WordPres
 
 Every Graha-specific custom admin menu page uses this parent. Do not create sibling root menus such as Graha Settings, Graha RFQ, Graha SEO, Graha Products or other plugin-owned roots.
 
-This grouping rule does **not** move or duplicate authoritative native/provider screens. WordPress Pages/Posts/Media, WooCommerce product/commerce screens, SEO-provider screens and form-provider screens remain in their native locations. The Graha wrapper may link to them but must not proxy or clone their CRUD.
+This grouping rule does **not** replace native WordPress CRUD. WordPress Pages/Posts/Media and the native `graha_product`/product-category/brand screens remain standard WordPress screens; the Graha wrapper may link to them but must not proxy or clone their CRUD. SEO-provider and form-provider screens likewise remain with their authoritative owners.
 
 Menu placement is not authorization. Each child page enforces its own least-privilege capability; state-changing actions also require nonce verification, validation/sanitization and native persistence. Graha admin assets load only on Graha-owned screens.
 
@@ -146,7 +146,7 @@ Support four entry doors:
 
 One indexable URL = one primary intent. Avoid doorway/keyword-variant duplication.
 
-The specification path may use progressive selector/filter logic backed by Woo/native structured attributes. Primary catalog and links remain server-rendered/crawlable without JS.
+The specification path may use progressive selector/filter logic backed by native structured taxonomy/meta. Primary catalog and links remain server-rendered/crawlable without JS.
 
 ## 10. Route/content model
 
@@ -154,15 +154,17 @@ Use native owners first:
 
 - Home/About/Services/Contact/RFQ/legal/evergreen landing surfaces: native Pages or provider output as appropriate;
 - articles/guides: native Posts;
-- products: Woo Products;
-- product categories: Woo categories;
-- brands: installed approved Woo brand taxonomy;
-- technical specs: Woo attributes or registered product meta owned with Woo content;
+- products: `graha_product`;
+- product archive: `/products/`;
+- product singles: `/product/{slug}/`;
+- product categories: `graha_product_category` at `/product-category/{slug}/`;
+- brands: `graha_product_brand` at `/brand/{slug}/`;
+- technical specs: approved registered product meta/native terms;
 - application pages: preserve the 4 retained application-intent URLs using native Pages unless deployment evidence proves a better native owner.
 
 Known retained public route families include `/`, `/about-us/`, `/products/`, `/product/…/`, `/product-category/…/`, `/brand/…/`, `/layanan-kami/`, `/articles/`, `/blog/…/`, `/contact-us/` and approved evergreen/application routes.
 
-Do not create CPTs/custom tables merely to mirror the brief.
+Do not create custom product tables, shadow catalogs, or virtual route engines merely to mirror the brief.
 
 ## 11. Required presentation families
 

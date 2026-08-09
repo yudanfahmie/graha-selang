@@ -5,7 +5,7 @@ namespace GrahaSelang;
 defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/ProductCatalogBundle.php';
 
-/** Narrow, non-bootable one-shot Woo product migration coordinator. */
+/** Narrow, non-bootable one-shot native Graha product migration coordinator. */
 final class ProductCatalogMigration {
 	const RUNTIME_RELATIVE_PATH = 'migration-runtime/product-catalog-v1';
 	const STATE_OPTION = 'graha_selang_product_catalog_v1_state';
@@ -14,6 +14,7 @@ final class ProductCatalogMigration {
 	const BUNDLE_META = '_graha_source_bundle';
 	const SOURCE_URL_META = '_graha_source_url';
 	const HOME_GROUP_META = '_graha_home_group';
+	const POST_TYPE = 'graha_product';
 	const LOCK_TTL = 900;
 
 	/** @var ProductCatalogBundle */
@@ -44,8 +45,8 @@ final class ProductCatalogMigration {
 	public function execute() {
 		$state = $this->get_state();
 		if ( 'consumed' === $state['status'] ) throw new \RuntimeException( 'Bundle ini sudah dikonsumsi dan tidak dapat dijalankan kembali.' );
-		if ( ! class_exists( 'WC_Product_Simple' ) || ! function_exists( 'wc_get_product' ) ) {
-			$state['status']='failed'; $state['message']='WooCommerce tidak tersedia; migrasi produk tidak dijalankan.'; $this->save_state( $state );
+		if ( ! post_type_exists( self::POST_TYPE ) ) {
+			$state['status']='failed'; $state['message']='Tipe konten produk Graha belum terdaftar; migrasi produk tidak dijalankan.'; $this->save_state( $state );
 			throw new \RuntimeException( $state['message'] );
 		}
 		$token = $this->acquire_lock();
@@ -79,28 +80,38 @@ final class ProductCatalogMigration {
 		if ( count($ids)>1 ) throw new \RuntimeException( 'Source identity collision di target: '.$record['source_id'] );
 		$is_new=false; $id=empty($ids)?0:(int)$ids[0];
 		if ( ! $id ) {
-			$title_ids=get_posts(array('post_type'=>'product','post_status'=>'any','title'=>$record['name'],'fields'=>'ids','numberposts'=>2,'suppress_filters'=>true));
-			if ( count($title_ids)>1 ) throw new \RuntimeException( 'Lebih dari satu product target memiliki judul yang sama: '.$record['name'] );
+			$title_ids=get_posts(array('post_type'=>self::POST_TYPE,'post_status'=>'any','title'=>$record['name'],'fields'=>'ids','numberposts'=>2,'suppress_filters'=>true));
+			if ( count($title_ids)>1 ) throw new \RuntimeException( 'Lebih dari satu produk target memiliki judul yang sama: '.$record['name'] );
 			if ( ! empty($title_ids) ) { $id=(int)$title_ids[0]; $existing=(string)get_post_meta($id,self::SOURCE_META,true); if ( ''!==$existing && $record['source_id']!==$existing ) throw new \RuntimeException('Judul target sudah dimiliki source identity lain: '.$record['name']); }
 		}
 		if ( ! $id ) {
-			$post=get_page_by_path($record['slug'],OBJECT,'product');
+			$post=get_page_by_path($record['slug'],OBJECT,self::POST_TYPE);
 			if ( $post ) { $existing=(string)get_post_meta($post->ID,self::SOURCE_META,true); if ( ''!==$existing && $record['source_id']!==$existing ) throw new \RuntimeException('Slug target sudah dimiliki source identity lain: '.$record['slug']); if ( sanitize_title($post->post_title)!==sanitize_title($record['name']) ) throw new \RuntimeException('Slug target bertabrakan dengan produk berjudul berbeda: '.$record['slug']); $id=(int)$post->ID; }
 		}
-		$product=$id?wc_get_product($id):new \WC_Product_Simple(); if(!$product) throw new \RuntimeException('WooCommerce gagal membuka product target untuk '.$record['source_id']);
-		if(!$id){$is_new=true;$product->set_name($record['name']);$product->set_slug($record['slug']);$product->set_status('draft');} elseif($product->get_name()!==$record['name']){$product->set_name($record['name']);}
-		$id=(int)$product->save(); if(!$id) throw new \RuntimeException('WooCommerce gagal menyimpan '.$record['source_id']);
+		if ( ! $id ) {
+			$is_new=true;
+			$saved=wp_insert_post(array('post_type'=>self::POST_TYPE,'post_title'=>$record['name'],'post_name'=>$record['slug'],'post_status'=>'draft'),true);
+			if ( is_wp_error($saved) || ! $saved ) throw new \RuntimeException('WordPress gagal menyimpan '.$record['source_id'].(is_wp_error($saved)?': '.$saved->get_error_message():''));
+			$id=(int)$saved;
+		} else {
+			$post=get_post($id);
+			if ( ! $post || self::POST_TYPE !== $post->post_type ) throw new \RuntimeException('Produk target tidak dapat dibuka untuk '.$record['source_id']);
+			if ( (string)$post->post_title !== $record['name'] ) {
+				$saved=wp_update_post(array('ID'=>$id,'post_title'=>$record['name']),true);
+				if ( is_wp_error($saved) || ! $saved ) throw new \RuntimeException('WordPress gagal memperbarui '.$record['source_id'].(is_wp_error($saved)?': '.$saved->get_error_message():''));
+			}
+		}
 		update_post_meta($id,self::SOURCE_META,$record['source_id']); update_post_meta($id,self::BUNDLE_META,$bundle_id); update_post_meta($id,self::HOME_GROUP_META,$record['home_group']);
 		if(''!==$record['source_url']) update_post_meta($id,self::SOURCE_URL_META,$record['source_url']);
 		return $is_new?'created':'updated';
 	}
 
 	private function verify_products( array $products ) {
-		foreach($products as $record){$ids=$this->find_by_source_identity($record['source_id']); if(1!==count($ids)) throw new \RuntimeException('Verifikasi source identity gagal: '.$record['source_id']); $id=(int)$ids[0];$product=wc_get_product($id);if(!$product||$product->get_name()!==$record['name']) throw new \RuntimeException('Verifikasi product gagal: '.$record['source_id']);if((string)get_post_meta($id,self::HOME_GROUP_META,true)!==$record['home_group']) throw new \RuntimeException('Verifikasi home_group gagal: '.$record['source_id']);}
+		foreach($products as $record){$ids=$this->find_by_source_identity($record['source_id']); if(1!==count($ids)) throw new \RuntimeException('Verifikasi source identity gagal: '.$record['source_id']); $id=(int)$ids[0];$post=get_post($id);if(!$post||self::POST_TYPE!==$post->post_type||(string)$post->post_title!==$record['name']) throw new \RuntimeException('Verifikasi produk gagal: '.$record['source_id']);if((string)get_post_meta($id,self::HOME_GROUP_META,true)!==$record['home_group']) throw new \RuntimeException('Verifikasi home_group gagal: '.$record['source_id']);}
 	}
 
 	private function find_by_source_identity( $source_id ) {
-		$ids=get_posts(array('post_type'=>'product','post_status'=>'any','meta_key'=>self::SOURCE_META,'meta_value'=>(string)$source_id,'fields'=>'ids','numberposts'=>2,'suppress_filters'=>true));
+		$ids=get_posts(array('post_type'=>self::POST_TYPE,'post_status'=>'any','meta_key'=>self::SOURCE_META,'meta_value'=>(string)$source_id,'fields'=>'ids','numberposts'=>2,'suppress_filters'=>true));
 		return is_array($ids)?array_map('intval',$ids):array();
 	}
 

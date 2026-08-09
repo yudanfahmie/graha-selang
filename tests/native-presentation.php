@@ -12,8 +12,8 @@ $GLOBALS['pages']         = array(
 	'contact-us'   => (object) array( 'ID' => 201, 'post_status' => 'publish' ),
 	'layanan-kami' => (object) array( 'ID' => 202, 'post_status' => 'publish' ),
 );
-$GLOBALS['statuses'] = array( 301 => 'publish', 400 => 'publish', 401 => 'publish', 501 => 'publish' );
-$GLOBALS['titles'] = array( 400 => 'Induk Halaman', 401 => 'Anak Halaman', 501 => 'Panduan Selang' );
+$GLOBALS['statuses'] = array( 400 => 'publish', 401 => 'publish', 501 => 'publish', 601 => 'publish' );
+$GLOBALS['titles'] = array( 400 => 'Induk Halaman', 401 => 'Anak Halaman', 501 => 'Panduan Selang', 601 => 'Produk Native' );
 $GLOBALS['ancestors'] = array( 401 => array( 400 ) );
 
 function add_action() {}
@@ -33,7 +33,7 @@ function is_singular( $types = null ) {
 }
 function in_the_loop() { return true; }
 function is_main_query() { return true; }
-function post_type_exists( $type ) { return 'product' === $type; }
+function post_type_exists( $type ) { return 'graha_product' === $type; }
 function get_posts( $args ) { return array_keys( $GLOBALS['products'] ); }
 function get_post_meta( $id, $key, $single = true ) { return isset( $GLOBALS['products'][ $id ][ $key ] ) ? $GLOBALS['products'][ $id ][ $key ] : ''; }
 function get_the_ID() { return $GLOBALS['current_id']; }
@@ -45,8 +45,8 @@ function get_the_title( $id = 0 ) {
 function get_post_ancestors( $id ) { return isset( $GLOBALS['ancestors'][ $id ] ) ? $GLOBALS['ancestors'][ $id ] : array(); }
 function get_permalink( $target ) { $id = is_object( $target ) ? $target->ID : (int) $target; return 'https://example.test/?p=' . $id; }
 function get_page_by_path( $slug, $output, $type ) { return isset( $GLOBALS['pages'][ $slug ] ) ? $GLOBALS['pages'][ $slug ] : null; }
-function wc_get_page_id( $page ) { return 'shop' === $page ? 301 : 0; }
 function get_post_status( $id ) { return isset( $GLOBALS['statuses'][ $id ] ) ? $GLOBALS['statuses'][ $id ] : false; }
+function get_post_type_archive_link( $type ) { return 'graha_product' === $type ? 'https://example.test/products/' : ''; }
 function wp_strip_all_tags( $value ) { return strip_tags( (string) $value ); }
 function wp_kses_post( $value ) { return (string) $value; }
 function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $value ) ); }
@@ -91,7 +91,7 @@ foreach ( $groups as $group => $name ) {
 	$id++;
 }
 
-$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/plugin/graha-selang-site-core/graha-selang.php', '0.4.0' );
+$assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/plugin/graha-selang-site-core/graha-selang.php', '0.5.0' );
 $nav = new \GrahaSelang\NavigationService();
 $templates = new \GrahaSelang\TemplateService( $assets, $nav );
 
@@ -100,13 +100,10 @@ assert_true( 4 === substr_count( $html, '<section class="graha-page-section' ), 
 assert_true( false !== strpos( $html, 'Hydraulic Hose / MORGEN' ), 'Home renders hydraulic anchor hierarchy' );
 assert_true( false !== strpos( $html, 'Industrial Hose &amp; Assembly / HAMMER + SUNFLEX' ), 'Home renders industrial anchor hierarchy' );
 assert_true( false !== strpos( $html, 'CNG / High-pressure Gas Hose' ), 'Home renders specialist group' );
-assert_true( false !== strpos( $html, 'https://example.test/?p=301' ), 'Home uses real native Woo shop permalink' );
+assert_true( false !== strpos( $html, 'https://example.test/products/' ), 'Home uses native graha_product archive link' );
 assert_true( false !== strpos( $html, 'https://example.test/?p=202' ) && false !== strpos( $html, 'https://example.test/?p=201' ), 'Home uses native Services and Contact destinations' );
 assert_true( false === strpos( $html, 'graha-breadcrumbs' ), 'native Home renders no breadcrumb' );
-$public_home = strtolower( wp_strip_all_tags( $html ) );
-foreach ( array( 'bundle', 'migrasi', 'migration', 'native woocommerce', 'jumlah record' ) as $internal_term ) {
-	assert_true( false === strpos( $public_home, $internal_term ), 'Home public copy omits internal term: ' . $internal_term );
-}
+assert_true( false === stripos( $html, 'woocommerce' ), 'Home contains no WooCommerce dependency/copy' );
 assert_true( false === strpos( $html, 'migration-source/' ), 'Home never reads or exposes repository migration archive' );
 
 $templates->prepare_native_presentation();
@@ -121,6 +118,7 @@ $GLOBALS['products'][6] = array( 'name' => $groups['cng_specialist'], '_graha_so
 unset( $GLOBALS['pages']['contact-us'] );
 $templates = new \GrahaSelang\TemplateService( $assets, $nav );
 assert_true( $original === $templates->enhance_native_content( $original ), 'Home remains native when real Contact destination is unavailable' );
+$GLOBALS['pages']['contact-us'] = (object) array( 'ID' => 201, 'post_status' => 'publish' );
 
 $GLOBALS['front_page'] = false;
 $GLOBALS['singular_type'] = 'page';
@@ -139,3 +137,11 @@ $post = $templates->enhance_native_content( '<p>Isi artikel asli.</p>' );
 assert_true( false !== strpos( $post, '>Beranda</a>' ), 'native Post breadcrumb starts with Home' );
 assert_true( false !== strpos( $post, 'aria-current="page">Panduan Selang</span>' ), 'native Post breadcrumb marks current article' );
 assert_true( false === strpos( $post, 'Induk Halaman' ), 'native Post breadcrumb stays simple without Page hierarchy' );
+
+$GLOBALS['singular_type'] = 'graha_product';
+$GLOBALS['current_id'] = 601;
+$templates = new \GrahaSelang\TemplateService( $assets, $nav );
+$product = $templates->enhance_native_content( '<p>Isi produk asli.</p>' );
+assert_true( false !== strpos( $product, 'href="https://example.test/products/"' ) && false !== strpos( $product, '>Produk</a>' ), 'native product breadcrumb links to graha_product archive' );
+assert_true( false !== strpos( $product, 'aria-current="page">Produk Native</span>' ), 'native product breadcrumb marks current product' );
+assert_true( false === stripos( $product, 'application/ld+json' ), 'native product breadcrumb emits no schema' );

@@ -15,13 +15,15 @@ Implementation must prove requirement coverage, not merely render pages.
 
 - exactly one Kernel;
 - <=8 first-party bootable owners unless approved change;
+- one native Graha product content-model owner;
 - one asset owner;
 - one navigation data tree;
 - optional providers resolved centrally;
 - no duplicate product/content persistence;
 - no custom DB by default;
 - no generic repair/migration/telemetry framework;
-- no unthreat-modeled public mutation endpoint.
+- no unthreat-modeled public mutation endpoint;
+- no WooCommerce prerequisite for Graha product activation, CRUD, migration or rendering.
 
 ## 3. Admin information-architecture assertions
 
@@ -33,9 +35,9 @@ Verify on the actual WordPress admin:
 - it is the second visible sidebar item, immediately after Dashboard;
 - default implementation uses menu position `3`;
 - if a plugin collision requires ordering correction, only the Graha parent is repositioned and unrelated menu order is preserved;
-- every plugin-owned Graha admin menu page is a child of `graha-selang-content`;
-- no sibling root Graha settings/RFQ/content/helper menu exists;
-- native WordPress/WooCommerce/SEO-provider/form-provider screens remain in their authoritative native locations;
+- every plugin-owned Graha custom menu page is a child of `graha-selang-content`;
+- no sibling root Graha settings/RFQ/content/helper/product menu exists;
+- standard WordPress product/category/brand screens linked by Graha remain native CRUD screens;
 - direct access to each Graha child page enforces the correct capability;
 - state-changing admin actions require capability + nonce + validation/sanitization + native persistence;
 - Graha admin CSS/JS loads only on Graha-owned screens;
@@ -79,7 +81,9 @@ A template family may share code with another family; behavior still needs cover
 
 ## 6. Required route coverage
 
-At minimum test `/`, `/about-us/`, `/products/`, parent+child product category where present, brand route, rich+sparse product, all four retained application URLs, `/layanan-kami/`, `/articles/`, representative `/blog/{slug}/`, `/contact-us/`, RFQ route/state, approved evergreen, search, 404 and all redirect/retire rows.
+At minimum test `/`, `/about-us/`, `/products/`, representative `/product/{slug}/`, parent+child `/product-category/{slug}/` where present, representative `/brand/{slug}/`, all four retained application URLs, `/layanan-kami/`, `/articles/`, representative `/blog/{slug}/`, `/contact-us/`, RFQ route/state, approved evergreen, search, 404 and all redirect/retire rows.
+
+The native product model itself must verify `graha_product`, `graha_product_category`, and `graha_product_brand` register the intended route bases through normal WordPress rewrite arguments.
 
 ## 7. Migration assertions
 
@@ -105,7 +109,7 @@ Home must visibly and semantically preserve:
 - specialist CNG/high-pressure gas;
 - four discovery doors: product/application/brand/specification.
 
-Do not accept six equal-priority cards if that loses the required hierarchy.
+Published product links must come from native `graha_product` records. Do not accept six equal-priority cards or a second PHP fixture catalog.
 
 ## 9. Product technical assertions
 
@@ -122,7 +126,7 @@ Test product/category/application states for:
 
 - catalog remains usable without JS;
 - keyboard-operable filters/decision tree;
-- query behavior uses authoritative data;
+- query behavior uses authoritative native taxonomy/meta;
 - no uncontrolled indexable filter combinations;
 - reset/empty/no-result states accessible;
 - no duplicate product registry/query ownership.
@@ -200,7 +204,7 @@ First-party mutations: capability, nonce, validation/sanitization, native persis
 
 ## 19. Regression exclusions
 
-Guard against Gloskin/Morgen runtime identifiers, custom product manager/database, Technical Library/PDF machinery, generic migration framework, telemetry, custom mail transport, duplicate SEO admin/proxy, hidden SEO content generator, multiple Graha root admin menus, or a global custom admin framework.
+Guard against Gloskin/Morgen runtime identifiers outside approved Home grouping, custom product manager/database, a second product registry, Woo-only product primitives, Technical Library/PDF machinery, generic migration framework, telemetry, custom mail transport, duplicate SEO admin/proxy, hidden SEO content generator, multiple Graha root admin menus, or a global custom admin framework.
 
 ## 20. Launch assertions
 
@@ -211,6 +215,7 @@ Guard against Gloskin/Morgen runtime identifiers, custom product manager/databas
 - redirect/canonical/schema/sitemap verified;
 - analytics/event continuity verified;
 - Graha Selang Content hierarchy/placement/capabilities verified on production admin;
+- native `/products/`, `/product/{slug}/`, `/product-category/{slug}/`, and `/brand/{slug}/` routes verified on production;
 - post-launch crawl completed;
 - 30-day defect-warranty scope and 30/60/90 operations handoff documented.
 
@@ -250,8 +255,10 @@ When the one-shot migration mechanism is implemented, verify:
 - no bundle means no migration submenu;
 - only valid pending state creates a temporary child submenu under `Graha Selang Content`;
 - invalid/corrupt/filesystem states perform no destructive write and remain non-fatal to the public site;
-- execution requires explicit capability + nonce;
-- native WordPress/Woo APIs own imported objects;
+- execution requires explicit native `edit_posts` capability + nonce;
+- native `wp_insert_post` / `wp_update_post` plus post meta own imported `graha_product` records;
+- new identity-only products are drafts;
+- existing published/draft/private records are never promoted by migration;
 - stable source identities make retry idempotent and prevent duplicate successful imports;
 - partial failure is visible/retryable;
 - consumed state prevents rerun even when physical cleanup fails;
@@ -264,8 +271,7 @@ When the one-shot migration mechanism is implemented, verify:
 
 Wave 0 remains incomplete while the deployment inputs in `implementation-inputs.md` are missing.
 
-Wave 1 remains incomplete until a real WordPress runtime proves activation, actual admin placement/collision behavior, and representative Page/Post/Woo shell behavior. Repository-level PHP/stub/static checks must be reported as such and must not be presented as target-runtime verification.
-
+Wave 1 remains incomplete until a real WordPress runtime proves activation, actual admin placement/collision behavior, native product/taxonomy screen behavior, rewrite resolution, and representative Page/Post/product presentation. Repository-level PHP/stub/static checks must be reported as such and must not be presented as target-runtime verification.
 
 ## 25. Migration admin AJAX assertions
 

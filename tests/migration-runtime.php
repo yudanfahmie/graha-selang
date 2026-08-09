@@ -3,12 +3,12 @@
 define( 'ABSPATH', __DIR__ . '/' );
 define( 'OBJECT', 'OBJECT' );
 
-$GLOBALS['options']    = array();
-$GLOBALS['posts']      = array();
-$GLOBALS['meta']       = array();
-$GLOBALS['next_id']    = 1;
-$GLOBALS['save_count'] = 0;
-$GLOBALS['fail_at']    = 0;
+$GLOBALS['options']     = array();
+$GLOBALS['posts']       = array();
+$GLOBALS['meta']        = array();
+$GLOBALS['next_id']     = 1;
+$GLOBALS['write_count'] = 0;
+$GLOBALS['fail_at']     = 0;
 
 class WP_Error {
 	private $message;
@@ -27,14 +27,15 @@ function update_option( $key, $value, $autoload = false ) { $GLOBALS['options'][
 function delete_option( $key ) { unset( $GLOBALS['options'][ $key ] ); return true; }
 function add_option( $key, $value ) { if ( isset( $GLOBALS['options'][ $key ] ) ) return false; $GLOBALS['options'][ $key ] = $value; return true; }
 function wp_generate_uuid4() { return uniqid( 'uuid-', true ); }
+function post_type_exists( $type ) { return 'graha_product' === $type; }
 function get_post_meta( $id, $key, $single = true ) { return isset( $GLOBALS['meta'][ $id ][ $key ] ) ? $GLOBALS['meta'][ $id ][ $key ] : ''; }
 function update_post_meta( $id, $key, $value ) { $GLOBALS['meta'][ $id ][ $key ] = $value; return true; }
 function get_posts( $args ) {
 	$out = array();
 	foreach ( $GLOBALS['posts'] as $id => $post ) {
-		if ( 'product' !== ( isset( $args['post_type'] ) ? $args['post_type'] : '' ) ) continue;
+		if ( 'graha_product' !== ( isset( $args['post_type'] ) ? $args['post_type'] : '' ) || 'graha_product' !== $post['post_type'] ) continue;
 		if ( isset( $args['meta_key'] ) && ( isset( $GLOBALS['meta'][ $id ][ $args['meta_key'] ] ) ? $GLOBALS['meta'][ $id ][ $args['meta_key'] ] : null ) !== ( isset( $args['meta_value'] ) ? $args['meta_value'] : null ) ) continue;
-		if ( isset( $args['title'] ) && $post['name'] !== $args['title'] ) continue;
+		if ( isset( $args['title'] ) && $post['post_title'] !== $args['title'] ) continue;
 		$out[] = $id;
 		if ( count( $out ) >= ( isset( $args['numberposts'] ) ? $args['numberposts'] : 99 ) ) break;
 	}
@@ -42,29 +43,31 @@ function get_posts( $args ) {
 }
 function get_page_by_path( $slug, $output, $type ) {
 	foreach ( $GLOBALS['posts'] as $id => $post ) {
-		if ( $post['slug'] === $slug ) return (object) array( 'ID' => $id, 'post_title' => $post['name'] );
+		if ( $post['post_type'] === $type && $post['post_name'] === $slug ) return (object) array( 'ID' => $id, 'post_title' => $post['post_title'] );
 	}
 	return null;
 }
-function wc_get_product( $id ) { return isset( $GLOBALS['posts'][ $id ] ) ? new WC_Product_Simple( $id ) : false; }
-class WC_Product_Simple {
-	private $id = 0;
-	private $name = '';
-	private $slug = '';
-	private $status = 'publish';
-	public function __construct( $id = 0 ) { $this->id = (int) $id; if ( $id && isset( $GLOBALS['posts'][ $id ] ) ) { $post = $GLOBALS['posts'][ $id ]; $this->name = $post['name']; $this->slug = $post['slug']; $this->status = $post['status']; } }
-	public function set_name( $value ) { $this->name = $value; }
-	public function set_slug( $value ) { $this->slug = $value; }
-	public function set_status( $value ) { $this->status = $value; }
-	public function get_name() { return $this->name; }
-	public function get_status() { return $this->status; }
-	public function save() {
-		$GLOBALS['save_count']++;
-		if ( $GLOBALS['fail_at'] && $GLOBALS['save_count'] === $GLOBALS['fail_at'] ) throw new RuntimeException( 'simulated partial failure' );
-		if ( ! $this->id ) $this->id = $GLOBALS['next_id']++;
-		$GLOBALS['posts'][ $this->id ] = array( 'name' => $this->name, 'slug' => $this->slug, 'status' => $this->status );
-		return $this->id;
-	}
+function get_post( $id ) {
+	return isset( $GLOBALS['posts'][ $id ] ) ? (object) array_merge( array( 'ID' => $id ), $GLOBALS['posts'][ $id ] ) : null;
+}
+function wp_insert_post( $args, $wp_error = false ) {
+	$GLOBALS['write_count']++;
+	if ( $GLOBALS['fail_at'] && $GLOBALS['write_count'] === $GLOBALS['fail_at'] ) return new WP_Error( 'fail', 'simulated partial failure' );
+	$id = $GLOBALS['next_id']++;
+	$GLOBALS['posts'][ $id ] = array(
+		'post_type'   => $args['post_type'],
+		'post_title'  => $args['post_title'],
+		'post_name'   => $args['post_name'],
+		'post_status' => $args['post_status'],
+	);
+	return $id;
+}
+function wp_update_post( $args, $wp_error = false ) {
+	$GLOBALS['write_count']++;
+	if ( $GLOBALS['fail_at'] && $GLOBALS['write_count'] === $GLOBALS['fail_at'] ) return new WP_Error( 'fail', 'simulated partial failure' );
+	$id = (int) $args['ID'];
+	foreach ( array( 'post_title', 'post_name', 'post_status' ) as $key ) if ( isset( $args[ $key ] ) ) $GLOBALS['posts'][ $id ][ $key ] = $args[ $key ];
+	return $id;
 }
 
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/ProductCatalogMigration.php';
@@ -101,19 +104,24 @@ function reset_store( $root, $with_bundle = true ) {
 	$GLOBALS['posts'] = array();
 	$GLOBALS['meta'] = array();
 	$GLOBALS['next_id'] = 1;
-	$GLOBALS['save_count'] = 0;
+	$GLOBALS['write_count'] = 0;
 	$GLOBALS['fail_at'] = 0;
 	remove_tree( $root . '/migration-runtime' );
 	if ( $with_bundle ) restore_runtime( $root );
 }
 function seed_product( $id, array $record, $status ) {
-	$GLOBALS['posts'][ $id ] = array( 'name' => $record['name'], 'slug' => $record['slug'], 'status' => $status );
+	$GLOBALS['posts'][ $id ] = array(
+		'post_type'   => 'graha_product',
+		'post_title'  => $record['name'],
+		'post_name'   => $record['slug'],
+		'post_status' => $status,
+	);
 	$GLOBALS['meta'][ $id ][ \GrahaSelang\ProductCatalogMigration::SOURCE_META ] = $record['source_id'];
 	$GLOBALS['next_id'] = max( $GLOBALS['next_id'], $id + 1 );
 }
 function count_status( $status ) {
 	$count = 0;
-	foreach ( $GLOBALS['posts'] as $post ) if ( $status === $post['status'] ) $count++;
+	foreach ( $GLOBALS['posts'] as $post ) if ( $status === $post['post_status'] ) $count++;
 	return $count;
 }
 
@@ -131,17 +139,17 @@ $records = $validated['products'];
 reset_store( $root );
 $migration = new \GrahaSelang\ProductCatalogMigration( $plugin );
 $result = $migration->execute();
-assert_true( 'consumed' === $result['status'] && 44 === count( $GLOBALS['posts'] ), 'fresh identity-only import creates all expected products' );
-assert_true( 44 === count_status( 'draft' ), 'new identity-only products are created as draft' );
+assert_true( 'consumed' === $result['status'] && 44 === count( $GLOBALS['posts'] ), 'fresh identity-only import creates all expected native products' );
+assert_true( 44 === count_status( 'draft' ), 'new identity-only native products are created as draft' );
 
 reset_store( $root );
 seed_product( 1, $records[0], 'publish' );
 seed_product( 2, $records[1], 'draft' );
 $migration = new \GrahaSelang\ProductCatalogMigration( $plugin );
 $result = $migration->execute();
-assert_true( 'publish' === $GLOBALS['posts'][1]['status'], 'existing published product remains published' );
-assert_true( 'draft' === $GLOBALS['posts'][2]['status'], 'existing draft product remains draft' );
-assert_true( 44 === count( $GLOBALS['posts'] ), 'existing products reconcile without duplicate source identities' );
+assert_true( 'publish' === $GLOBALS['posts'][1]['post_status'], 'existing published native product remains published' );
+assert_true( 'draft' === $GLOBALS['posts'][2]['post_status'], 'existing draft native product remains draft' );
+assert_true( 44 === count( $GLOBALS['posts'] ), 'existing native products reconcile without duplicate source identities' );
 
 reset_store( $root );
 $manifest_path = runtime_path( $root ) . '/manifest.json';
@@ -168,10 +176,10 @@ assert_true( 9 === count( $GLOBALS['posts'] ), 'partial failure writes only comp
 assert_true( 'failed' === $migration->get_state()['status'], 'partial failure state is retryable failed' );
 
 $GLOBALS['fail_at'] = 0;
-$GLOBALS['save_count'] = 0;
+$GLOBALS['write_count'] = 0;
 $result = $migration->execute();
 assert_true( 'consumed' === $result['status'], 'retry reaches consumed' );
-assert_true( 44 === count( $GLOBALS['posts'] ), 'retry reconciles to exactly 44 products without duplicate' );
+assert_true( 44 === count( $GLOBALS['posts'] ), 'retry reconciles to exactly 44 native products without duplicate' );
 assert_true( 44 === count_status( 'draft' ), 'retry preserves draft status for identity-only products' );
 assert_true( ! is_dir( $migration->runtime_dir() ), 'verified success cleans disposable runtime bundle' );
 assert_true( is_dir( dirname( __DIR__ ) . '/migration-source/product-catalog-v1' ), 'permanent repository archive remains after cleanup' );
@@ -206,7 +214,7 @@ try { $migration->execute(); assert_true( false, 'cleanup-failed consumed state 
 catch ( RuntimeException $error ) { assert_true( true, 'cleanup-failed consumed state remains non-rerunnable' ); }
 
 reset_store( $root );
-$GLOBALS['posts'][1] = array( 'name' => 'Sunflex AH600 Air Hose 600 PSI', 'slug' => 'existing-different', 'status' => 'publish' );
+$GLOBALS['posts'][1] = array( 'post_type'=>'graha_product', 'post_title'=>'Sunflex AH600 Air Hose 600 PSI', 'post_name'=>'existing-different', 'post_status'=>'publish' );
 $GLOBALS['meta'][1][ \GrahaSelang\ProductCatalogMigration::SOURCE_META ] = 'graha-public-product:another-source';
 $GLOBALS['next_id'] = 2;
 $migration = new \GrahaSelang\ProductCatalogMigration( $plugin );
