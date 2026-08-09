@@ -1,0 +1,40 @@
+.graha-admin-overview {
+	max-width: 70rem;
+}
+
+.graha-admin-overview__intro {
+	max-width: 52rem;
+	font-size: 1rem;
+}
+
+.graha-admin-overview__links {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+	gap: 1rem;
+	margin-top: 1.5rem;
+}
+
+.graha-admin-overview__card {
+	display: grid;
+	gap: 0.5rem;
+	min-height: 7rem;
+	padding: 1rem;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	background: #fff;
+	color: #1d2327;
+	text-decoration: none;
+}
+
+.graha-admin-overview__card:hover {
+	border-color: currentColor;
+}
+
+.graha-admin-overview__card:focus-visible {
+	outline: 3px solid currentColor;
+	outline-offset: 2px;
+}
+
+.graha-admin-overview__card span {
+	color: #50575e;
+}

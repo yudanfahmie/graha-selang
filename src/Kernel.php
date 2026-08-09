@@ -5,10 +5,23 @@ namespace GrahaSelang;
 defined( 'ABSPATH' ) || exit;
 
 final class Kernel {
-	/**
-	 * @var array<int, object>
-	 */
+	/** @var string */
+	private $plugin_file;
+
+	/** @var string */
+	private $version;
+
+	/** @var array<int, object> */
 	private $services = array();
+
+	/**
+	 * @param string $plugin_file Main plugin file.
+	 * @param string $version Plugin version.
+	 */
+	public function __construct( $plugin_file, $version ) {
+		$this->plugin_file = $plugin_file;
+		$this->version     = $version;
+	}
 
 	/**
 	 * Compose and register first-party owners once.
@@ -20,8 +33,12 @@ final class Kernel {
 			return;
 		}
 
+		$assets = new AssetService( $this->plugin_file, $this->version );
+
 		$this->services = array(
-			new AdminService(),
+			$assets,
+			new NavigationService(),
+			new AdminService( $assets ),
 		);
 
 		foreach ( $this->services as $service ) {

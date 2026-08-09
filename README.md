@@ -119,6 +119,16 @@ Do not copy that binary into this repository. Requirements needed by developers 
 
 Use a small modular monolith with one composition root and one owner per concern. Prefer native WordPress/WooCommerce storage/routing. No custom database tables, generic migration framework, duplicate commerce stack, custom mail backend, global mega-class, or sprawling custom admin framework by default.
 
+## Development verification
+
+Run the lightweight repository gate before each push:
+
+```bash
+./scripts/verify.sh
+```
+
+It performs PHP syntax checks, static architecture/security guards, navigation normalization/render checks, admin asset-scope checks, Kernel hook smoke checks, and JavaScript syntax validation when Node is available. These checks are repository-level verification; they do not replace activation and behavior testing on the target WordPress environment.
+
 ## Implementation status
 
-**Wave 1 foundation started.** The repository now contains the plugin entrypoint, one `Kernel` composition root, and the initial `AdminService` shell for the canonical `Graha Selang Content` parent. Route-sensitive/provider-sensitive implementation remains blocked on the Wave 0 deployment inputs recorded in `docs/implementation-inputs.md`.
+**Wave 1 environment-independent foundation is in progress.** The plugin now has one `Kernel`, `AdminService`, the canonical single `AssetService`, and a native `NavigationService`. Ringkasan admin assets are screen-scoped; public foundation/navigation assets are registered but not globally enqueued; reusable responsive/accessibility primitives and progressive navigation behavior are present without taking over public routes. Wave 1 is **not complete**: target WordPress activation/admin placement, semantic shell/template prototypes, and deployment-sensitive integration checks remain pending. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`.
