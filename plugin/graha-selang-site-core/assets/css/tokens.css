@@ -27,15 +27,16 @@
 	--graha-space-7: 3rem;
 	--graha-space-8: 4rem;
 	--graha-space-9: 6rem;
-	--graha-content-narrow: 48rem;
-	--graha-content-max: 72rem;
-	--graha-content-wide: 80rem;
+	--graha-page-gutter: clamp(1rem, 2.5vw, 2rem);
+	--graha-content-narrow: 50rem;
+	--graha-content-max: 80rem;
+	--graha-content-wide: 90rem;
 	--graha-card-min: 16rem;
-	--graha-header-identity-min: 12rem;
-	--graha-logo-max: 3rem;
+	--graha-header-identity-min: 11rem;
+	--graha-logo-max: 12.5rem;
 	/* CSS custom properties cannot be consumed by media conditions; tests guard these approved literals. */
 	--graha-breakpoint-small: 36rem;
-	--graha-breakpoint-navigation: 48rem;
+	--graha-breakpoint-navigation: 68rem;
 	--graha-breakpoint-wide: 64rem;
 
 	/* Identity: Graha blue + deep navy + white + industrial neutral grays. */
@@ -68,10 +69,6 @@
 	--graha-z-skip-link: 100000;
 	--graha-focus-width: 0.1875rem;
 	--graha-focus-offset: 0.1875rem;
-	/* Default focus ring for light surfaces. Dark surfaces (hero/CTA panels/
-	   footer/page-header) redeclare these two variables locally so the same
-	   one focus-visible rule in foundation.css stays sufficiently visible
-	   against navy/blue backgrounds instead of a same-hue outline. */
 	--graha-focus-color: var(--graha-color-primary);
 	--graha-focus-ring: 0 0 0 0 transparent;
 	--graha-motion-fast: 160ms;

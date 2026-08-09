@@ -66,7 +66,7 @@ assert_true( 1 === count( $GLOBALS['menu_calls'] ), 'single canonical Graha root
 assert_true( 5 === count( $GLOBALS['submenu_calls'] ), 'native product/category/brand links plus pending migration child live under Graha root' );
 assert_true( 'edit.php?post_type=graha_product' === $GLOBALS['submenu_calls'][1][4], 'native Graha product CRUD link is exposed under Graha root' );
 assert_true( false !== strpos( $GLOBALS['submenu_calls'][2][4], 'graha_product_category' ) && false !== strpos( $GLOBALS['submenu_calls'][3][4], 'graha_product_brand' ), 'native category and brand links are exposed under Graha root' );
-assert_true( 'manage_categories' === $GLOBALS['submenu_calls'][2][2] && 'manage_categories' === $GLOBALS['submenu_calls'][3][2], 'native taxonomy links use WordPress term-management capability' );
+assert_true( 'manage_categories' === $GLOBALS['submenu_calls'][2][3] && 'manage_categories' === $GLOBALS['submenu_calls'][3][3], 'native taxonomy links use WordPress term-management capability' );
 $migration_hook = $GLOBALS['submenu_calls'][4][0] . '_page_' . $GLOBALS['submenu_calls'][4][4];
 $admin->enqueue_assets( $migration_hook );
 assert_true( in_array( 'graha-selang-admin-migration', $GLOBALS['enqueued'], true ), 'migration assets load on exact temporary screen' );

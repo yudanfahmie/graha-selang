@@ -5,10 +5,10 @@
 .graha-ui h1 { font-size: var(--graha-type-4xl); font-weight: var(--graha-weight-bold); }
 .graha-ui h2 { font-size: var(--graha-type-3xl); font-weight: var(--graha-weight-bold); }
 .graha-ui h3 { font-size: var(--graha-type-2xl); font-weight: var(--graha-weight-semibold); }
-.graha-ui a { color: var(--graha-color-primary); }
-.graha-container { inline-size: min(100% - calc(var(--graha-space-4) * 2), var(--graha-content-max)); margin-inline: auto; }
-.graha-container--wide { max-inline-size: var(--graha-content-wide); }
-.graha-container--narrow { max-inline-size: var(--graha-content-narrow); }
+.graha-ui :where(a) { color: var(--graha-color-primary); }
+.graha-container { inline-size:min(calc(100% - (var(--graha-page-gutter) * 2)),var(--graha-container-limit,var(--graha-content-max))); margin-inline:auto; }
+.graha-container--wide { --graha-container-limit:var(--graha-content-wide); }
+.graha-container--narrow { --graha-container-limit:var(--graha-content-narrow); }
 .graha-stack > * + * { margin-block-start: var(--graha-space-4); }
 .graha-stack--large > * + * { margin-block-start: var(--graha-space-6); }
 .graha-cluster { display:flex; flex-wrap:wrap; gap:var(--graha-space-3); align-items:center; }
@@ -18,17 +18,29 @@
 .graha-eyebrow::before { content:""; inline-size:1.5rem; block-size:2px; background:currentColor; }
 .graha-eyebrow--on-dark { color:var(--graha-color-inverse-muted); }
 
-/* Buttons: solid/outline/ghost variants over one shared control shape. */
+/* Buttons: component variants own every link state over generic anchor defaults. */
 .graha-button,.graha-link-button { display:inline-flex; min-block-size:var(--graha-control-min); align-items:center; justify-content:center; gap:var(--graha-space-2); padding:var(--graha-space-3) var(--graha-space-5); border:var(--graha-border-width) solid currentColor; border-radius:var(--graha-radius-md); font:inherit; font-weight:var(--graha-weight-semibold); line-height:var(--graha-leading-tight); text-decoration:none; cursor:pointer; transition:background-color var(--graha-motion-fast) var(--graha-motion-ease), color var(--graha-motion-fast) var(--graha-motion-ease), border-color var(--graha-motion-fast) var(--graha-motion-ease), transform var(--graha-motion-fast) var(--graha-motion-ease); }
 .graha-button:hover,.graha-link-button:hover { transform:translateY(-1px); }
-.graha-button--primary,.graha-link-button { background:var(--graha-color-primary); border-color:var(--graha-color-primary); color:var(--graha-color-on-primary); }
-.graha-button--primary:hover,.graha-link-button:hover { background:var(--graha-color-primary-hover); border-color:var(--graha-color-primary-hover); color:var(--graha-color-on-primary); }
-.graha-button--outline { background:transparent; border-color:var(--graha-color-primary); color:var(--graha-color-primary); }
-.graha-button--outline:hover { background:var(--graha-color-primary-tint); }
+.graha-button--primary,
+.graha-button--primary:visited,
+.graha-link-button,
+.graha-link-button:visited { background:var(--graha-color-primary); border-color:var(--graha-color-primary); color:var(--graha-color-on-primary); }
+.graha-button--primary:hover,
+.graha-button--primary:focus-visible,
+.graha-button--primary:active,
+.graha-link-button:hover,
+.graha-link-button:focus-visible,
+.graha-link-button:active { background:var(--graha-color-primary-hover); border-color:var(--graha-color-primary-hover); color:var(--graha-color-on-primary); }
+.graha-button--outline,
+.graha-button--outline:visited { background:transparent; border-color:var(--graha-color-primary); color:var(--graha-color-primary); }
+.graha-button--outline:hover,.graha-button--outline:active { background:var(--graha-color-primary-tint); color:var(--graha-color-primary); }
 .graha-button--ghost { border-color:transparent; color:var(--graha-color-primary); padding-inline:var(--graha-space-2); min-block-size:auto; }
 .graha-button--ghost:hover { text-decoration:underline; text-underline-offset:var(--graha-link-underline-offset); }
-.graha-button--on-dark.graha-button--outline { border-color:var(--graha-color-inverse); color:var(--graha-color-inverse); }
-.graha-button--on-dark.graha-button--outline:hover { background:rgb(255 255 255 / 0.12); }
+.graha-button--on-dark.graha-button--outline,
+.graha-button--on-dark.graha-button--outline:visited { border-color:var(--graha-color-inverse); color:var(--graha-color-inverse); }
+.graha-button--on-dark.graha-button--outline:hover,
+.graha-button--on-dark.graha-button--outline:focus-visible,
+.graha-button--on-dark.graha-button--outline:active { background:rgb(255 255 255 / 0.12); border-color:var(--graha-color-inverse); color:var(--graha-color-inverse); }
 .graha-button--lg { min-block-size:3.25rem; padding-inline:var(--graha-space-6); font-size:var(--graha-type-lg); }
 .graha-button--full { inline-size:100%; }
 
@@ -48,9 +60,7 @@
 .graha-stat-list li { min-inline-size:min(100%,var(--graha-card-min)); padding:var(--graha-space-3) var(--graha-space-4); border:var(--graha-border-width) solid var(--graha-color-border); border-radius:var(--graha-radius-md); }
 .graha-ui :where(a,button,input,select,textarea,summary):focus-visible { outline:var(--graha-focus-width) solid var(--graha-focus-color); outline-offset:var(--graha-focus-offset); box-shadow:var(--graha-focus-ring); }
 
-/* Centralized on-dark focus treatment: a light outline plus a navy halo reads clearly against
-   navy/blue surfaces (hero, CTA panels, footer, page header) where the default primary-blue
-   outline would otherwise blend in. Every :focus-visible rule above stays the single source. */
+/* Centralized on-dark focus treatment. */
 .graha-hero,
 .graha-cta-panel:not(.graha-cta-panel--tint),
 .graha-site-footer,

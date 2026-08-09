@@ -26,9 +26,7 @@ final class AdminService {
 	/** @var string */
 	private $migration_hook = '';
 
-	/**
-	 * @param AssetService $assets Canonical asset owner.
-	 */
+	/** @param AssetService $assets Canonical asset owner. */
 	public function __construct( AssetService $assets ) {
 		$this->assets    = $assets;
 		$this->migration = null;
@@ -38,7 +36,6 @@ final class AdminService {
 	public function register() {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-
 		if ( function_exists( 'is_admin' ) && is_admin() ) {
 			add_action( 'wp_ajax_' . self::MIGRATION_AJAX, array( $this, 'run_product_migration' ) );
 		}
@@ -95,16 +92,12 @@ final class AdminService {
 		}
 	}
 
-	/**
-	 * @param string $hook_suffix Current admin hook suffix.
-	 * @return void
-	 */
+	/** @param string $hook_suffix Current admin hook suffix. @return void */
 	public function enqueue_assets( $hook_suffix ) {
 		if ( in_array( $hook_suffix, $this->overview_hooks, true ) ) {
 			$this->assets->enqueue_admin_overview();
 			return;
 		}
-
 		if ( '' !== $this->migration_hook && $hook_suffix === $this->migration_hook && current_user_can( self::MIGRATION_CAPABILITY ) ) {
 			$this->assets->enqueue_admin_migration(
 				self::MIGRATION_AJAX,
@@ -119,8 +112,8 @@ final class AdminService {
 			wp_die( esc_html__( 'Anda tidak memiliki izin untuk membuka halaman ini.', 'graha-selang' ) );
 		}
 
-		$migration = current_user_can( self::MIGRATION_CAPABILITY ) ? $this->get_migration() : null;
-		$summary   = $migration ? $migration->get_summary() : array();
+		$migration    = current_user_can( self::MIGRATION_CAPABILITY ) ? $this->get_migration() : null;
+		$summary      = $migration ? $migration->get_summary() : array();
 		$presentation = $this->presentation_status();
 		?>
 		<div class="wrap graha-admin-overview">
@@ -129,6 +122,8 @@ final class AdminService {
 
 			<?php if ( ! $presentation['ownership_active'] ) : ?>
 				<div class="notice notice-error inline"><p><?php echo esc_html__( 'Graha tidak dapat menampilkan Homepage: berkas presentasi front-page plugin tidak ditemukan atau tidak dapat dibaca. Periksa hasil deployment plugin.', 'graha-selang' ); ?></p></div>
+			<?php elseif ( ! $presentation['logo_ready'] || ! $presentation['favicons_ready'] || ! $presentation['product_presentation_active'] ) : ?>
+				<div class="notice notice-warning inline"><p><?php echo esc_html__( 'Sebagian aset atau pemilik presentasi Graha tidak lengkap pada deployment ini. Periksa status Presentasi di bawah sebelum membuka frontend untuk stakeholder.', 'graha-selang' ); ?></p></div>
 			<?php endif; ?>
 
 			<h2><?php echo esc_html__( 'Presentasi', 'graha-selang' ); ?></h2>
@@ -136,7 +131,13 @@ final class AdminService {
 				<dt><?php echo esc_html__( 'Versi plugin', 'graha-selang' ); ?></dt>
 				<dd><?php echo esc_html( $presentation['version'] ); ?></dd>
 				<dt><?php echo esc_html__( 'Kepemilikan Homepage', 'graha-selang' ); ?></dt>
-				<dd><span class="graha-status-badge <?php echo $presentation['ownership_active'] ? 'graha-status-badge--ok' : 'graha-status-badge--warn'; ?>"><?php echo esc_html( $presentation['ownership_active'] ? __( 'Aktif', 'graha-selang' ) : __( 'Perlu perhatian', 'graha-selang' ) ); ?></span></dd>
+				<dd><?php $this->render_status_badge( $presentation['ownership_active'], __( 'Aktif', 'graha-selang' ), __( 'Perlu perhatian', 'graha-selang' ) ); ?></dd>
+				<dt><?php echo esc_html__( 'Logo header kanonis', 'graha-selang' ); ?></dt>
+				<dd><?php $this->render_status_badge( $presentation['logo_ready'], __( 'OK', 'graha-selang' ), __( 'MISSING', 'graha-selang' ) ); ?></dd>
+				<dt><?php echo esc_html__( 'Favicon kanonis', 'graha-selang' ); ?></dt>
+				<dd><?php $this->render_status_badge( $presentation['favicons_ready'], __( 'OK', 'graha-selang' ), __( 'MISSING', 'graha-selang' ) ); ?></dd>
+				<dt><?php echo esc_html__( 'Presentasi katalog produk', 'graha-selang' ); ?></dt>
+				<dd><?php $this->render_status_badge( $presentation['product_presentation_active'], __( 'Aktif', 'graha-selang' ), __( 'MISSING', 'graha-selang' ) ); ?></dd>
 				<dt><?php echo esc_html__( 'Mode Homepage WordPress', 'graha-selang' ); ?></dt>
 				<dd><?php echo esc_html( $presentation['mode_label'] ); ?></dd>
 				<dt><?php echo esc_html__( 'Halaman struktural tersedia', 'graha-selang' ); ?></dt>
@@ -171,22 +172,17 @@ final class AdminService {
 		<?php
 	}
 
-	/**
-	 * Compact, factual presentation-ownership signal for Ringkasan. Not a
-	 * diagnostics framework -- just the state an authorized admin needs to
-	 * notice if the frontend root cannot render Graha's shell.
-	 *
-	 * Homepage ownership is now route-driven (TemplateService owns whatever
-	 * WordPress resolves as is_front_page(), regardless of Reading Settings),
-	 * so the only realistic failure this can factually report is a missing
-	 * plugin-owned template file from a broken deployment -- never Reading
-	 * Settings, which no longer gate ownership at all.
-	 *
-	 * @return array<string,mixed>
-	 */
+	/** Render one compact factual readiness badge. */
+	private function render_status_badge( $ready, $ok_label, $bad_label ) {
+		?><span class="graha-status-badge <?php echo $ready ? 'graha-status-badge--ok' : 'graha-status-badge--warn'; ?>"><?php echo esc_html( $ready ? $ok_label : $bad_label ); ?></span><?php
+	}
+
+	/** @return array<string,mixed> */
 	private function presentation_status() {
-		$front_template = dirname( __DIR__ ) . '/templates/front-page.php';
-		$show_on_front  = (string) get_option( 'show_on_front', 'posts' );
+		$front_template   = dirname( __DIR__ ) . '/templates/front-page.php';
+		$product_template = dirname( __DIR__ ) . '/templates/product.php';
+		$show_on_front    = (string) get_option( 'show_on_front', 'posts' );
+		$asset_status     = $this->assets->canonical_asset_status();
 
 		$slugs = array( 'home', 'about-us', 'layanan-kami', 'contact-us', 'request-quote' );
 		$available = 0;
@@ -198,11 +194,14 @@ final class AdminService {
 		}
 
 		return array(
-			'version'          => Kernel::VERSION,
-			'ownership_active' => is_readable( $front_template ),
-			'mode_label'       => 'page' === $show_on_front ? __( 'Halaman statis', 'graha-selang' ) : __( 'Pos terbaru', 'graha-selang' ),
-			'pages_available'  => $available,
-			'pages_total'      => count( $slugs ),
+			'version'                     => Kernel::VERSION,
+			'ownership_active'            => is_readable( $front_template ),
+			'logo_ready'                  => ! empty( $asset_status['wordmark'] ),
+			'favicons_ready'              => ! empty( $asset_status['favicons'] ),
+			'product_presentation_active' => is_readable( $product_template ),
+			'mode_label'                  => 'page' === $show_on_front ? __( 'Halaman statis', 'graha-selang' ) : __( 'Pos terbaru', 'graha-selang' ),
+			'pages_available'             => $available,
+			'pages_total'                 => count( $slugs ),
 		);
 	}
 
@@ -261,12 +260,7 @@ final class AdminService {
 		}
 	}
 
-	/**
-	 * Lazily load the narrow migration coordinator only for authorized admin
-	 * menu/render/AJAX paths. Frontend requests never require this file.
-	 *
-	 * @return ProductCatalogMigration
-	 */
+	/** @return ProductCatalogMigration */
 	private function get_migration() {
 		if ( ! $this->migration ) {
 			require_once __DIR__ . '/ProductCatalogMigration.php';
