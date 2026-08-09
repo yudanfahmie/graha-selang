@@ -88,7 +88,7 @@ final class ProductCatalogMigration {
 			if ( $post ) { $existing=(string)get_post_meta($post->ID,self::SOURCE_META,true); if ( ''!==$existing && $record['source_id']!==$existing ) throw new \RuntimeException('Slug target sudah dimiliki source identity lain: '.$record['slug']); if ( sanitize_title($post->post_title)!==sanitize_title($record['name']) ) throw new \RuntimeException('Slug target bertabrakan dengan produk berjudul berbeda: '.$record['slug']); $id=(int)$post->ID; }
 		}
 		$product=$id?wc_get_product($id):new \WC_Product_Simple(); if(!$product) throw new \RuntimeException('WooCommerce gagal membuka product target untuk '.$record['source_id']);
-		if(!$id){$is_new=true;$product->set_name($record['name']);$product->set_slug($record['slug']);$product->set_status('publish');} elseif($product->get_name()!==$record['name']){$product->set_name($record['name']);}
+		if(!$id){$is_new=true;$product->set_name($record['name']);$product->set_slug($record['slug']);$product->set_status('draft');} elseif($product->get_name()!==$record['name']){$product->set_name($record['name']);}
 		$id=(int)$product->save(); if(!$id) throw new \RuntimeException('WooCommerce gagal menyimpan '.$record['source_id']);
 		update_post_meta($id,self::SOURCE_META,$record['source_id']); update_post_meta($id,self::BUNDLE_META,$bundle_id); update_post_meta($id,self::HOME_GROUP_META,$record['home_group']);
 		if(''!==$record['source_url']) update_post_meta($id,self::SOURCE_URL_META,$record['source_url']);

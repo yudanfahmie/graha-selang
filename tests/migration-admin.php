@@ -50,6 +50,12 @@ function assert_true( $condition, $message ) {
 	echo "PASS: {$message}\n";
 }
 
+class FakeMigration {
+	private $result;
+	public function __construct( array $result ) { $this->result = $result; }
+	public function execute() { return $this->result; }
+}
+
 $assets = new \GrahaSelang\AssetService( dirname( __DIR__ ) . '/graha-selang.php', '0.4.0' );
 $admin  = new \GrahaSelang\AdminService( $assets );
 $admin->register();
@@ -71,6 +77,19 @@ $GLOBALS['caps']['manage_woocommerce'] = true;
 $GLOBALS['valid_nonce'] = false;
 try { $admin->run_product_migration(); assert_true( false, 'nonce should reject' ); }
 catch ( RuntimeException $error ) { assert_true( false !== strpos( $error->getMessage(), '403' ), 'migration AJAX requires nonce' ); }
+
+$property = new ReflectionProperty( $admin, 'migration' );
+$property->setAccessible( true );
+$GLOBALS['valid_nonce'] = true;
+$property->setValue( $admin, new FakeMigration( array( 'status' => 'consumed', 'cleanup' => 'complete' ) ) );
+$admin->run_product_migration();
+assert_true( false !== strpos( $GLOBALS['ajax_success']['message'], 'telah dibersihkan' ), 'AJAX success message confirms runtime cleanup only when cleanup completes' );
+
+$property->setValue( $admin, new FakeMigration( array( 'status' => 'consumed', 'cleanup' => 'failed', 'cleanup_message' => 'read-only' ) ) );
+$admin->run_product_migration();
+assert_true( false !== strpos( $GLOBALS['ajax_success']['message'], 'pembersihan file runtime gagal' ), 'AJAX success message clearly reports cleanup failure after successful import' );
+assert_true( false === strpos( $GLOBALS['ajax_success']['message'], 'telah dibersihkan' ), 'cleanup-failed message never claims runtime files were cleaned' );
+$property->setValue( $admin, null );
 
 $GLOBALS['migration_state'][ \GrahaSelang\ProductCatalogMigration::STATE_OPTION ] = array( 'status' => 'consumed', 'cleanup' => 'failed', 'cleanup_message' => 'read-only' );
 $GLOBALS['submenu_calls'] = array();

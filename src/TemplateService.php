@@ -49,7 +49,7 @@ final class TemplateService {
 	public function enhance_native_content( $content ) {
 		if ( ( function_exists( 'is_admin' ) && is_admin() ) || ! in_the_loop() || ! is_main_query() ) return $content;
 		if ( is_front_page() ) return $this->render_native_home_content( $content );
-		if ( is_singular( array( 'page', 'post' ) ) ) return '<div class="graha-ui graha-native-content graha-stack">' . wp_kses_post( $content ) . '</div>';
+		if ( is_singular( array( 'page', 'post' ) ) ) return '<div class="graha-ui graha-native-content graha-stack">' . $this->render_native_breadcrumbs() . wp_kses_post( $content ) . '</div>';
 		return $content;
 	}
 
@@ -89,6 +89,24 @@ final class TemplateService {
 		if ( count( $items ) < 2 ) return '';
 		ob_start(); ?><nav class="graha-breadcrumbs" aria-label="<?php echo esc_attr__( 'Jejak navigasi', 'graha-selang' ); ?>"><ol><?php foreach ( $items as $i => $item ) : ?><li><?php if ( $i < count( $items ) - 1 && '' !== $item['url'] ) : ?><a href="<?php echo esc_url( $item['url'] ); ?>"><?php echo esc_html( $item['label'] ); ?></a><?php else : ?><span<?php echo $i === count( $items ) - 1 ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $item['label'] ); ?></span><?php endif; ?></li><?php endforeach; ?></ol></nav><?php
 		return (string) ob_get_clean();
+	}
+
+	private function render_native_breadcrumbs() {
+		$post_id = function_exists( 'get_the_ID' ) ? (int) get_the_ID() : 0;
+		if ( ! $post_id ) return '';
+		$current = trim( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
+		if ( '' === $current ) return '';
+		$items = array();
+		if ( is_singular( 'page' ) && function_exists( 'get_post_ancestors' ) ) {
+			$ancestors = array_reverse( array_map( 'intval', (array) get_post_ancestors( $post_id ) ) );
+			foreach ( $ancestors as $ancestor_id ) {
+				if ( $ancestor_id < 1 || 'publish' !== get_post_status( $ancestor_id ) ) continue;
+				$label = trim( wp_strip_all_tags( (string) get_the_title( $ancestor_id ) ) );
+				$url = get_permalink( $ancestor_id );
+				if ( '' !== $label && $url ) $items[] = array( 'label' => $label, 'url' => $url );
+			}
+		}
+		return $this->render_breadcrumbs( $items, $current );
 	}
 
 	private function render_main( $family, array $context, $is_home ) {
@@ -173,8 +191,6 @@ final class TemplateService {
 		$contact = get_page_by_path( 'contact-us', OBJECT, 'page' );
 		$services = get_page_by_path( 'layanan-kami', OBJECT, 'page' );
 		$shop_id = (int) wc_get_page_id( 'shop' );
-		$count = 0;
-		foreach ( $groups as $group ) $count += count( $group['products'] );
 		ob_start();
 		include dirname( __DIR__ ) . '/templates/native-home.php';
 		return (string) ob_get_clean();

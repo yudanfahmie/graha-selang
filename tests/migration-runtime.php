@@ -57,6 +57,7 @@ class WC_Product_Simple {
 	public function set_slug( $value ) { $this->slug = $value; }
 	public function set_status( $value ) { $this->status = $value; }
 	public function get_name() { return $this->name; }
+	public function get_status() { return $this->status; }
 	public function save() {
 		$GLOBALS['save_count']++;
 		if ( $GLOBALS['fail_at'] && $GLOBALS['save_count'] === $GLOBALS['fail_at'] ) throw new RuntimeException( 'simulated partial failure' );
@@ -105,6 +106,16 @@ function reset_store( $root, $with_bundle = true ) {
 	remove_tree( $root . '/migration-runtime' );
 	if ( $with_bundle ) restore_runtime( $root );
 }
+function seed_product( $id, array $record, $status ) {
+	$GLOBALS['posts'][ $id ] = array( 'name' => $record['name'], 'slug' => $record['slug'], 'status' => $status );
+	$GLOBALS['meta'][ $id ][ \GrahaSelang\ProductCatalogMigration::SOURCE_META ] = $record['source_id'];
+	$GLOBALS['next_id'] = max( $GLOBALS['next_id'], $id + 1 );
+}
+function count_status( $status ) {
+	$count = 0;
+	foreach ( $GLOBALS['posts'] as $post ) if ( $status === $post['status'] ) $count++;
+	return $count;
+}
 
 $root   = temp_root();
 $plugin = $root . '/graha-selang.php';
@@ -115,7 +126,24 @@ $summary = $migration->get_summary();
 assert_true( 'pending' === $summary['detection'] && 44 === $summary['expected_records'], 'valid bundle detected as pending with 44 records' );
 $validated = $migration->validate_bundle();
 assert_true( 44 === count( $validated['products'] ), 'manifest checksum and product count validate' );
+$records = $validated['products'];
 
+reset_store( $root );
+$migration = new \GrahaSelang\ProductCatalogMigration( $plugin );
+$result = $migration->execute();
+assert_true( 'consumed' === $result['status'] && 44 === count( $GLOBALS['posts'] ), 'fresh identity-only import creates all expected products' );
+assert_true( 44 === count_status( 'draft' ), 'new identity-only products are created as draft' );
+
+reset_store( $root );
+seed_product( 1, $records[0], 'publish' );
+seed_product( 2, $records[1], 'draft' );
+$migration = new \GrahaSelang\ProductCatalogMigration( $plugin );
+$result = $migration->execute();
+assert_true( 'publish' === $GLOBALS['posts'][1]['status'], 'existing published product remains published' );
+assert_true( 'draft' === $GLOBALS['posts'][2]['status'], 'existing draft product remains draft' );
+assert_true( 44 === count( $GLOBALS['posts'] ), 'existing products reconcile without duplicate source identities' );
+
+reset_store( $root );
 $manifest_path = runtime_path( $root ) . '/manifest.json';
 $manifest = json_decode( file_get_contents( $manifest_path ), true );
 unset( $manifest['checksums'] );
@@ -144,6 +172,7 @@ $GLOBALS['save_count'] = 0;
 $result = $migration->execute();
 assert_true( 'consumed' === $result['status'], 'retry reaches consumed' );
 assert_true( 44 === count( $GLOBALS['posts'] ), 'retry reconciles to exactly 44 products without duplicate' );
+assert_true( 44 === count_status( 'draft' ), 'retry preserves draft status for identity-only products' );
 assert_true( ! is_dir( $migration->runtime_dir() ), 'verified success cleans disposable runtime bundle' );
 assert_true( is_dir( dirname( __DIR__ ) . '/migration-source/product-catalog-v1' ), 'permanent repository archive remains after cleanup' );
 try { $migration->execute(); assert_true( false, 'consumed bundle rerun should fail' ); }

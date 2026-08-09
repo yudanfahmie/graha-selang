@@ -180,9 +180,13 @@ final class AdminService {
 
 		try {
 			$result = $migration->execute();
+			$cleanup_complete = isset( $result['cleanup'] ) && 'complete' === $result['cleanup'];
+			$message = $cleanup_complete
+				? __( 'Impor produk berhasil dan file runtime migrasi telah dibersihkan.', 'graha-selang' )
+				: __( 'Impor produk berhasil, tetapi pembersihan file runtime gagal. Impor tidak akan dijalankan ulang.', 'graha-selang' );
 			wp_send_json_success(
 				array(
-					'message' => __( 'Migrasi produk selesai dan bundle telah dikonsumsi.', 'graha-selang' ),
+					'message' => $message,
 					'state'   => $result,
 				)
 			);
