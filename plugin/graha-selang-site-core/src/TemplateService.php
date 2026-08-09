@@ -52,28 +52,34 @@ final class TemplateService {
 		add_filter( 'the_content', array( $this, 'enhance_native_content' ), 30 );
 	}
 
+	/**
+	 * Graha owns presentation for whatever WordPress itself resolves as the
+	 * public front page -- the posts index, the canonical static Home Page,
+	 * or any other Page an owner has configured as the site front. Reading
+	 * Settings decide *what content* backs the front page; they never gate
+	 * *whether* Graha's own shell renders it. See resolve_native_template().
+	 */
 	public function prepare_native_presentation() {
 		if ( function_exists( 'is_admin' ) && is_admin() ) return;
-		if ( is_front_page() ) {
-			if ( $this->is_graha_static_front_page() ) $this->assets->enqueue_shell();
-			return;
-		}
+		if ( is_front_page() ) { $this->assets->enqueue_shell(); return; }
 		if ( is_singular( 'page' ) ) { $this->assets->enqueue_shell(); return; }
 		if ( is_singular( array( 'post', self::PRODUCT_POST_TYPE ) ) ) $this->assets->enqueue_foundation();
 	}
 
 	/**
-	 * Resolve the real WordPress front page and any singular Page to their
-	 * plugin-owned document shells. Posts/products keep the active theme's
-	 * own template and only receive content-region enhancement.
+	 * Resolve the real WordPress front page (regardless of latest-posts vs
+	 * static-Page Reading Settings, and regardless of which Page is chosen)
+	 * and any singular Page to their plugin-owned document shells.
+	 * Posts/products keep the active theme's own template and only receive
+	 * content-region enhancement.
 	 */
 	public function resolve_native_template( $template ) {
 		if ( function_exists( 'is_admin' ) && is_admin() ) return $template;
-		if ( $this->is_graha_static_front_page() ) {
+		if ( is_front_page() ) {
 			$front = dirname( __DIR__ ) . '/templates/front-page.php';
 			return is_readable( $front ) ? $front : $template;
 		}
-		if ( ! is_front_page() && is_singular( 'page' ) ) {
+		if ( is_singular( 'page' ) ) {
 			$page_template = dirname( __DIR__ ) . '/templates/page.php';
 			return is_readable( $page_template ) ? $page_template : $template;
 		}
@@ -92,7 +98,7 @@ final class TemplateService {
 
 	public function enhance_native_content( $content ) {
 		if ( ( function_exists( 'is_admin' ) && is_admin() ) || ! in_the_loop() || ! is_main_query() ) return $content;
-		if ( is_front_page() ) return $this->is_graha_static_front_page() ? $this->render_native_home_content( $content ) : $content;
+		if ( is_front_page() ) return $this->render_native_home_content( $content );
 		if ( is_singular( 'page' ) ) $content = $this->bootstrap_page_fallback( $content );
 		if ( is_singular( array( 'page', 'post', self::PRODUCT_POST_TYPE ) ) ) return '<div class="graha-ui graha-native-content graha-stack">' . $this->render_native_breadcrumbs() . wp_kses_post( $content ) . '</div>';
 		return $content;
@@ -224,14 +230,6 @@ final class TemplateService {
 	}
 
 	private function is_supported_family( $family ) { return in_array( sanitize_key( (string) $family ), self::FAMILIES, true ); }
-
-	private function is_graha_static_front_page() {
-		if ( ! is_front_page() || 'page' !== (string) get_option( 'show_on_front', 'posts' ) ) return false;
-		$front_id = absint( get_option( 'page_on_front', 0 ) );
-		if ( $front_id < 1 ) return false;
-		$home = get_page_by_path( 'home', OBJECT, 'page' );
-		return $home instanceof \WP_Post && 'publish' === $home->post_status && (int) $home->ID === $front_id;
-	}
 
 	/** Presentation family for a native Page slug; unmapped Pages get the generic 'legal' family. */
 	private function family_for_page_slug( $slug ) {

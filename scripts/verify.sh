@@ -25,6 +25,7 @@ php tests/kernel-smoke.php
 php tests/version-consistency.php
 php tests/brand-identity.php
 php tests/homepage-copy.php
+php tests/admin-presentation-status.php
 if command -v node >/dev/null 2>&1; then
   echo '== JavaScript syntax =='
   node --check plugin/graha-selang-site-core/assets/js/navigation.js

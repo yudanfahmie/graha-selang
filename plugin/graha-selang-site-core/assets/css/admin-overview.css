@@ -38,3 +38,39 @@
 .graha-admin-overview__card span {
 	color: #50575e;
 }
+
+.graha-admin-overview__status {
+	display: grid;
+	grid-template-columns: minmax(10rem, 14rem) 1fr;
+	gap: 0.5rem 1rem;
+	max-width: 40rem;
+	padding: 1rem;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+}
+
+.graha-admin-overview__status dt {
+	font-weight: 600;
+}
+
+.graha-admin-overview__status dd {
+	margin: 0;
+}
+
+.graha-status-badge {
+	display: inline-block;
+	padding: 0.125rem 0.625rem;
+	border-radius: 999px;
+	font-weight: 600;
+	font-size: 0.8125rem;
+}
+
+.graha-status-badge--ok {
+	background: #edfaef;
+	color: #1a7f37;
+}
+
+.graha-status-badge--warn {
+	background: #fcf0f1;
+	color: #b32d2e;
+}

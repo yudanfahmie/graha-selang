@@ -105,10 +105,22 @@ $GLOBALS['front_page'] = false; $GLOBALS['singular_type'] = 'page';
 $resolved = $templates->resolve_native_template( '/theme/page.php' );
 ok( false !== strpos( $resolved, 'templates/page.php' ), 'singular Page resolves to plugin-owned document shell' );
 
-// resolve_native_template(): a genuinely custom (non-Graha) static front Page is left untouched.
-$GLOBALS['front_page'] = true; $GLOBALS['options']['page_on_front'] = 999; $GLOBALS['posts'][999] = array( 'slug' => 'custom-front', 'title' => 'Custom', 'status' => 'publish', 'content' => '', 'ancestors' => array() );
-ok( '/theme/page.php' === $templates->resolve_native_template( '/theme/page.php' ), 'established custom front Page is not hijacked' );
-$GLOBALS['front_page'] = false; $GLOBALS['options']['page_on_front'] = 50;
+// resolve_native_template()/output_front_page(): an existing custom (non-canonical) static front Page
+// still receives Graha's presentation shell -- Reading Settings decide *what* backs the front page,
+// never *whether* Graha owns it. The Page's own editor content remains authoritative: it is read
+// into the Homepage composition, never overwritten.
+$GLOBALS['front_page'] = true;
+$GLOBALS['options']['page_on_front'] = 999;
+$GLOBALS['posts'][999] = array( 'slug' => 'custom-front', 'title' => 'Custom Front', 'status' => 'publish', 'content' => '<p>Konten halaman depan kustom milik editor.</p>', 'ancestors' => array() );
+$resolved = $templates->resolve_native_template( '/theme/page.php' );
+ok( false !== strpos( $resolved, 'templates/front-page.php' ), 'an existing custom static front Page still resolves to the Graha front-page shell' );
+ok( '/theme/page.php' !== $resolved, 'a custom front Page is never left on the plain Page template while it is the front page' );
+$GLOBALS['queried_id'] = 999;
+ob_start(); $templates->output_front_page(); $custom_front = (string) ob_get_clean();
+ok( false !== strpos( $custom_front, 'graha-site-shell' ) && false !== strpos( $custom_front, 'graha-hero' ), 'custom front Page renders the full Graha shell and hero' );
+ok( false !== strpos( $custom_front, 'Konten halaman depan kustom milik editor.' ), "the custom front Page's own editor content remains authoritative and is read, not overwritten" );
+ok( 'Custom Front' === $GLOBALS['posts'][999]['title'] && 'publish' === $GLOBALS['posts'][999]['status'], 'the custom front Page record itself is never modified merely because Graha renders it' );
+$GLOBALS['front_page'] = false; $GLOBALS['options']['page_on_front'] = 50; $GLOBALS['queried_id'] = 301;
 
 // resolve_native_template(): posts/products keep the active theme template.
 $GLOBALS['singular_type'] = 'post';

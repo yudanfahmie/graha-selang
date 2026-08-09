@@ -121,16 +121,30 @@ $templates->prepare_native_presentation();
 assert_true( array( 'graha-selang-tokens', 'graha-selang-foundation', 'graha-selang-navigation', 'graha-selang-shell' ) === $GLOBALS['styles'], 'front page loads complete Graha shell style chain regardless of product readiness' );
 $resolved = $templates->resolve_native_template( '/theme/index.php' );
 assert_true( false !== strpos( $resolved, 'templates/front-page.php' ), 'front page resolves to plugin-owned document shell' );
+assert_true( '/theme/index.php' !== $resolved, 'the active theme fallback template is not selected for the front page' );
+ob_start(); $templates->output_front_page(); $front_shell = (string) ob_get_clean();
+assert_true( false !== strpos( $front_shell, 'graha-site-shell' ) && false !== strpos( $front_shell, 'graha-hero' ), 'canonical static Home front page renders the full Graha shell and hero' );
 
+// Route-driven ownership: Graha owns the public front page purely because it IS is_front_page(),
+// never because Reading Settings happen to point at the canonical static Home Page. An established
+// latest-posts front (show_on_front=posts, fresh_site=0 -- SiteLifecycleService deliberately leaves
+// this untouched) must still resolve to the Graha shell/Homepage instead of falling back to
+// whatever the active theme renders ("No content found" / "Powered by WordPress").
 $GLOBALS['options']['show_on_front'] = 'posts';
 $GLOBALS['options']['page_on_front'] = 0;
 $templates = new \GrahaSelang\TemplateService( $assets, $nav );
-assert_true( '/theme/index.php' === $templates->resolve_native_template( '/theme/index.php' ), 'established posts-front does not resolve to Graha front-page shell' );
+$resolved = $templates->resolve_native_template( '/theme/index.php' );
+assert_true( false !== strpos( $resolved, 'templates/front-page.php' ), 'established posts-front STILL resolves to the Graha front-page shell (route-driven ownership)' );
+assert_true( '/theme/index.php' !== $resolved, 'established posts-front does not fall back to the active theme template' );
 $before_styles = count( $GLOBALS['styles'] );
 $templates->prepare_native_presentation();
-assert_true( $before_styles === count( $GLOBALS['styles'] ), 'established posts-front does not enqueue Graha shell assets' );
+assert_true( count( $GLOBALS['styles'] ) > $before_styles && in_array( 'graha-selang-shell', $GLOBALS['styles'], true ), 'established posts-front STILL enqueues the full Graha shell assets' );
 $posts_front_content = '<article>Native posts index item.</article>';
-assert_true( $posts_front_content === $templates->enhance_native_content( $posts_front_content ), 'established posts-front content is not hijacked' );
+$posts_front_home = $templates->enhance_native_content( $posts_front_content );
+assert_true( $posts_front_content !== $posts_front_home, 'established posts-front content is composed into the Graha Homepage rather than passed through untouched' );
+assert_true( 4 === substr_count( $posts_front_home, '<section class="graha-page-section' ), 'posts-front Homepage still renders all four required sections without any static Page existing' );
+ob_start(); $templates->output_front_page(); $posts_front_shell = (string) ob_get_clean();
+assert_true( false !== strpos( $posts_front_shell, 'graha-site-shell' ) && false !== strpos( $posts_front_shell, 'graha-hero' ), 'established posts-front renders the full Graha shell and hero, not the theme "No content found" fallback' );
 $GLOBALS['options']['show_on_front'] = 'page';
 $GLOBALS['options']['page_on_front'] = 50;
 

@@ -172,7 +172,7 @@ Prefer:
 
 Known product route bases are `/products/`, `/product/{slug}/`, `/product-category/{slug}/`, and `/brand/{slug}/`. The approved structural RFQ Page is `/request-quote/`.
 
-`TemplateService` may use one narrow `template_include` decision for the actual WordPress front page so activation immediately renders the Graha document shell. This is presentation ownership, not a virtual route engine.
+`TemplateService` may use one narrow `template_include` decision for the actual WordPress front page (`is_front_page()`, regardless of whether Reading Settings resolve it to latest-posts or a static Page, and regardless of which Page) and for any singular Page, so the Graha document shell renders deterministically without depending on Reading Settings or a specific canonical Page slug. This is presentation ownership, not a virtual route engine.
 
 Avoid:
 

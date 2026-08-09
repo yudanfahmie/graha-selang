@@ -121,10 +121,27 @@ final class AdminService {
 
 		$migration = current_user_can( self::MIGRATION_CAPABILITY ) ? $this->get_migration() : null;
 		$summary   = $migration ? $migration->get_summary() : array();
+		$presentation = $this->presentation_status();
 		?>
 		<div class="wrap graha-admin-overview">
 			<h1><?php echo esc_html( 'Graha Selang Content' ); ?></h1>
 			<p class="graha-admin-overview__intro"><?php echo esc_html__( 'Kelola konten Graha melalui layar WordPress native yang tetap menjadi pemilik datanya.', 'graha-selang' ); ?></p>
+
+			<?php if ( ! $presentation['ownership_active'] ) : ?>
+				<div class="notice notice-error inline"><p><?php echo esc_html__( 'Graha tidak dapat menampilkan Homepage: berkas presentasi front-page plugin tidak ditemukan atau tidak dapat dibaca. Periksa hasil deployment plugin.', 'graha-selang' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2><?php echo esc_html__( 'Presentasi', 'graha-selang' ); ?></h2>
+			<dl class="graha-admin-overview__status">
+				<dt><?php echo esc_html__( 'Versi plugin', 'graha-selang' ); ?></dt>
+				<dd><?php echo esc_html( $presentation['version'] ); ?></dd>
+				<dt><?php echo esc_html__( 'Kepemilikan Homepage', 'graha-selang' ); ?></dt>
+				<dd><span class="graha-status-badge <?php echo $presentation['ownership_active'] ? 'graha-status-badge--ok' : 'graha-status-badge--warn'; ?>"><?php echo esc_html( $presentation['ownership_active'] ? __( 'Aktif', 'graha-selang' ) : __( 'Perlu perhatian', 'graha-selang' ) ); ?></span></dd>
+				<dt><?php echo esc_html__( 'Mode Homepage WordPress', 'graha-selang' ); ?></dt>
+				<dd><?php echo esc_html( $presentation['mode_label'] ); ?></dd>
+				<dt><?php echo esc_html__( 'Halaman struktural tersedia', 'graha-selang' ); ?></dt>
+				<dd><?php echo esc_html( sprintf( '%d/%d', $presentation['pages_available'], $presentation['pages_total'] ) ); ?></dd>
+			</dl>
 
 			<?php if ( ! empty( $summary ) && 'invalid' === $summary['detection'] ) : ?>
 				<div class="notice notice-error inline"><p><?php echo esc_html( $summary['message'] ); ?></p></div>
@@ -152,6 +169,41 @@ final class AdminService {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Compact, factual presentation-ownership signal for Ringkasan. Not a
+	 * diagnostics framework -- just the state an authorized admin needs to
+	 * notice if the frontend root cannot render Graha's shell.
+	 *
+	 * Homepage ownership is now route-driven (TemplateService owns whatever
+	 * WordPress resolves as is_front_page(), regardless of Reading Settings),
+	 * so the only realistic failure this can factually report is a missing
+	 * plugin-owned template file from a broken deployment -- never Reading
+	 * Settings, which no longer gate ownership at all.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function presentation_status() {
+		$front_template = dirname( __DIR__ ) . '/templates/front-page.php';
+		$show_on_front  = (string) get_option( 'show_on_front', 'posts' );
+
+		$slugs = array( 'home', 'about-us', 'layanan-kami', 'contact-us', 'request-quote' );
+		$available = 0;
+		foreach ( $slugs as $slug ) {
+			$page = get_page_by_path( $slug, OBJECT, 'page' );
+			if ( $page instanceof \WP_Post && 'publish' === $page->post_status ) {
+				$available++;
+			}
+		}
+
+		return array(
+			'version'          => Kernel::VERSION,
+			'ownership_active' => is_readable( $front_template ),
+			'mode_label'       => 'page' === $show_on_front ? __( 'Halaman statis', 'graha-selang' ) : __( 'Pos terbaru', 'graha-selang' ),
+			'pages_available'  => $available,
+			'pages_total'      => count( $slugs ),
+		);
 	}
 
 	/** @return void */

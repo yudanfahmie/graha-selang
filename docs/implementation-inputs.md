@@ -21,7 +21,8 @@ Fresh activation now has an owner-approved structural bootstrap contract:
 - never overwrite meaningful existing Page title/content/status, and never silently publish a draft/private/trash canonical Page;
 - treat the bootstrap schema as complete only when all five canonical Pages are publicly usable; unresolved Page status remains an admin-side retry condition without duplicate insertion;
 - on a genuinely fresh/default WordPress install, assign the provisioned published Home as the static front page;
-- preserve a valid existing static front-page choice and preserve established non-fresh posts-front configuration; the Graha document shell only owns the canonical static Home;
+- lifecycle preserves a valid existing static front-page choice and preserves established non-fresh posts-front Reading Settings -- it never forces `show_on_front`/`page_on_front` on an established site;
+- presentation ownership of the public front page is decoupled from that Reading Settings choice: the Graha document shell owns whatever WordPress resolves as `is_front_page()` -- latest-posts mode, the canonical static Home, or any other Page an owner has set as front -- so the frontend root is never left to the active theme's own template/"No content found" fallback; a canonical Home Page is useful structural/editor content, not a prerequisite for the shell to render; existing static-front Page content is read, never overwritten;
 - render deterministic fallback navigation without database menu provisioning, omitting any canonical Page destination that is not public;
 - render small factual runtime fallbacks for empty About, Services, Contact, and Request Quote Pages; meaningful editor content remains authoritative and suppresses those fallbacks;
 - keep form-provider-specific RFQ fields, upload, recipients, routing, privacy, and analytics configuration unresolved until approved inputs exist.
