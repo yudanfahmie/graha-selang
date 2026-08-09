@@ -1,0 +1,9 @@
+service,request_profile,owns,primary_storage,depends_on,must_not_own
+Kernel,all,"composition only; plugin constants/version; explicit service registration",none,WordPress,"business logic; page queries; persistence; Woo/form/SEO business operations"
+TemplateService,frontend,"template selection; small page contexts; presentation helpers; Graha shell around supported native WP/Woo surfaces",none,"WordPress; NavigationService; adapters","virtual route engine; global site dataset; persistence; product CRUD; SEO campaign logic"
+AssetService,frontend,"single asset registry; registration; conditional enqueue",none,WordPress,"compatibility aliases; queue repair; diagnostics; unrelated feature assets"
+NavigationService,frontend,"single normalized navigation tree; desktop/mobile shared data","native WP menu or code fallback",WordPress,"duplicate desktop/mobile persistence; custom route registry; hidden SEO navigation"
+WooCommerceAdapter,frontend-optional,"lazily resolved Woo availability; normalized presentation reads for products categories brands attributes URLs and optional cart state","WooCommerce-owned data",WooCommerce,"product CRUD; duplicate catalog; orders; payments; customers; parallel search index"
+SeoService,frontend,"technical SEO/GEO integration boundary; breadcrumb/semantic context; provider-safe guards; documented fallbacks only",none,"WordPress; optional SEO provider; WooCommerce","keyword operations; content generation; rank tracking; backlinks; duplicate sitemap/canonical/meta/schema ownership"
+FormAdapter,frontend-optional,"configured external form rendering; presentation fallback","small trusted setting only if required","external form plugin","submission; mail; captcha; anti-spam; submission storage"
+AdminService,admin,"minimal global presentation/integration settings; small editor enhancements","Settings API + registered meta",WordPress,"custom admin framework; generic AJAX transactions; migrations; product administration"
