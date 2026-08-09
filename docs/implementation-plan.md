@@ -172,3 +172,19 @@ If target-environment data required for Wave 0 is unavailable, do not fabricate 
 Any material discovery changing counts, route ownership, provider capability, RFQ transport, brand taxonomy, SEO ownership, commerce mode, services model, admin menu architecture or architecture budget must update canonical docs/matrices in the same coherent commit.
 
 Do not hide requirement decisions only in code, chat or deployment memory.
+
+## 13. Approved next-bundle execution order
+
+`docs/approved-next-bundle-contract.md` is canonical for the newly approved page-quality/design/breadcrumb and one-shot migration requirements.
+
+While Wave 0 remains blocked, use this safe execution order without falsely advancing the overall wave state:
+
+1. canonicalize the approved next-bundle requirements;
+2. finish the environment-independent portion of Wave 1 with `TemplateService`, semantic shell, centralized tokens, reusable breadcrumbs, presentation-family prototypes, accessibility and conditional asset use;
+3. build/activate the production Homepage only when real approved content and real crawlable native destinations are available;
+4. implement the one-shot migration mechanism only when an approved migration bundle/manifest/runtime prerequisites exist; never create fake bundle content to make the mechanism appear complete;
+5. complete production inner-page families after real route/data/provider information is available.
+
+The one-shot content-import mechanism is distinct from the 96-URL redirect/reconciliation workstream. It must not replace or bypass Wave 0 URL reconciliation.
+
+Wave 1 may not be marked complete until activation, admin placement, representative Page/Post/Woo behavior, and the other Wave 1 exit conditions are verified in a real WordPress runtime.

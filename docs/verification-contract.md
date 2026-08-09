@@ -215,3 +215,53 @@ Guard against Gloskin/Morgen runtime identifiers, custom product manager/databas
 - 30-day defect-warranty scope and 30/60/90 operations handoff documented.
 
 Production implementation is complete only when these contracts pass on the target environment.
+
+## 21. Production page-quality assertions
+
+Apply `docs/approved-next-bundle-contract.md` to every shipped public page:
+
+- no lorem ipsum, dummy/fabricated products/specs/certifications/NAP/legal facts or factual-looking visual placeholders;
+- centralized typography/design tokens are used rather than repeated one-off component values;
+- exactly one intended H1 and semantic shell/landmarks;
+- deliberate responsive composition and sparse-state behavior;
+- primary public template copy is Indonesian and fact-based;
+- non-home families expose one useful visible breadcrumb when structurally appropriate;
+- breadcrumb links are real anchors and Graha does not emit duplicate breadcrumb schema/provider metadata.
+
+## 22. Homepage production assertions
+
+A production Homepage may not be accepted until:
+
+- at least four substantial real sections exist: hero/value, product discovery, capability/application/trust, and technical consultation/RFQ;
+- all sections use real approved/native content and crawlable destinations;
+- required anchor/support/specialist product hierarchy remains unequal and visible;
+- the primary action is meaningful and not a placeholder;
+- first-viewport/LCP behavior follows the existing performance contract.
+
+A renderer/prototype with fixture data is not evidence that the production Homepage is complete.
+
+## 23. One-shot migration assertions
+
+When the one-shot migration mechanism is implemented, verify:
+
+- no recursive/arbitrary-directory scanning;
+- runtime reads only the explicitly approved disposable plugin-local bundle path;
+- manifest identity/schema/file list/checksums are validated before writes;
+- no bundle means no migration submenu;
+- only valid pending state creates a temporary child submenu under `Graha Selang Content`;
+- invalid/corrupt/filesystem states perform no destructive write and remain non-fatal to the public site;
+- execution requires explicit capability + nonce;
+- native WordPress/Woo APIs own imported objects;
+- stable source identities make retry idempotent and prevent duplicate successful imports;
+- partial failure is visible/retryable;
+- consumed state prevents rerun even when physical cleanup fails;
+- logical consumed state is persisted before cleanup is attempted;
+- cleanup targets only the disposable runtime bundle, never plugin core or repository archive/source files;
+- migration runtime stays off public frontend requests;
+- no permanent root or generic migration admin framework is introduced.
+
+## 24. Readiness assertions
+
+Wave 0 remains incomplete while the deployment inputs in `implementation-inputs.md` are missing.
+
+Wave 1 remains incomplete until a real WordPress runtime proves activation, actual admin placement/collision behavior, and representative Page/Post/Woo shell behavior. Repository-level PHP/stub/static checks must be reported as such and must not be presented as target-runtime verification.
