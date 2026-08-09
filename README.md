@@ -31,7 +31,20 @@ The brief also requires:
 - dynamic technical RFQ, secure upload support, source-page context, buyer/reseller routing, contextual WhatsApp and conversion events;
 - controlled migration, crawl-diff, rollback readiness, accessibility and Core Web Vitals work.
 
-Read `docs/operational-requirements.md` for the complete normalized contract.
+Read `docs/operational-requirements.md` for the complete normalized public/runtime contract.
+
+## Admin-side contract
+
+All **Graha Selang plugin-owned admin pages** must live under exactly one top-level WordPress admin parent:
+
+- label: **Graha Selang Content**;
+- slug: `graha-selang-content`;
+- target position: immediately after Dashboard (default implementation position `3`);
+- owner: `AdminService`.
+
+No Graha-specific settings/RFQ/content-helper page may appear as a separate root sidebar menu. Native WordPress, WooCommerce, SEO-provider and form-provider screens remain in their authoritative native locations rather than being cloned or proxied.
+
+See `docs/admin-information-architecture.md`.
 
 ## Scope boundary
 
@@ -49,6 +62,7 @@ Read `docs/operational-requirements.md` for the complete normalized contract.
 - stable IA and migration-safe routes;
 - semantic HTML, crawlability, internal linking and provider-safe metadata/schema integration;
 - developer-side analytics/event continuity hooks;
+- one clean Graha-specific admin wrapper and screen-scoped admin UX;
 - staging/launch/rollback verification contracts.
 
 ### Outside this repository
@@ -68,20 +82,22 @@ Read `docs/operational-requirements.md` for the complete normalized contract.
 1. `CONTRIBUTING.md`
 2. `docs/developer-source-of-truth.md`
 3. `docs/operational-requirements.md`
-4. `docs/scope-inventory.csv`
-5. `docs/requirement-traceability.csv`
-6. `docs/architecture-efficiency-audit.md`
-7. `docs/runtime-service-map.csv`
-8. `docs/content-data-contracts.md`
-9. `docs/template-matrix.csv`
-10. `docs/page-matrix.csv`
-11. `docs/seo-geo-engineering-contract.md`
-12. `docs/legacy-migration-contract.md`
-13. `docs/implementation-plan.md`
-14. `docs/verification-contract.md`
-15. `docs/prune-matrix.csv`
-16. `docs/source-notes.md`
-17. `docs/implementation-inputs.md`
+4. `docs/admin-information-architecture.md`
+5. `docs/scope-inventory.csv`
+6. `docs/requirement-traceability.csv`
+7. `docs/architecture-efficiency-audit.md`
+8. `docs/runtime-service-map.csv`
+9. `docs/content-data-contracts.md`
+10. `docs/template-matrix.csv`
+11. `docs/page-matrix.csv`
+12. `docs/seo-geo-engineering-contract.md`
+13. `docs/legacy-migration-contract.md`
+14. `docs/implementation-plan.md`
+15. `docs/verification-contract.md`
+16. `docs/prune-matrix.csv`
+17. `docs/source-notes.md`
+18. `docs/implementation-inputs.md`
+19. `docs/developer-kickoff-prompt.md`
 
 Owner instructions outrank repository docs. Material implementation discoveries must update the affected canonical docs in the same coherent change.
 
@@ -101,8 +117,8 @@ Do not copy that binary into this repository. Requirements needed by developers 
 
 ## Architecture decision
 
-Use a small modular monolith with one composition root and one owner per concern. Prefer native WordPress/WooCommerce storage/routing. No custom database tables, generic migration framework, duplicate commerce stack, custom mail backend or global mega-class by default.
+Use a small modular monolith with one composition root and one owner per concern. Prefer native WordPress/WooCommerce storage/routing. No custom database tables, generic migration framework, duplicate commerce stack, custom mail backend, global mega-class, or sprawling custom admin framework by default.
 
 ## Implementation status
 
-**Repository preparation / canonical planning only.** Production plugin code is intentionally not started in this phase. The next developer begins from `docs/implementation-plan.md` and the traceability/inventory contracts above, not from the raw brief.
+**Repository preparation / canonical planning only.** Production plugin code is intentionally not started in this phase. The next developer begins from `docs/developer-kickoff-prompt.md`, `docs/implementation-plan.md`, and the traceability/inventory contracts above, not from the raw brief.

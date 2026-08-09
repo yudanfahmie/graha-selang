@@ -23,7 +23,25 @@ Implementation must prove requirement coverage, not merely render pages.
 - no generic repair/migration/telemetry framework;
 - no unthreat-modeled public mutation endpoint.
 
-## 3. Scope-count invariants
+## 3. Admin information-architecture assertions
+
+Verify on the actual WordPress admin:
+
+- exactly one plugin-owned top-level Graha menu exists;
+- its visible label is **Graha Selang Content**;
+- its canonical slug is `graha-selang-content`;
+- it is the second visible sidebar item, immediately after Dashboard;
+- default implementation uses menu position `3`;
+- if a plugin collision requires ordering correction, only the Graha parent is repositioned and unrelated menu order is preserved;
+- every plugin-owned Graha admin menu page is a child of `graha-selang-content`;
+- no sibling root Graha settings/RFQ/content/helper menu exists;
+- native WordPress/WooCommerce/SEO-provider/form-provider screens remain in their authoritative native locations;
+- direct access to each Graha child page enforces the correct capability;
+- state-changing admin actions require capability + nonce + validation/sanitization + native persistence;
+- Graha admin CSS/JS loads only on Graha-owned screens;
+- the admin wrapper does not introduce duplicate product/content/provider CRUD.
+
+## 4. Scope-count invariants
 
 Before launch verify the final URL inventory explicitly reconciles the brief baseline:
 
@@ -39,7 +57,7 @@ Before launch verify the final URL inventory explicitly reconciles the brief bas
 
 A changed live-site count is allowed only with documented reconciliation/owner-approved classification; never silently alter baseline numbers to make tests pass.
 
-## 4. Template-family coverage
+## 5. Template-family coverage
 
 Representative tests must cover every row in `template-matrix.csv`:
 
@@ -59,11 +77,11 @@ Representative tests must cover every row in `template-matrix.csv`:
 
 A template family may share code with another family; behavior still needs coverage.
 
-## 5. Required route coverage
+## 6. Required route coverage
 
 At minimum test `/`, `/about-us/`, `/products/`, parent+child product category where present, brand route, rich+sparse product, all four retained application URLs, `/layanan-kami/`, `/articles/`, representative `/blog/{slug}/`, `/contact-us/`, RFQ route/state, approved evergreen, search, 404 and all redirect/retire rows.
 
-## 6. Migration assertions
+## 7. Migration assertions
 
 - every REDIRECT reaches closest intended final URL in one hop where practical;
 - no loops/chains;
@@ -75,7 +93,7 @@ At minimum test `/`, `/about-us/`, `/products/`, parent+child product category w
 - all continuing product/category/brand/article/application slugs resolve as expected;
 - crawl-diff against Wave 0 has no unintended disappearances.
 
-## 7. Homepage/product hierarchy assertions
+## 8. Homepage/product hierarchy assertions
 
 Home must visibly and semantically preserve:
 
@@ -89,7 +107,7 @@ Home must visibly and semantically preserve:
 
 Do not accept six equal-priority cards if that loses the required hierarchy.
 
-## 8. Product technical assertions
+## 9. Product technical assertions
 
 Test product/category/application states for:
 
@@ -100,7 +118,7 @@ Test product/category/application states for:
 - related product paths real anchors;
 - rich and sparse records both deliberate.
 
-## 9. Selector/filter assertions
+## 10. Selector/filter assertions
 
 - catalog remains usable without JS;
 - keyboard-operable filters/decision tree;
@@ -109,7 +127,7 @@ Test product/category/application states for:
 - reset/empty/no-result states accessible;
 - no duplicate product registry/query ownership.
 
-## 10. RFQ assertions
+## 11. RFQ assertions
 
 Test representative product/application/contact RFQ flows:
 
@@ -124,7 +142,7 @@ Test representative product/application/contact RFQ flows:
 - conversion events fire once at approved points;
 - plugin does not persist plaintext submission/upload data outside the chosen owner.
 
-## 11. SEO/GEO structural assertions
+## 12. SEO/GEO structural assertions
 
 Representative pages:
 
@@ -141,7 +159,7 @@ Representative pages:
 - Indonesian UI/locale without accidental English archive labels;
 - one approved organization/contact dataset.
 
-## 12. Homepage/LCP/performance assertions
+## 13. Homepage/LCP/performance assertions
 
 Inspect:
 
@@ -157,34 +175,34 @@ Inspect:
 
 Perfect Lighthouse 100 is not the criterion; material field/CWV quality is.
 
-## 13. Accessibility assertions
+## 14. Accessibility assertions
 
 Keyboard test nav, drawer, selector/filter, product gallery if interactive, RFQ/form, pagination and any carousel. Verify visible focus, names/labels, contrast, reduced motion, no hover-only critical action, responsive technical tables, useful ~44px primary mobile targets and sticky CTA not covering content.
 
-## 14. Legal/privacy assertions
+## 15. Legal/privacy assertions
 
 - no production footer legal link is `href="#"`;
 - legal destinations are approved/real or intentionally absent;
 - privacy policy reflects enabled RFQ/form upload behavior;
 - consent behavior matches actual tracking stack/legal requirement.
 
-## 15. Analytics continuity assertions
+## 16. Analytics continuity assertions
 
 When tracking exists, verify approved tags/events survive rebuild without creating plugin-owned reporting. RFQ, WhatsApp, contact/resource/selector events fire once with no duplicate listeners.
 
-## 16. Content/fallback assertions
+## 17. Content/fallback assertions
 
 Missing specs/logo/contact/form data yields deliberate omission/fallback, not invented facts. No staging image impersonates a factual product/brand/workshop/project.
 
-## 17. Security assertions
+## 18. Security assertions
 
 First-party mutations: capability, nonce, validation/sanitization, native persistence and contextual escaping. RFQ/file upload threat model/provider controls must be verified before production.
 
-## 18. Regression exclusions
+## 19. Regression exclusions
 
-Guard against Gloskin/Morgen runtime identifiers, custom product manager/database, Technical Library/PDF machinery, generic migration framework, telemetry, custom mail transport, duplicate SEO admin/proxy, hidden SEO content generator.
+Guard against Gloskin/Morgen runtime identifiers, custom product manager/database, Technical Library/PDF machinery, generic migration framework, telemetry, custom mail transport, duplicate SEO admin/proxy, hidden SEO content generator, multiple Graha root admin menus, or a global custom admin framework.
 
-## 19. Launch assertions
+## 20. Launch assertions
 
 - staging approved;
 - backup/rollback ready;
@@ -192,6 +210,7 @@ Guard against Gloskin/Morgen runtime identifiers, custom product manager/databas
 - 96-baseline/current inventory reconciliation complete;
 - redirect/canonical/schema/sitemap verified;
 - analytics/event continuity verified;
+- Graha Selang Content hierarchy/placement/capabilities verified on production admin;
 - post-launch crawl completed;
 - 30-day defect-warranty scope and 30/60/90 operations handoff documented.
 

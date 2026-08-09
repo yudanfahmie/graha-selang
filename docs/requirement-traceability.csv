@@ -29,3 +29,4 @@ REQ-027,"Production noindex/robots check",SeoService+deployment_owner,"launch ch
 REQ-028,"Preserve analytics/tag implementation continuity without building analytics product",TemplateService+deployment_owner,"event hooks/tag-safe templates","approved tags/events remain functional",CANONICAL
 REQ-029,"Staging-first, backup/rollback readiness",deployment_owner+LifecycleService,"Wave 0/6 deployment plan","rollback rehearsal/checklist",CANONICAL
 REQ-030,"30-day defect warranty + 30/60/90 operational monitoring handoff plan",project_handoff,"launch documentation","handoff artifact produced; operations remain outside plugin",CANONICAL
+REQ-031,"All Graha plugin-owned admin menu pages live under one `Graha Selang Content` parent immediately after Dashboard; no other Graha root menu",AdminService,"admin-information-architecture.md + Wave 1 admin shell","single parent/slug/position; submenu-only; native provider screens unchanged; capability/nonce/assets verified",CANONICAL

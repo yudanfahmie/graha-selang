@@ -7,7 +7,7 @@ This is the canonical developer-facing requirements source for `yudanfahmie/grah
 Normal developers should not need `yudanfahmie/project-9901`. Authority order:
 
 1. explicit repository-owner instruction;
-2. this document + `docs/operational-requirements.md`;
+2. this document + `docs/operational-requirements.md` + `docs/admin-information-architecture.md`;
 3. `docs/scope-inventory.csv` + `docs/requirement-traceability.csv`;
 4. remaining canonical repository docs/matrices;
 5. current public site only as migration evidence;
@@ -20,7 +20,7 @@ Do not invent missing business/technical facts.
 
 Graha Selang Site Core is a **developer-only WordPress plugin acting as website builder/presentation layer** for a controlled rebuild of the existing Graha Selang site.
 
-Developer-side SEO/GEO friendliness, accessibility, performance, technical product discovery, migration-safe routing and RFQ presentation/integration are part of the product.
+Developer-side SEO/GEO friendliness, accessibility, performance, technical product discovery, migration-safe routing, RFQ presentation/integration and a coherent Graha-specific admin wrapper are part of the product.
 
 Recurring SEO campaigns, backlinks, ranking/reporting, content operations, routine GSC/GA4/GTM/GBP management, social/media campaigns and ads are not plugin responsibilities.
 
@@ -73,7 +73,8 @@ Do not copy Gloskin medical models, routes, UI assets, CSS/JS or content.
 - asset loading;
 - developer-side SEO/GEO structure and provider compatibility;
 - conversion-event integration hooks;
-- minimal site presentation settings.
+- minimal site presentation/integration settings;
+- registration/presentation of the single Graha-specific admin wrapper and its plugin-owned child screens.
 
 ### WordPress owns
 
@@ -91,7 +92,27 @@ Canonical/title/meta/robots/schema/sitemap/breadcrumb output where the configure
 
 Submission transport, spam/captcha, upload storage/retention, email/autoresponse and submission records. Graha owns RFQ context, presentation and compatible routing/configuration integration. If provider capability cannot meet the mandatory RFQ behavior, an architecture decision is required before first-party backend work.
 
-## 7. Product hierarchy
+## 7. Admin-side information architecture
+
+All **plugin-owned custom admin pages** must live beneath one top-level WordPress admin parent:
+
+- visible label: **Graha Selang Content**;
+- slug: `graha-selang-content`;
+- target visible location: the second admin sidebar item, immediately after Dashboard;
+- default WordPress position argument: `3`;
+- canonical owner: `AdminService`.
+
+Every Graha-specific custom admin menu page uses this parent. Do not create sibling root menus such as Graha Settings, Graha RFQ, Graha SEO, Graha Products or other plugin-owned roots.
+
+This grouping rule does **not** move or duplicate authoritative native/provider screens. WordPress Pages/Posts/Media, WooCommerce product/commerce screens, SEO-provider screens and form-provider screens remain in their native locations. The Graha wrapper may link to them but must not proxy or clone their CRUD.
+
+Menu placement is not authorization. Each child page enforces its own least-privilege capability; state-changing actions also require nonce verification, validation/sanitization and native persistence. Graha admin assets load only on Graha-owned screens.
+
+Use normal WordPress menu APIs. If another plugin causes a menu-position collision on the target environment, only a narrow ordering adjustment for `graha-selang-content` is permitted so it remains immediately after `index.php`; unrelated admin-menu ordering must remain intact.
+
+See `docs/admin-information-architecture.md`.
+
+## 8. Product hierarchy
 
 Homepage/discovery keeps six visible groups with unequal hierarchy:
 
@@ -114,7 +135,7 @@ Large-bore is a capability/application within Industrial Hose & Assembly, not an
 
 Brand/technical claims must be evidence-backed.
 
-## 8. Discovery architecture
+## 9. Discovery architecture
 
 Support four entry doors:
 
@@ -127,7 +148,7 @@ One indexable URL = one primary intent. Avoid doorway/keyword-variant duplicatio
 
 The specification path may use progressive selector/filter logic backed by Woo/native structured attributes. Primary catalog and links remain server-rendered/crawlable without JS.
 
-## 9. Route/content model
+## 10. Route/content model
 
 Use native owners first:
 
@@ -143,11 +164,11 @@ Known retained public route families include `/`, `/about-us/`, `/products/`, `/
 
 Do not create CPTs/custom tables merely to mirror the brief.
 
-## 10. Required presentation families
+## 11. Required presentation families
 
 Presentation coverage must exist for Home, archive, category, product, application, brand, About, Service, RFQ, Guide/Article, Legal/Trust, Search and 404. Families may share implementation components/files.
 
-## 11. Technical product contract
+## 12. Technical product contract
 
 When data exists, templates support semantic specs, size/diameter, pressure, temperature, material/construction, standards, media compatibility, application, compatible fittings/connections, approved resources/datasheets and related discovery.
 
@@ -155,11 +176,11 @@ No technical field is fabricated to make a template look complete.
 
 The selector/filter/decision tree is a mandatory experience requirement, but it must use authoritative structured values and crawl-safe query behavior.
 
-## 12. Application/specialist contract
+## 13. Application/specialist contract
 
 The brief identifies mining, cement/bulk, marine, dredging/slurry, drilling, oil & gas, MRO and CNG themes. The legacy baseline has **4 retained application URLs**. Do not turn all themes into eight programmatic pages automatically; additions require distinct content/intent approval.
 
-## 13. RFQ contract
+## 14. RFQ contract
 
 The technical RFQ must support context-sensitive entry, dynamic technical fields, secure provider-owned file upload where enabled, source URL/entity context, buyer vs reseller/cooperation routing where configured, contextual WhatsApp and approved conversion-event hooks.
 
@@ -167,7 +188,7 @@ Contact page prioritizes buyer technical RFQ; cooperation/reseller intent is sec
 
 See `operational-requirements.md` and `content-data-contracts.md`.
 
-## 14. Services/trust/legal
+## 15. Services/trust/legal
 
 Retain `/layanan-kami/` as the service hub. `/services/` is a consolidation/redirect concern, not a second hub.
 
@@ -177,13 +198,13 @@ About/trust surfaces support verified workshop/capability/project evidence. Do n
 
 Legal footer links may not ship as `#`; they must resolve to approved legal/provider surfaces or be removed intentionally.
 
-## 15. Public-language/semantic contract
+## 16. Public-language/semantic contract
 
 Primary public UI is Indonesian. Use correct Indonesian document locale, one intended H1, semantic landmarks and translated UI strings. Technical English terminology may remain where natural.
 
 Never expose internal SEO controls/prompts as public body content.
 
-## 16. SEO/GEO engineering contract
+## 17. SEO/GEO engineering contract
 
 Required by construction:
 
@@ -200,23 +221,23 @@ Required by construction:
 - no hidden keyword/GEO blocks;
 - Core Web Vitals-minded asset/media behavior.
 
-## 17. Performance/accessibility contract
+## 18. Performance/accessibility contract
 
 Treat mobile field performance as a launch concern. Optimize LCP/hero loading, conditional assets, responsive images, font/library payload and layout stability. Distinguish server/TTFB problems from frontend work.
 
 Practical WCAG AA target: keyboard support, visible focus, proper labels/names, contrast, reduced motion, no hover-only controls, responsive spec tables, ~44px primary mobile targets, sticky CTA that never obscures content.
 
-## 18. Migration contract
+## 19. Migration contract
 
 Every baseline/current URL receives KEEP, REDIRECT or RETIRE before launch. Validate one-hop redirects, final internal links, canonicals, sitemap and crawl-diff.
 
 Known duplicate concerns include `/products-2/` vs `/products/` and `/services/` vs `/layanan-kami/`.
 
-## 19. Launch contract
+## 20. Launch contract
 
 Staging-first. Preserve measurement integration, verify production not `noindex`, run pre/post crawl comparison, verify redirects/canonical/schema/sitemap, test representative route families, keep rollback ready, and hand off a 30/60/90 monitoring plan to the operations team.
 
-## 20. Missing-data rule
+## 21. Missing-data rule
 
 When a business/provider value is missing or conflicting:
 

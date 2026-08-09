@@ -14,20 +14,21 @@ For normal Graha Selang development, this repository is authoritative. Read rele
 
 1. `docs/developer-source-of-truth.md`
 2. `docs/operational-requirements.md`
-3. `docs/scope-inventory.csv`
-4. `docs/requirement-traceability.csv`
-5. `docs/architecture-efficiency-audit.md`
-6. `docs/runtime-service-map.csv`
-7. `docs/content-data-contracts.md`
-8. `docs/template-matrix.csv`
-9. `docs/page-matrix.csv`
-10. `docs/seo-geo-engineering-contract.md`
-11. `docs/legacy-migration-contract.md`
-12. `docs/implementation-plan.md`
-13. `docs/verification-contract.md`
-14. `docs/prune-matrix.csv`
-15. `docs/source-notes.md`
-16. `docs/implementation-inputs.md`
+3. `docs/admin-information-architecture.md`
+4. `docs/scope-inventory.csv`
+5. `docs/requirement-traceability.csv`
+6. `docs/architecture-efficiency-audit.md`
+7. `docs/runtime-service-map.csv`
+8. `docs/content-data-contracts.md`
+9. `docs/template-matrix.csv`
+10. `docs/page-matrix.csv`
+11. `docs/seo-geo-engineering-contract.md`
+12. `docs/legacy-migration-contract.md`
+13. `docs/implementation-plan.md`
+14. `docs/verification-contract.md`
+15. `docs/prune-matrix.csv`
+16. `docs/source-notes.md`
+17. `docs/implementation-inputs.md`
 
 `yudanfahmie/project-9901` is provenance/raw reference only. Do not modify it, copy raw project files here, or make routine implementation depend on re-reading it.
 
@@ -59,6 +60,7 @@ Rules:
 8. Identify canonical owner(s) for changed concerns.
 9. For route/content changes, check scope inventory, migration and SEO/GEO consequences.
 10. For RFQ/form changes, check provider capability, file-security/privacy and routing ownership.
+11. For any custom admin page/menu change, check `docs/admin-information-architecture.md` first.
 
 ## Architecture efficiency contract
 
@@ -80,6 +82,29 @@ Mandatory rules:
 - no custom database tables by default;
 - no generic migration/recovery/telemetry/cache framework;
 - no duplicate product/category/brand persistence.
+
+## Admin-side information architecture
+
+All **Graha plugin-owned admin menu pages** must be wrapped under exactly one top-level menu:
+
+- visible label: **Graha Selang Content**;
+- slug: `graha-selang-content`;
+- intended position: immediately after Dashboard; use WordPress menu position `3` as the default implementation;
+- canonical owner: `AdminService`.
+
+Rules:
+
+- all Graha custom admin pages use this parent, normally through `add_submenu_page()`;
+- no separate root Graha settings/RFQ/content/helper menus;
+- keep native WordPress/WooCommerce/SEO-provider/form-provider screens in their own native menus;
+- do not clone native CRUD merely to place it under the wrapper;
+- capability checks remain per-screen and are not replaced by menu visibility;
+- state-changing admin actions require capability + nonce + validation/sanitization + native persistence;
+- load Graha admin assets only on Graha-owned screens;
+- do not globally restyle or reorder unrelated WordPress admin menus;
+- if a target-site plugin collision prevents the parent from being immediately after Dashboard, use only a narrow menu-order adjustment for this parent while preserving unrelated menu order.
+
+See `docs/admin-information-architecture.md`.
 
 ## Product and discovery contract
 
@@ -162,7 +187,7 @@ Do not expose editorial strings such as `Keyword utama`, `Meta Title`, `Meta Des
 
 ## Documentation discipline
 
-Changes to ownership, services, data fields, routes, inventory counts/classification, redirects, RFQ behavior, SEO/GEO responsibilities or retained/pruned baseline behavior must update canonical docs in the same coherent change.
+Changes to ownership, services, data fields, routes, inventory counts/classification, redirects, RFQ behavior, admin menu architecture, SEO/GEO responsibilities or retained/pruned baseline behavior must update canonical docs in the same coherent change.
 
 ## Verification before push
 
@@ -175,10 +200,11 @@ Changes to ownership, services, data fields, routes, inventory counts/classifica
 7. Verify no duplicate canonical/meta/schema owner.
 8. Verify Woo ownership.
 9. Verify RFQ security/provider boundaries when affected.
-10. Verify accessibility/performance regressions on affected families.
-11. Commit coherent change set.
-12. Push directly to `origin/main`.
-13. Verify remote `main` points to pushed commit.
-14. Inspect final commit stats/diff.
+10. Verify admin parent/submenu/capability/asset rules when affected.
+11. Verify accessibility/performance regressions on affected families.
+12. Commit coherent change set.
+13. Push directly to `origin/main`.
+14. Verify remote `main` points to pushed commit.
+15. Inspect final commit stats/diff.
 
 Do not claim completion when remote verification fails.
