@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Graha Selang Site Core
  * Description: WordPress-native presentation foundation for Graha Selang.
- * Version: 0.3.0
+ * Version: 0.4.0
  * Text Domain: graha-selang
  */
 
@@ -17,7 +17,7 @@ require_once __DIR__ . '/src/Kernel.php';
 add_action(
 	'plugins_loaded',
 	static function () {
-		$kernel = new \GrahaSelang\Kernel( __FILE__, '0.3.0' );
+		$kernel = new \GrahaSelang\Kernel( __FILE__, '0.4.0' );
 		$kernel->boot();
 	}
 );

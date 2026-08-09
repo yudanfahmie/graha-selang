@@ -5,12 +5,14 @@ namespace GrahaSelang;
 defined( 'ABSPATH' ) || exit;
 
 final class AssetService {
-	const TOKENS_STYLE         = 'graha-selang-tokens';
-	const FOUNDATION_STYLE     = 'graha-selang-foundation';
-	const NAVIGATION_STYLE     = 'graha-selang-navigation';
-	const SHELL_STYLE          = 'graha-selang-shell';
-	const NAVIGATION_SCRIPT    = 'graha-selang-navigation';
-	const ADMIN_OVERVIEW_STYLE = 'graha-selang-admin-overview';
+	const TOKENS_STYLE          = 'graha-selang-tokens';
+	const FOUNDATION_STYLE      = 'graha-selang-foundation';
+	const NAVIGATION_STYLE      = 'graha-selang-navigation';
+	const SHELL_STYLE           = 'graha-selang-shell';
+	const NAVIGATION_SCRIPT     = 'graha-selang-navigation';
+	const ADMIN_OVERVIEW_STYLE  = 'graha-selang-admin-overview';
+	const ADMIN_MIGRATION_STYLE = 'graha-selang-admin-migration';
+	const ADMIN_MIGRATION_SCRIPT = 'graha-selang-admin-migration';
 
 	/** @var string */
 	private $base_url;
@@ -27,74 +29,28 @@ final class AssetService {
 		$this->version  = $version;
 	}
 
-	/**
-	 * Register public assets without loading them globally.
-	 *
-	 * @return void
-	 */
+	/** @return void */
 	public function register() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_public_assets' ), 5 );
 	}
 
-	/**
-	 * Register the public design/presentation assets. Enqueue remains opt-in.
-	 *
-	 * @return void
-	 */
+	/** @return void */
 	public function register_public_assets() {
-		wp_register_style(
-			self::TOKENS_STYLE,
-			$this->base_url . 'assets/css/tokens.css',
-			array(),
-			$this->version
-		);
-
-		wp_register_style(
-			self::FOUNDATION_STYLE,
-			$this->base_url . 'assets/css/foundation.css',
-			array( self::TOKENS_STYLE ),
-			$this->version
-		);
-
-		wp_register_style(
-			self::NAVIGATION_STYLE,
-			$this->base_url . 'assets/css/navigation.css',
-			array( self::FOUNDATION_STYLE ),
-			$this->version
-		);
-
-		wp_register_style(
-			self::SHELL_STYLE,
-			$this->base_url . 'assets/css/shell.css',
-			array( self::FOUNDATION_STYLE, self::NAVIGATION_STYLE ),
-			$this->version
-		);
-
-		wp_register_script(
-			self::NAVIGATION_SCRIPT,
-			$this->base_url . 'assets/js/navigation.js',
-			array(),
-			$this->version,
-			true
-		);
+		wp_register_style( self::TOKENS_STYLE, $this->base_url . 'assets/css/tokens.css', array(), $this->version );
+		wp_register_style( self::FOUNDATION_STYLE, $this->base_url . 'assets/css/foundation.css', array( self::TOKENS_STYLE ), $this->version );
+		wp_register_style( self::NAVIGATION_STYLE, $this->base_url . 'assets/css/navigation.css', array( self::FOUNDATION_STYLE ), $this->version );
+		wp_register_style( self::SHELL_STYLE, $this->base_url . 'assets/css/shell.css', array( self::FOUNDATION_STYLE, self::NAVIGATION_STYLE ), $this->version );
+		wp_register_script( self::NAVIGATION_SCRIPT, $this->base_url . 'assets/js/navigation.js', array(), $this->version, true );
 	}
 
-	/**
-	 * Enqueue only generic Graha UI primitives requested by a live component.
-	 *
-	 * @return void
-	 */
+	/** @return void */
 	public function enqueue_foundation() {
 		$this->register_public_assets();
 		wp_enqueue_style( self::TOKENS_STYLE );
 		wp_enqueue_style( self::FOUNDATION_STYLE );
 	}
 
-	/**
-	 * Enqueue navigation assets when presentation actually renders the nav.
-	 *
-	 * @return void
-	 */
+	/** @return void */
 	public function enqueue_navigation() {
 		$this->register_public_assets();
 		wp_enqueue_style( self::TOKENS_STYLE );
@@ -103,11 +59,7 @@ final class AssetService {
 		wp_enqueue_script( self::NAVIGATION_SCRIPT );
 	}
 
-	/**
-	 * Enqueue the complete semantic shell bundle on explicit presentation use.
-	 *
-	 * @return void
-	 */
+	/** @return void */
 	public function enqueue_shell() {
 		$this->register_public_assets();
 		wp_enqueue_style( self::TOKENS_STYLE );
@@ -117,19 +69,32 @@ final class AssetService {
 		wp_enqueue_script( self::NAVIGATION_SCRIPT );
 	}
 
+	/** @return void */
+	public function enqueue_admin_overview() {
+		wp_register_style( self::ADMIN_OVERVIEW_STYLE, $this->base_url . 'assets/css/admin-overview.css', array(), $this->version );
+		wp_enqueue_style( self::ADMIN_OVERVIEW_STYLE );
+	}
+
 	/**
-	 * Enqueue the Ringkasan-only admin stylesheet on demand.
+	 * Load migration assets only on the temporary migration child screen.
 	 *
+	 * @param string $action Authenticated admin-AJAX action.
+	 * @param string $nonce Nonce for the current authorized user.
 	 * @return void
 	 */
-	public function enqueue_admin_overview() {
-		wp_register_style(
-			self::ADMIN_OVERVIEW_STYLE,
-			$this->base_url . 'assets/css/admin-overview.css',
-			array(),
-			$this->version
+	public function enqueue_admin_migration( $action, $nonce ) {
+		wp_register_style( self::ADMIN_MIGRATION_STYLE, $this->base_url . 'assets/css/admin-migration.css', array(), $this->version );
+		wp_register_script( self::ADMIN_MIGRATION_SCRIPT, $this->base_url . 'assets/js/admin-migration.js', array(), $this->version, true );
+		wp_localize_script(
+			self::ADMIN_MIGRATION_SCRIPT,
+			'GrahaProductMigration',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'action'  => (string) $action,
+				'nonce'   => (string) $nonce,
+			)
 		);
-
-		wp_enqueue_style( self::ADMIN_OVERVIEW_STYLE );
+		wp_enqueue_style( self::ADMIN_MIGRATION_STYLE );
+		wp_enqueue_script( self::ADMIN_MIGRATION_SCRIPT );
 	}
 }

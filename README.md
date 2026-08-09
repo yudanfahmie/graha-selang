@@ -120,6 +120,19 @@ Do not copy that binary into this repository. Requirements needed by developers 
 
 Use a small modular monolith with one composition root and one owner per concern. Prefer native WordPress/WooCommerce storage/routing. No custom database tables, generic migration framework, duplicate commerce stack, custom mail backend, global mega-class, or sprawling custom admin framework by default.
 
+## Product catalog migration
+
+A narrow one-shot product catalog migration now lives behind the existing `AdminService` boundary. It is **not** a bootable service and never loads in normal frontend Kernel composition.
+
+- permanent source/audit copy: `migration-source/product-catalog-v1/`;
+- disposable runtime copy: `migration-runtime/product-catalog-v1/`;
+- temporary admin child: `Graha Selang Content -> Migrasi Produk` only while the runtime bundle is pending/retryable;
+- execution: explicit authenticated `wp_ajax_*`, `manage_woocommerce`, nonce, atomic option lock;
+- persistence: native WooCommerce products + native post meta provenance only;
+- consumed state is stored before cleanup; cleanup only removes the fixed runtime bundle files/directory.
+
+The committed v1 bundle contains **44 conservative current-public product identity/title records** observed on Graha Selang on 2026-08-09: 15 hydraulic-anchor, 11 industrial-anchor, 5 ducting-support, 2 PVC/suction-support, 10 fittings/accessories-support and 1 CNG specialist record. The bundle intentionally omits prices, stock, SKU, technical specifications, certifications, media, attributes and authoritative brand taxonomy. It does **not** replace the still-required 96-URL Wave 0 reconciliation.
+
 ## Development verification
 
 Run the lightweight repository gate before each push:
@@ -128,8 +141,12 @@ Run the lightweight repository gate before each push:
 ./scripts/verify.sh
 ```
 
-It performs PHP syntax checks, static architecture/security guards, navigation normalization/render checks, admin asset-scope checks, Kernel hook smoke checks, and JavaScript syntax validation when Node is available. These checks are repository-level verification; they do not replace activation and behavior testing on the target WordPress environment.
+It performs PHP syntax checks, static architecture/security guards, navigation normalization/render checks, page/Home presentation tests, one-shot migration validation/idempotency/lock/cleanup tests, admin capability/nonce/submenu/asset checks, Kernel hook smoke checks, and JavaScript syntax validation when Node is available. These checks are repository-level verification; they do not replace activation and behavior testing on the target WordPress environment.
 
 ## Implementation status
 
-**Wave 1 environment-independent foundation is substantially implemented.** The plugin now has one `Kernel` with four active owners: `AdminService`, the canonical `AssetService`, native `NavigationService`, and opt-in `TemplateService`. Centralized neutral/system-safe design tokens, responsive/accessibility primitives, semantic shell/header/main/footer composition, one visible breadcrumb renderer, and all documented presentation-family identifiers are implemented without public route takeover. Public assets remain opt-in and admin assets remain screen-scoped. Wave 1 is **not complete** until a real WordPress runtime verifies activation, actual admin placement/collision behavior, and representative Page/Post/Woo integration. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`. Production Homepage activation/content and the one-shot migration runtime remain gated by `docs/approved-next-bundle-contract.md`. Future migration UI work must also follow `docs/migration-admin-ajax-contract.md`: lightweight page render, screen-scoped assets, and explicit authenticated AJAX for heavy validation/import.
+**Wave 1 environment-independent foundation is substantially implemented and the narrow product-catalog migration path is prepared.** The plugin still has one `Kernel` with four active owners: `AdminService`, the canonical `AssetService`, native `NavigationService`, and `TemplateService`. The one-shot migration coordinator is a lazy admin helper rather than a fifth bootable owner.
+
+Native Page/Post content receives the centralized Graha presentation primitives without route takeover. The production Homepage augmentation now reads only migrated/native Woo products carrying Graha migration provenance, preserves the required two-anchor/three-support/one-specialist hierarchy, and activates only when all six product groups plus real published Woo shop, `/layanan-kami/`, and `/contact-us/` destinations are available. Otherwise WordPress native Home content remains untouched.
+
+Wave 1 is **not complete** until a real WordPress runtime verifies activation, actual admin placement/collision behavior, and representative Page/Post/Woo integration. The committed migration runtime bundle remains logically **pending until it is explicitly run on a real target WooCommerce environment**; repository simulations do not claim production import or cleanup. Wave 0 remains incomplete for the deployment inputs recorded in `docs/implementation-inputs.md`.

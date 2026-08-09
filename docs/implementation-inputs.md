@@ -13,6 +13,19 @@ Safe implementation boundary for this state:
 - continue only environment-independent Wave 1 foundation work that preserves native WordPress/WooCommerce ownership and provider-safe boundaries;
 - verify the admin parent placement/collision behavior on the actual target WordPress admin before calling the admin-shell requirement complete.
 
+## Product migration input packaged 2026-08-09
+
+A one-shot **44-record current-public product identity bundle** is now packaged in `migration-source/product-catalog-v1/` with an identical disposable copy in `migration-runtime/product-catalog-v1/`.
+
+This input is deliberately narrower than the frozen migration baseline and does not close Wave 0:
+
+- it contains only product identity/title, deterministic target slug, directly verified source URL where available, and one approved Home presentation group;
+- it does not invent or import price, stock, SKU, technical specifications, certification, media, product attributes, or authoritative brand taxonomy;
+- it is not the fresh full-site crawl and does not reconcile the 68 product/series baseline or the remaining 96-URL scope;
+- target execution/verification/cleanup remains pending until a real WooCommerce runtime is available.
+
+The source/archive copy is permanent repository evidence. Only the fixed plugin-local runtime copy may be consumed and cleaned after verified import.
+
 ## Required during Wave 0 / before production
 
 | Input | Why it matters | Safe behavior until supplied |

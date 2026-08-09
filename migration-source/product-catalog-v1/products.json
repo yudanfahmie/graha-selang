@@ -1,0 +1,313 @@
+{
+  "source_note": "Current public Graha Selang Woo product identities observed 2026-08-09; identity/title/group only. No price/specification/media/certification/brand taxonomy is imported.",
+  "products": [
+    {
+      "source_id": "graha-public-product:sunflex-ah300-air-hose-300psi",
+      "name": "Sunflex AH300 Air Hose 300 PSI",
+      "slug": "sunflex-ah300-air-hose-300psi",
+      "source_url": "",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-ah600-air-hose-600psi",
+      "name": "Sunflex AH600 Air Hose 600 PSI",
+      "slug": "sunflex-ah600-air-hose-600psi",
+      "source_url": "https://www.grahaselang.com/product/sunflex-ah600-air-hose-600psi/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-osd-250-oil-suction-discharge-hose",
+      "name": "Sunflex OSD 250 Oil Suction Discharge Hose",
+      "slug": "sunflex-osd-250-oil-suction-discharge-hose",
+      "source_url": "https://www.grahaselang.com/product/sunflex-osd-250-oil-suction-discharge-hose/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-osd-600-oil-suction-discharge-hose",
+      "name": "Sunflex OSD 600 Oil Suction Discharge Hose",
+      "slug": "sunflex-osd-600-oil-suction-discharge-hose",
+      "source_url": "https://www.grahaselang.com/product/sunflex-osd-600-oil-suction-discharge-hose/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-osd150-oil-suction-discharge-hose",
+      "name": "Sunflex OSD150 Oil Suction Discharge Hose",
+      "slug": "sunflex-osd150-oil-suction-discharge-hose",
+      "source_url": "https://www.grahaselang.com/product/sunflex-osd150-oil-suction-discharge-hose/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-wsd-150-water-suction-discharge-hose",
+      "name": "Sunflex WSD 150 Water Suction Discharge Hose 150 PSI",
+      "slug": "sunflex-wsd-150-water-suction-discharge-hose",
+      "source_url": "https://www.grahaselang.com/product/sunflex-wsd-150-water-suction-discharge-hose/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:hammer-osd-oil-suction-delivery-hose-150-psi",
+      "name": "HAMMER OSD / OIL SUCTION & DELIVERY HOSE 150 PSI",
+      "slug": "hammer-osd-oil-suction-delivery-hose-150-psi",
+      "source_url": "",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:hammer-wsd-water-suction-delivery-hose",
+      "name": "HAMMER Water Suction & Delivery Hose 150 PSI",
+      "slug": "hammer-wsd-water-suction-delivery-hose",
+      "source_url": "https://www.grahaselang.com/product/hammer-wsd-water-suction-delivery-hose/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:hammer-water-suction-delivery-hose",
+      "name": "HAMMER WATER SUCTION & DELIVERY HOSE – SELANG HISAP & PENYALUR AIR",
+      "slug": "hammer-water-suction-delivery-hose",
+      "source_url": "https://www.grahaselang.com/product/hammer-water-suction-delivery-hose/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:suction-hose-delivery-lpg-selang-hisap-multi-purpose",
+      "name": "LPG / MULTI PURPOSE SUCTION & DELIVERY HOSE",
+      "slug": "suction-hose-delivery-lpg-selang-hisap-multi-purpose",
+      "source_url": "https://www.grahaselang.com/product/suction-hose-delivery-lpg-selang-hisap-multi-purpose/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:composite-hose-indonesia",
+      "name": "Composite Hose Indonesia",
+      "slug": "composite-hose-indonesia",
+      "source_url": "https://www.grahaselang.com/product/composite-hose-indonesia/",
+      "home_group": "industrial_anchor"
+    },
+    {
+      "source_id": "graha-public-product:morgen-r1-hydraulic-hose",
+      "name": "Morgen R1 Hydraulic Hose",
+      "slug": "morgen-r1-hydraulic-hose",
+      "source_url": "https://www.grahaselang.com/product/morgen-r1-hydraulic-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:morgen-r2-hydraulic-hose",
+      "name": "Morgen R2 Hydraulic Hose",
+      "slug": "morgen-r2-hydraulic-hose",
+      "source_url": "https://www.grahaselang.com/product/morgen-r2-hydraulic-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:morgen-r2-supreme-hydraulic-hose",
+      "name": "Morgen R2 Supreme Hydraulic Hose",
+      "slug": "morgen-r2-supreme-hydraulic-hose",
+      "source_url": "https://www.grahaselang.com/product/morgen-r2-supreme-hydraulic-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:morgen-4sp-4sh-hydraulic-hose",
+      "name": "Morgen 4SP / 4SH Hydraulic Hose",
+      "slug": "morgen-4sp-4sh-hydraulic-hose",
+      "source_url": "https://www.grahaselang.com/product/morgen-4sp-4sh-hydraulic-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:morgen-supreme-4sh-hydraulic-hose",
+      "name": "Morgen Supreme 4SH Hydraulic Hose",
+      "slug": "morgen-supreme-4sh-hydraulic-hose",
+      "source_url": "https://www.grahaselang.com/product/morgen-supreme-4sh-hydraulic-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:morgen-sae-100-r15-morgen-supreme-r15",
+      "name": "Morgen SAE 100 R15 – Morgen Supreme R15 Hydraulic Hose",
+      "slug": "morgen-sae-100-r15-morgen-supreme-r15",
+      "source_url": "https://www.grahaselang.com/product/morgen-sae-100-r15-morgen-supreme-r15/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:morgen-sae-j517-r6-multi-fuel-oil-hose",
+      "name": "Morgen SAE J517 R6 Multi Fuel Oil Hose – Hydraulic Hose",
+      "slug": "morgen-sae-j517-r6-multi-fuel-oil-hose",
+      "source_url": "https://www.grahaselang.com/product/morgen-sae-j517-r6-multi-fuel-oil-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-4sp-4sh-hydraulic-hose",
+      "name": "Sunflex 4SP / 4SH Hydraulic Hose",
+      "slug": "sunflex-4sp-4sh-hydraulic-hose",
+      "source_url": "https://www.grahaselang.com/product/sunflex-4sp-4sh-hydraulic-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-r15-hydraulic-hose",
+      "name": "Sunflex R15 Hydraulic Hose",
+      "slug": "sunflex-r15-hydraulic-hose",
+      "source_url": "https://www.grahaselang.com/product/sunflex-r15-hydraulic-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-r1t-hydraulic-hose",
+      "name": "Sunflex R1T Hydraulic Hose",
+      "slug": "sunflex-r1t-hydraulic-hose",
+      "source_url": "https://www.grahaselang.com/product/sunflex-r1t-hydraulic-hose/",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:sunflex-r2t-hydraulic-hose",
+      "name": "Sunflex R2T Hydraulic Hose",
+      "slug": "sunflex-r2t-hydraulic-hose",
+      "source_url": "",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:hydraulic-hose-crane",
+      "name": "Hydraulic Hose Crane",
+      "slug": "hydraulic-hose-crane",
+      "source_url": "",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:hydraulic-hose-forklift",
+      "name": "Hydraulic Hose Forklift",
+      "slug": "hydraulic-hose-forklift",
+      "source_url": "",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:hydraulic-hose-mesin-inject-pabrik-plastic-dll",
+      "name": "Hydraulic hose mesin inject pabrik plastic, DLL",
+      "slug": "hydraulic-hose-mesin-inject-pabrik-plastic-dll",
+      "source_url": "",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:hydraulic-hose-untuk-alat-berat",
+      "name": "Hydraulic Hose untuk Alat Berat",
+      "slug": "hydraulic-hose-untuk-alat-berat",
+      "source_url": "",
+      "home_group": "hydraulic_anchor"
+    },
+    {
+      "source_id": "graha-public-product:morgen-cng-hose-5000-psi",
+      "name": "Morgen CNG Hose Assembly 5000 PSI High Pressure",
+      "slug": "morgen-cng-hose-5000-psi",
+      "source_url": "https://www.grahaselang.com/product/morgen-cng-hose-5000-psi/",
+      "home_group": "cng_specialist"
+    },
+    {
+      "source_id": "graha-public-product:aluminium-ducting-hose",
+      "name": "Aluminium Ducting Hose",
+      "slug": "aluminium-ducting-hose",
+      "source_url": "https://www.grahaselang.com/product/aluminium-ducting-hose/",
+      "home_group": "ducting_support"
+    },
+    {
+      "source_id": "graha-public-product:pu-ducting-hose-indonesia",
+      "name": "PU Ducting Hose Indonesia",
+      "slug": "pu-ducting-hose-indonesia",
+      "source_url": "",
+      "home_group": "ducting_support"
+    },
+    {
+      "source_id": "graha-public-product:pu-duct-hose-pu-copper-wire-ducting-hose-indonesia",
+      "name": "PU Duct Hose - PU Copper Wire Ducting Hose Indonesia",
+      "slug": "pu-duct-hose-pu-copper-wire-ducting-hose-indonesia",
+      "source_url": "",
+      "home_group": "ducting_support"
+    },
+    {
+      "source_id": "graha-public-product:local-pvc-ducting-hose",
+      "name": "Local PVC Ducting Hose",
+      "slug": "local-pvc-ducting-hose",
+      "source_url": "",
+      "home_group": "ducting_support"
+    },
+    {
+      "source_id": "graha-public-product:import-pvc-ducting-hose",
+      "name": "Import PVC Ducting Hose",
+      "slug": "import-pvc-ducting-hose",
+      "source_url": "",
+      "home_group": "ducting_support"
+    },
+    {
+      "source_id": "graha-public-product:corrugated-spiral-suction-hose-selang-spiral-biru",
+      "name": "Corrugated Spiral Suction Hose/ Selang Spiral Biru",
+      "slug": "corrugated-spiral-suction-hose-selang-spiral-biru",
+      "source_url": "",
+      "home_group": "pvc_support"
+    },
+    {
+      "source_id": "graha-public-product:selang-kawat-spiral-transparan-pvc-spring-hose",
+      "name": "Selang Kawat Spiral Transparan / PVC Spring Hose",
+      "slug": "selang-kawat-spiral-transparan-pvc-spring-hose",
+      "source_url": "",
+      "home_group": "pvc_support"
+    },
+    {
+      "source_id": "graha-public-product:camlock-aluminium",
+      "name": "Camlock Aluminium",
+      "slug": "camlock-aluminium",
+      "source_url": "https://www.grahaselang.com/product/camlock-aluminium/",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:camlock-brass-kuningan",
+      "name": "Camlock Brass Kuningan",
+      "slug": "camlock-brass-kuningan",
+      "source_url": "https://www.grahaselang.com/product/camlock-brass-kuningan/",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:camlock-coupling-indonesia",
+      "name": "Camlock Coupling Indonesia",
+      "slug": "camlock-coupling-indonesia",
+      "source_url": "https://www.grahaselang.com/product/camlock-coupling-indonesia/",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:camlock-plastik-pp-hdpe",
+      "name": "Camlock Plastik PP / HDPE",
+      "slug": "camlock-plastik-pp-hdpe",
+      "source_url": "https://www.grahaselang.com/product/camlock-plastik-pp-hdpe/",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:camlock-reducer-alumimium",
+      "name": "Camlock Reducer Alumimium",
+      "slug": "camlock-reducer-alumimium",
+      "source_url": "https://www.grahaselang.com/product/camlock-reducer-alumimium/",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:camlock-reducer-ss",
+      "name": "Camlock Reducer SS",
+      "slug": "camlock-reducer-ss",
+      "source_url": "https://www.grahaselang.com/product/camlock-reducer-ss/",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:camlock-stainless-steel-ss316",
+      "name": "Camlock Stainless Steel / SS316",
+      "slug": "camlock-stainless-steel-ss316",
+      "source_url": "https://www.grahaselang.com/product/camlock-stainless-steel-ss316/",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:chicago-claw-coupling",
+      "name": "Chicago Claw Coupling",
+      "slug": "chicago-claw-coupling",
+      "source_url": "https://www.grahaselang.com/product/chicago-claw-coupling/",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:sambungan-selang-ke-pipa-nipple-king",
+      "name": "Sambungan Selang ke Pipa / Nipple King",
+      "slug": "sambungan-selang-ke-pipa-nipple-king",
+      "source_url": "",
+      "home_group": "fittings_support"
+    },
+    {
+      "source_id": "graha-public-product:hydraulic-ferrule-fitting-adapter",
+      "name": "Hydraulic Ferrule, Fitting & Adapter",
+      "slug": "hydraulic-ferrule-fitting-adapter",
+      "source_url": "",
+      "home_group": "fittings_support"
+    }
+  ]
+}
