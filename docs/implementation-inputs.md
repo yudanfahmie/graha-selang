@@ -2,6 +2,17 @@
 
 These are deployment/client inputs, not unresolved architecture questions. Do not guess them.
 
+## Current Wave 0 discovery status
+
+Repository-only execution on **2026-08-09** did not provide target WordPress admin/server access, a fresh current-site crawl/export, or verified deployment provider configuration. Wave 0 production discovery therefore remains incomplete for route, redirect, provider, taxonomy, analytics, RFQ transport/upload, contact/legal, commerce-mode, and admin-collision decisions.
+
+Safe implementation boundary for this state:
+
+- do not create/finalize `docs/redirect-matrix.csv` without real crawl evidence;
+- do not freeze unknown public routes, provider ownership, brand taxonomy, contact data, event IDs, RFQ recipients, or upload policy;
+- continue only environment-independent Wave 1 foundation work that preserves native WordPress/WooCommerce ownership and provider-safe boundaries;
+- verify the admin parent placement/collision behavior on the actual target WordPress admin before calling the admin-shell requirement complete.
+
 ## Required during Wave 0 / before production
 
 | Input | Why it matters | Safe behavior until supplied |

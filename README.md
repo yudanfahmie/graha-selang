@@ -121,4 +121,4 @@ Use a small modular monolith with one composition root and one owner per concern
 
 ## Implementation status
 
-**Repository preparation / canonical planning only.** Production plugin code is intentionally not started in this phase. The next developer begins from `docs/developer-kickoff-prompt.md`, `docs/implementation-plan.md`, and the traceability/inventory contracts above, not from the raw brief.
+**Wave 1 foundation started.** The repository now contains the plugin entrypoint, one `Kernel` composition root, and the initial `AdminService` shell for the canonical `Graha Selang Content` parent. Route-sensitive/provider-sensitive implementation remains blocked on the Wave 0 deployment inputs recorded in `docs/implementation-inputs.md`.
