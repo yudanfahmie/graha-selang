@@ -4,8 +4,8 @@
  *
  * Phase D1/D2 markup ownership lives in templates/home/content.php. This
  * bridge only prepares presentation context that belongs to the existing Home
- * view. Zero-product orientation remains "Gunakan katalog atau konsultasi
- * teknis" in the composition owner so Home always has an honest next path.
+ * view. Zero-product orientation remains "Gunakan katalog atau konsultasi teknis"
+ * in the composition owner so Home always has an honest next path.
  *
  * @package GrahaSelang
  */
