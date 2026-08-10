@@ -461,6 +461,14 @@
 	}
 }
 
+@media (min-width: 44.0625rem) and (max-width: 64rem) {
+	.graha-home-support-grid > :last-child:nth-child(odd) {
+		grid-column: 1 / -1;
+		inline-size: min(100%, 30rem);
+		justify-self: center;
+	}
+}
+
 @media (max-width: 56rem) {
 	.graha-home-anchor-grid,
 	.graha-home-specialist__layout,
@@ -497,6 +505,18 @@
 
 	.graha-home-hero__illustration {
 		max-block-size: 28rem;
+	}
+}
+
+@media (max-width: 48rem) {
+	.graha-home-family-card__links li {
+		padding-block: 0;
+	}
+
+	.graha-home-family-card__links a {
+		display: flex;
+		min-block-size: var(--graha-control-min);
+		align-items: center;
 	}
 }
 

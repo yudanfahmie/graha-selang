@@ -53,7 +53,6 @@
 .graha-card--anchor { grid-column:span 2; border-color:var(--graha-color-primary); box-shadow:var(--graha-shadow-soft); position:relative; }
 .graha-card--anchor::before { content:""; position:absolute; inset-block-start:0; inset-inline-start:0; inline-size:100%; block-size:0.25rem; background:var(--graha-color-primary); border-start-start-radius:var(--graha-radius-lg); border-start-end-radius:var(--graha-radius-lg); }
 .graha-card--specialist { grid-column:1 / -1; background:var(--graha-color-surface-subtle); border-style:dashed; }
-.graha-card:hover { box-shadow:var(--graha-shadow-elevated); border-color:var(--graha-color-border-strong); }
 .graha-link-list { margin:0; padding-inline-start:var(--graha-space-5); }
 .graha-link-list a { color:inherit; text-underline-offset:var(--graha-link-underline-offset); }
 .graha-stat-list { margin:0; padding:0; list-style:none; align-items:stretch; }
@@ -126,7 +125,6 @@
 
 /* Discovery/category cards: real catalog entry doors only -- the grid reduces gracefully. */
 .graha-discovery-card { position:relative; display:flex; flex-direction:column; gap:var(--graha-space-2); padding:var(--graha-space-5); border:var(--graha-border-width) solid var(--graha-color-border); border-radius:var(--graha-radius-lg); background:var(--graha-color-surface); text-decoration:none; color:inherit; transition:box-shadow var(--graha-motion-standard) var(--graha-motion-ease), border-color var(--graha-motion-standard) var(--graha-motion-ease); }
-.graha-discovery-card:hover { border-color:var(--graha-color-primary); box-shadow:var(--graha-shadow-elevated); }
 .graha-discovery-card__icon { display:inline-flex; align-items:center; justify-content:center; inline-size:2.5rem; block-size:2.5rem; border-radius:var(--graha-radius-md); background:var(--graha-color-primary-tint); color:var(--graha-color-primary); }
 .graha-discovery-card__icon svg { inline-size:1.25rem; block-size:1.25rem; }
 .graha-discovery-card strong { font-size:var(--graha-type-lg); }

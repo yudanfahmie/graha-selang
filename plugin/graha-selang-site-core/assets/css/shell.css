@@ -248,7 +248,7 @@ body.admin-bar .graha-site-header { inset-block-start: 32px; }
 }
 
 .graha-site-footer {
-	border-block-start: var(--graha-border-width) solid var(--graha-color-primary-dark);
+	border-block-start: var(--graha-border-width) solid rgb(255 255 255 / 0.12);
 	background: var(--graha-color-primary-dark);
 	color: var(--graha-color-inverse-muted);
 }

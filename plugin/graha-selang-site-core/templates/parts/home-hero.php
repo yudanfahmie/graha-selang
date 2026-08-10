@@ -13,12 +13,12 @@ $rfq_url               = isset( $rfq_url ) ? trim( (string) $rfq_url ) : '';
 $hero_illustration_url = isset( $hero_illustration_url ) ? trim( (string) $hero_illustration_url ) : '';
 ?>
 <section class="graha-hero graha-home-hero" aria-labelledby="graha-home-hero-title">
-	<div class="graha-home-hero__grid graha-container graha-container--wide">
+	<div class="graha-home-hero__grid graha-container">
 		<div class="graha-home-hero__body">
 			<p class="graha-eyebrow graha-hero__eyebrow"><?php echo esc_html__( 'Graha Selang', 'graha-selang' ); ?></p>
 			<h1 id="graha-home-hero-title"><?php echo esc_html__( 'Solusi selang industri dan hidrolik untuk kebutuhan lapangan Anda', 'graha-selang' ); ?></h1>
 			<div class="graha-home-hero__lead">
-				<p><?php echo esc_html__( 'Untuk kebutuhan industri dan hidrolik, telusuri katalog produk yang tersedia atau lanjutkan ke konsultasi teknis melalui jalur Graha Selang.', 'graha-selang' ); ?></p>
+				<p><?php echo esc_html__( 'Telusuri katalog produk yang tersedia atau lanjutkan ke konsultasi teknis melalui jalur Graha Selang.', 'graha-selang' ); ?></p>
 			</div>
 			<div class="graha-home-hero__actions">
 				<?php graha_render_button( __( 'Lihat Katalog Produk', 'graha-selang' ), $products_url, 'primary', 'graha-button--lg' ); ?>
