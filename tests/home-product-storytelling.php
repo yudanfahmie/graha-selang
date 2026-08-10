@@ -82,7 +82,7 @@ foreach ( $group_keys as $group ) {
 }
 
 $plugin = dirname( __DIR__ ) . '/plugin/graha-selang-site-core';
-$assets = new \GrahaSelang\AssetService( $plugin . '/graha-selang.php', '0.7.6' );
+$assets = new \GrahaSelang\AssetService( $plugin . '/graha-selang.php', '0.7.7' );
 $nav = new \GrahaSelang\NavigationService();
 $templates = new \GrahaSelang\TemplateService( $assets, $nav );
 $html = $templates->enhance_native_content( '' );
@@ -98,8 +98,8 @@ ok( substr_count( $html, 'graha-home-family-card--support' ) === 3, 'exactly thr
 foreach ( array( 'hydraulic-hose.svg', 'industrial-hose.svg', 'ducting-hose.svg', 'pvc-hose.svg', 'fittings-couplings.svg', 'cng-hose.svg' ) as $svg ) {
 	ok( false !== strpos( $html, $svg ), "category illustration is wired through the Home presentation: {$svg}" );
 }
-ok( 6 === substr_count( $html, 'loading="lazy"' ), 'all six below-fold category illustrations are lazy' );
-ok( 6 === substr_count( $html, 'width="640"' ) && 6 === substr_count( $html, 'height="480"' ), 'all six category illustrations preserve 640x480 intrinsic dimensions' );
+ok( 7 === substr_count( $html, 'loading="lazy"' ), 'six D1 category illustrations plus the D2 technical-services illustration are lazy' );
+ok( 7 === substr_count( $html, 'width="640"' ) && 7 === substr_count( $html, 'height="480"' ), 'all below-fold Home illustrations preserve 640x480 intrinsic dimensions' );
 ok( 18 === substr_count( $html, 'href="https://example.test/product/' ), 'Home limits every six family groups to three representative native products' );
 ok( false === strpos( $html, '<h1' ), 'post-Hero D1 composition introduces no H1' );
 

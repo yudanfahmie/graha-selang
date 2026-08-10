@@ -83,7 +83,7 @@ for path in CSS.glob('*.css'):
     check('@import' not in text, f'no CSS import dependency introduced: {path.name}')
     check(re.search(r'https?://', text) is None, f'no external stylesheet/media URL introduced: {path.name}')
 
-check('Version: 0.7.6' in entry, 'plugin header version is 0.7.6')
-check("const VERSION = '0.7.6'" in kernel, 'Kernel runtime version is 0.7.6')
+check('Version: 0.7.7' in entry, 'plugin header version is 0.7.7')
+check("const VERSION = '0.7.7'" in kernel, 'Kernel runtime version is 0.7.7')
 
 print('Visual foundation contract checks passed.')
