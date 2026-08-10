@@ -6,6 +6,8 @@ command -v php >/dev/null 2>&1 || { echo 'FAIL: php is required for syntax check
 command -v python3 >/dev/null 2>&1 || { echo 'FAIL: python3 is required for contract guards' >&2; exit 1; }
 echo '== PHP syntax =='
 while IFS= read -r file; do php -l "$file"; done < <(find . -type f -name '*.php' -not -path './vendor/*' | sort)
+echo '== cPanel deployment script syntax =='
+sh -n scripts/cpanel-deploy.sh
 echo '== Repository contract guards =='
 python3 tests/verify_contracts.py
 echo '== PHP foundation and migration tests =='

@@ -8,8 +8,11 @@ This document records the production deployment integrity contract for the Graha
 
 - Repository source: `plugin/graha-selang-site-core/`
 - Production destination: `/home/markascl/graha-selang.markas.cloud/wp-content/plugins/graha-selang-site-core/`
+- Deployment task implementation: `scripts/cpanel-deploy.sh` (run by `.cpanel.yml` with cwd already set to the repository checkout root, per cPanel's documented deployment behavior)
 
 No other plugin source or destination is authoritative for this deployment.
+
+`.cpanel.yml` itself intentionally stays a one-line task (`/bin/sh scripts/cpanel-deploy.sh`) rather than an inline shell one-liner. cPanel's own `.cpanel.yml` YAML parsing is far stricter than the YAML spec generally allows (it has repeatedly failed to deploy an inline task containing routine POSIX single-quote-escaping and message text with a colon-space, both of which are valid YAML and valid shell on their own) -- keeping deployment logic in a real `.sh` file removes that entire class of failure and makes the logic readable/diffable on its own.
 
 ## Deployment contract
 
