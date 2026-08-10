@@ -5,3 +5,7 @@
 *.gif binary
 *.webp binary
 *.svg text
+*.woff2 binary
+*.woff binary
+*.ttf binary
+*.otf binary

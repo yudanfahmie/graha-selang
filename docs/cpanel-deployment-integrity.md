@@ -34,4 +34,8 @@ For pull-based cPanel Git deployment, a GitHub push alone is not production veri
 - **Deploy HEAD Commit** completes successfully;
 - `Last Deployed SHA` matches that same intended SHA.
 
-Repository CI success proves repository integrity only. It does not prove the production filesystem has been updated until the cPanel deployment state is verified.
+Repository CI success proves repository integrity only. It does not prove the production filesystem has been updated until the cPanel deployment state is verified. `.github/workflows/verify.yml` runs repository tests on every push to `main`; it never touches the cPanel host, so a green GitHub Actions run and a deployed production site are two independent facts.
+
+## Interrupt-safety hardening
+
+The one-shot `trap ... HUP INT TERM` rollback guard is only armed immediately before the live-directory swap (the two `mv` operations), not for the entire task. Staging (`cp -R` of the full plugin tree, the pre-swap `diff`, the pre-swap `php -l`) runs unguarded first: if the task is interrupted during that phase, nothing under `$DEPLOYPATH` has been touched yet, so the process simply exits and the next deployment attempt cleans up the leftover stage directory. Arming the trap earlier was tried and found unsafe: `rollback()` unconditionally does `rm -rf "$DEPLOYPATH"` before restoring `$BACKUPPATH`, and during staging `$BACKUPPATH` does not exist yet — an interrupt in that window would have deleted the still-good live plugin directory with nothing to restore it from. Each `echo` line in the task is a deployment-log checkpoint so a stalled or interrupted run is diagnosable from cPanel's task output alone.
