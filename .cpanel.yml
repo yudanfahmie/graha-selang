@@ -1,12 +1,6 @@
 ---
+# Canonical source: plugin/graha-selang-site-core/.
 # Canonical destination: /home/markascl/graha-selang.markas.cloud/wp-content/plugins/graha-selang-site-core/
 deployment:
   tasks:
-    - export PLUGINROOT=/home/markascl/graha-selang.markas.cloud/wp-content/plugins
-    - export DEPLOYPATH=$PLUGINROOT/graha-selang-site-core
-    - export STAGEPATH=$PLUGINROOT/.graha-selang-site-core.deploy
-    - export BACKUPPATH=$PLUGINROOT/.graha-selang-site-core.previous
-    - /bin/rm -rf "$STAGEPATH" "$BACKUPPATH"
-    - /bin/mkdir -p "$STAGEPATH"
-    - /bin/cp -R plugin/graha-selang-site-core/. "$STAGEPATH/"
-    - /bin/sh -c 'set -eu; if [ -d "$DEPLOYPATH" ]; then /bin/mv "$DEPLOYPATH" "$BACKUPPATH"; fi; if /bin/mv "$STAGEPATH" "$DEPLOYPATH"; then /bin/rm -rf "$BACKUPPATH"; else status=$?; if [ -d "$BACKUPPATH" ]; then /bin/mv "$BACKUPPATH" "$DEPLOYPATH"; fi; exit "$status"; fi'
+    - /bin/sh -c 'set -eu; PLUGINROOT=/home/markascl/graha-selang.markas.cloud/wp-content/plugins; SOURCE=plugin/graha-selang-site-core; DEPLOYPATH=$PLUGINROOT/graha-selang-site-core; STAGEPATH=$PLUGINROOT/.graha-selang-site-core.deploy; BACKUPPATH=$PLUGINROOT/.graha-selang-site-core.previous; rollback(){ status=${1:-1}; /bin/rm -rf "$DEPLOYPATH" "$STAGEPATH"; if [ -d "$BACKUPPATH" ]; then /bin/mv "$BACKUPPATH" "$DEPLOYPATH"; fi; exit "$status"; }; trap '"'"'rollback 1'"'"' HUP INT TERM; /bin/rm -rf "$STAGEPATH" "$BACKUPPATH"; /bin/mkdir -p "$STAGEPATH"; /bin/cp -R "$SOURCE"/. "$STAGEPATH"/; /usr/bin/diff -qr "$SOURCE" "$STAGEPATH" >/dev/null; command -v php >/dev/null 2>&1; php -l "$STAGEPATH/src/ProductPresentation.php" >/dev/null; if [ -d "$DEPLOYPATH" ]; then /bin/mv "$DEPLOYPATH" "$BACKUPPATH"; fi; if ! /bin/mv "$STAGEPATH" "$DEPLOYPATH"; then rollback 1; fi; if ! /usr/bin/diff -qr "$SOURCE" "$DEPLOYPATH" >/dev/null || ! php -l "$DEPLOYPATH/src/ProductPresentation.php" >/dev/null; then rollback 1; fi; /bin/rm -rf "$BACKUPPATH"; trap - HUP INT TERM'
