@@ -1,6 +1,6 @@
 .graha-ui {
 	/* Approved Graha Selang brand tokens: industrial hose/engineering supplier identity. */
-	--graha-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	--graha-font-sans: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	--graha-font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
 	--graha-type-xs: 0.75rem;
 	--graha-type-sm: 0.875rem;

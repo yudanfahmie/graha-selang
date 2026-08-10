@@ -6,6 +6,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class AssetService {
 	const TOKENS_STYLE            = 'graha-selang-tokens';
+	const FONTS_STYLE             = 'graha-selang-fonts';
 	const FOUNDATION_STYLE        = 'graha-selang-foundation';
 	const NAVIGATION_STYLE        = 'graha-selang-navigation';
 	const SHELL_STYLE             = 'graha-selang-shell';
@@ -15,6 +16,8 @@ final class AssetService {
 	const ADMIN_MIGRATION_SCRIPT  = 'graha-selang-admin-migration';
 	const WORDMARK_RELATIVE_PATH  = 'assets/images/graha-selang-logo-text.svg';
 	const MARK_RELATIVE_PATH      = 'assets/images/graha-selang-logo.svg';
+	/** Primary self-hosted font subset: preloaded so the swap window stays short. */
+	const FONT_PRELOAD_RELATIVE_PATH = 'assets/fonts/instrument-sans-latin.woff2';
 
 	/** @var string */
 	private $base_url;
@@ -43,7 +46,8 @@ final class AssetService {
 
 	/** @return void */
 	public function register_public_assets() {
-		wp_register_style( self::TOKENS_STYLE, $this->base_url . 'assets/css/tokens.css', array(), $this->version );
+		wp_register_style( self::FONTS_STYLE, $this->base_url . 'assets/css/fonts.css', array(), $this->version );
+		wp_register_style( self::TOKENS_STYLE, $this->base_url . 'assets/css/tokens.css', array( self::FONTS_STYLE ), $this->version );
 		wp_register_style( self::FOUNDATION_STYLE, $this->base_url . 'assets/css/foundation.css', array( self::TOKENS_STYLE ), $this->version );
 		wp_register_style( self::NAVIGATION_STYLE, $this->base_url . 'assets/css/navigation.css', array( self::FOUNDATION_STYLE ), $this->version );
 		wp_register_style( self::SHELL_STYLE, $this->base_url . 'assets/css/shell.css', array( self::FOUNDATION_STYLE, self::NAVIGATION_STYLE ), $this->version );
@@ -101,12 +105,32 @@ final class AssetService {
 		return $this->base_path . 'assets/images/' . ltrim( (string) $filename, '/' );
 	}
 
+	/** URL for the preloaded self-hosted Instrument Sans subset. */
+	public function font_preload_url() {
+		return $this->base_url . self::FONT_PRELOAD_RELATIVE_PATH;
+	}
+
+	/**
+	 * Preload the primary (latin) Instrument Sans subset so the browser starts
+	 * fetching it in parallel with CSS parsing instead of discovering it only
+	 * after fonts.css loads -- this is what keeps the font-display:swap window
+	 * short and avoids a visible reflow/flash once the webfont is ready. Kept
+	 * as one wp_head-hooked emission alongside favicons rather than a second
+	 * hook registration.
+	 */
+	private function render_font_preload() {
+		if ( ! file_exists( $this->base_path . self::FONT_PRELOAD_RELATIVE_PATH ) ) return;
+		echo '<link rel="preload" href="' . esc_url( $this->font_preload_url() ) . '" as="font" type="font/woff2" crossorigin="anonymous">' . "\n";
+	}
+
 	/**
 	 * Graha owns favicon presentation while its branded presentation layer is
 	 * active. Remove WordPress' Site Icon output before its priority-99 hook,
 	 * then emit one canonical set derived from the approved Graha mark.
 	 */
 	public function render_canonical_favicons() {
+		$this->render_font_preload();
+
 		remove_action( 'wp_head', 'wp_site_icon', 99 );
 
 		echo '<link rel="icon" type="image/svg+xml" sizes="any" href="' . esc_url( $this->canonical_mark_url() ) . '">' . "\n";

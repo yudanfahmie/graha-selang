@@ -80,7 +80,9 @@ Before page implementation expands, centralize at minimum:
 - focus treatment;
 - motion and reduced-motion behavior.
 
-Components/templates consume shared tokens rather than introducing repeated one-off values. Until approved brand font/color inputs arrive, use neutral/system-safe fallback tokens and do not present them as final brand facts.
+Components/templates consume shared tokens rather than introducing repeated one-off values. Until approved brand color inputs arrive, use neutral/system-safe fallback color tokens and do not present them as final brand facts.
+
+Typeface is approved: Instrument Sans (Google Fonts, SIL OFL 1.1), self-hosted by `AssetService` (`assets/css/fonts.css`, `assets/fonts/*.woff2`) rather than linked from `fonts.googleapis.com`, with the prior system-font stack retained as the `--graha-font-sans` fallback chain and a `wp_head` preload of the primary subset so `font-display: swap` never produces a visible flash.
 
 ## 5. Breadcrumb contract
 
