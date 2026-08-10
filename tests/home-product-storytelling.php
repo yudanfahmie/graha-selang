@@ -113,7 +113,7 @@ ok( false === strpos( $template_service, '<div class="graha-container graha-cont
 foreach ( array( 'wp_insert_post', 'wp_update_post', 'wp_set_object_terms', 'update_post_meta', 'add_post_meta', 'delete_post_meta' ) as $mutation ) {
 	ok( false === strpos( $template_service . $content_template, $mutation ), "D1 presentation performs no product mutation: {$mutation}" );
 }
-ok( false === preg_match( '/https?:\/\//', $home_css ), 'D1 Home CSS introduces no external dependency' );
+ok( 0 === preg_match( '/https?:\/\//', $home_css ), 'D1 Home CSS introduces no external dependency' );
 
 $cng_ids = array();
 foreach ( $GLOBALS['products'] as $product_id => $product ) {
