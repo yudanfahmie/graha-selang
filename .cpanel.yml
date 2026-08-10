@@ -1,9 +1,7 @@
 ---
-# Canonical source: plugin/graha-selang-site-core/.
-# Canonical destination: /home/markascl/graha-selang.markas.cloud/wp-content/plugins/graha-selang-site-core/
-# Deployment logic lives in scripts/cpanel-deploy.sh (kept out of this YAML
-# file because cPanel's own YAML parser does not reliably handle a long,
-# heavily quote-escaped inline one-liner). See docs/cpanel-deployment-integrity.md.
 deployment:
   tasks:
-    - /bin/sh scripts/cpanel-deploy.sh
+    - export DEPLOYPATH=/home/markascl/graha-selang.markas.cloud/wp-content/plugins/graha-selang-site-core/
+    - /bin/rm -rf $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp -R plugin/graha-selang-site-core/. $DEPLOYPATH
