@@ -1,6 +1,7 @@
-/* Phase C Home-only composition. Shared tokens/foundation/shell remain authoritative. */
+/* Phase C/D1 Home-only composition. Shared tokens/foundation/shell remain authoritative. */
 .graha-site-main--home {
-	padding-block: 0 var(--graha-space-8);
+	padding-block: 0;
+	background: var(--graha-color-canvas);
 }
 
 .graha-home-hero {
@@ -111,8 +112,132 @@
 	object-fit: contain;
 }
 
-.graha-site-main--home > .graha-container {
+/* D1: post-Hero product storytelling owns full-width section surfaces. */
+.graha-native-home {
+	inline-size: 100%;
+	background: var(--graha-color-canvas);
+}
+
+.graha-home-orientation .graha-section-heading {
+	max-inline-size: 44rem;
+}
+
+.graha-native-home__source {
+	max-inline-size: var(--graha-content-narrow);
 	margin-block-start: var(--graha-space-6);
+	padding-block-start: var(--graha-space-5);
+	border-block-start: var(--graha-border-width) solid var(--graha-color-border);
+}
+
+.graha-home-anchor-grid,
+.graha-home-support-grid {
+	display: grid;
+	gap: var(--graha-space-5);
+	align-items: stretch;
+}
+
+.graha-home-anchor-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--graha-space-6);
+}
+
+.graha-home-support-grid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.graha-home-anchor-grid .graha-card--anchor {
+	grid-column: auto;
+}
+
+.graha-home-family-card {
+	display: flex;
+	min-inline-size: 0;
+	flex-direction: column;
+	padding: clamp(var(--graha-space-4), 2.1vw, var(--graha-space-6));
+}
+
+.graha-home-family-card--anchor {
+	border-color: var(--graha-color-border-brand-soft);
+}
+
+.graha-home-family-card--support {
+	padding: var(--graha-space-5);
+}
+
+.graha-home-family-card .graha-card__visual {
+	margin-block-end: var(--graha-space-5);
+}
+
+.graha-home-family-card--support .graha-card__visual {
+	margin-block-end: var(--graha-space-4);
+}
+
+.graha-home-family-card__copy {
+	margin-block-end: var(--graha-space-4);
+	color: var(--graha-color-on-surface-muted);
+}
+
+.graha-home-family-card__links {
+	display: grid;
+	gap: 0;
+	margin-block-start: auto;
+	padding-inline-start: 0;
+	list-style: none;
+}
+
+.graha-home-family-card__links li {
+	min-inline-size: 0;
+	padding-block: var(--graha-space-2);
+	border-block-start: var(--graha-border-width) solid var(--graha-color-border);
+}
+
+.graha-home-family-card__links a {
+	display: inline;
+	overflow-wrap: anywhere;
+	font-size: var(--graha-type-sm);
+	font-weight: var(--graha-weight-medium);
+}
+
+.graha-home-specialist {
+	overflow: hidden;
+}
+
+.graha-home-specialist__layout {
+	display: grid;
+	grid-template-columns: minmax(18rem, 0.82fr) minmax(0, 1.18fr);
+	gap: clamp(var(--graha-space-5), 4vw, var(--graha-space-8));
+	align-items: center;
+}
+
+.graha-home-specialist__visual {
+	margin: 0;
+	border-color: var(--graha-color-border-brand-soft);
+	background: var(--graha-color-surface-raised);
+}
+
+.graha-home-specialist__body {
+	min-inline-size: 0;
+}
+
+.graha-home-specialist__body h3 {
+	margin-block-end: var(--graha-space-3);
+}
+
+.graha-home-specialist .graha-home-family-card__links li {
+	border-color: color-mix(in srgb, var(--graha-color-inverse) 22%, transparent);
+}
+
+.graha-home-specialist .graha-home-family-card__links a,
+.graha-home-specialist .graha-home-family-card__links a:visited {
+	color: var(--graha-color-on-contrast);
+}
+
+.graha-home-existing-proof .graha-trust-strip {
+	margin-block-start: var(--graha-space-2);
+}
+
+.graha-home-closing .graha-cta-panel {
+	box-shadow: var(--graha-shadow-soft);
 }
 
 @media (max-width: 64rem) {
@@ -127,6 +252,21 @@
 
 	.graha-home-hero__body h1 {
 		max-inline-size: 20ch;
+	}
+
+	.graha-home-support-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 56rem) {
+	.graha-home-anchor-grid,
+	.graha-home-specialist__layout {
+		grid-template-columns: 1fr;
+	}
+
+	.graha-home-specialist__visual {
+		inline-size: min(100%, 34rem);
 	}
 }
 
@@ -145,6 +285,17 @@
 
 	.graha-home-hero__illustration {
 		max-block-size: 28rem;
+	}
+}
+
+@media (max-width: 44rem) {
+	.graha-home-support-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.graha-home-family-card .graha-card__visual,
+	.graha-home-specialist__visual {
+		max-inline-size: 30rem;
 	}
 }
 
@@ -170,5 +321,9 @@
 	.graha-home-hero__visual .graha-accent-rule {
 		inset-block-start: var(--graha-space-4);
 		inset-inline-end: var(--graha-space-4);
+	}
+
+	.graha-home-family-card {
+		padding: var(--graha-space-4);
 	}
 }

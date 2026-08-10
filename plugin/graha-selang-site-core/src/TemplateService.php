@@ -468,7 +468,7 @@ final class TemplateService {
 		ob_start();
 		?><main id="graha-main" class="graha-site-main graha-site-main--home">
 			<?php include dirname( __DIR__ ) . '/templates/parts/home-hero.php'; ?>
-			<div class="graha-container graha-container--wide graha-stack--large"><article class="graha-page graha-page--home"><?php echo $home_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></article></div>
+			<?php echo $home_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</main><?php
 		$main = (string) ob_get_clean();
 		$site_name = trim( (string) get_bloginfo( 'name' ) );

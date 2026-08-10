@@ -103,7 +103,7 @@ for marker in (
 ):
     check(marker not in public_assets.lower(), f'no external UI framework asset introduced: {marker}')
 
-check('Version: 0.7.5' in entry, 'plugin header version is 0.7.5')
-check("const VERSION = '0.7.5'" in kernel, 'Kernel runtime version is 0.7.5')
+check('Version: 0.7.6' in entry, 'plugin header version is 0.7.6')
+check("const VERSION = '0.7.6'" in kernel, 'Kernel runtime version is 0.7.6')
 
 print('Hero illustration contract checks passed.')

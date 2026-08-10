@@ -109,7 +109,7 @@ $nav = new \GrahaSelang\NavigationService();
 $templates = new \GrahaSelang\TemplateService( $assets, $nav );
 
 $html = $templates->enhance_native_content( '<p>Konten beranda asli.</p>' );
-assert_true( 4 === substr_count( $html, '<section class="graha-page-section' ), 'Home renders four substantial sections' );
+assert_true( false !== strpos( $html, 'graha-home-orientation' ) && false !== strpos( $html, 'graha-home-anchors' ) && false !== strpos( $html, 'graha-home-support' ) && false !== strpos( $html, 'graha-home-specialist' ), 'Home renders the D1 orientation, anchor, support and specialist zones' );
 assert_true( false !== strpos( $html, 'Konten beranda asli.' ), 'Home preserves meaningful editor content' );
 assert_true( false !== strpos( $html, 'Hydraulic Hose / MORGEN' ), 'Home renders hydraulic anchor hierarchy' );
 assert_true( false !== strpos( $html, 'CNG / High-pressure Gas Hose' ), 'Home renders specialist group' );
@@ -124,6 +124,7 @@ assert_true( false !== strpos( $resolved, 'templates/front-page.php' ), 'front p
 assert_true( '/theme/index.php' !== $resolved, 'the active theme fallback template is not selected for the front page' );
 ob_start(); $templates->output_front_page(); $front_shell = (string) ob_get_clean();
 assert_true( false !== strpos( $front_shell, 'graha-site-shell' ) && false !== strpos( $front_shell, 'graha-hero' ), 'canonical static Home front page renders the full Graha shell and hero' );
+assert_true( false === strpos( $front_shell, '<div class="graha-container graha-container--wide graha-stack--large"><article class="graha-page graha-page--home">' ), 'front page no longer wraps the post-Hero journey in one shared wide container' );
 
 // Route-driven ownership: Graha owns the public front page purely because it IS is_front_page(),
 // never because Reading Settings happen to point at the canonical static Home Page. An established
@@ -142,7 +143,7 @@ assert_true( count( $GLOBALS['styles'] ) > $before_styles && in_array( 'graha-se
 $posts_front_content = '<article>Native posts index item.</article>';
 $posts_front_home = $templates->enhance_native_content( $posts_front_content );
 assert_true( $posts_front_content !== $posts_front_home, 'established posts-front content is composed into the Graha Homepage rather than passed through untouched' );
-assert_true( 4 === substr_count( $posts_front_home, '<section class="graha-page-section' ), 'posts-front Homepage still renders all four required sections without any static Page existing' );
+assert_true( false !== strpos( $posts_front_home, 'graha-home-orientation' ) && false !== strpos( $posts_front_home, 'graha-home-anchors' ) && false !== strpos( $posts_front_home, 'graha-home-support' ) && false !== strpos( $posts_front_home, 'graha-home-specialist' ), 'posts-front Homepage preserves the D1 product-storytelling zones without a static Page' );
 ob_start(); $templates->output_front_page(); $posts_front_shell = (string) ob_get_clean();
 assert_true( false !== strpos( $posts_front_shell, 'graha-site-shell' ) && false !== strpos( $posts_front_shell, 'graha-hero' ), 'established posts-front renders the full Graha shell and hero, not the theme "No content found" fallback' );
 $GLOBALS['options']['show_on_front'] = 'page';
@@ -151,14 +152,15 @@ $GLOBALS['options']['page_on_front'] = 50;
 unset( $GLOBALS['products'][6] );
 $templates = new \GrahaSelang\TemplateService( $assets, $nav );
 $html = $templates->enhance_native_content( '<p>Native fallback.</p>' );
-assert_true( 4 === substr_count( $html, '<section class="graha-page-section' ), 'Home remains useful when a product group is empty' );
-assert_true( false !== strpos( $html, 'Gunakan katalog atau konsultasi teknis' ), 'missing product group renders graceful empty state' );
+assert_true( false !== strpos( $html, 'graha-home-orientation' ) && false !== strpos( $html, 'graha-home-anchors' ) && false !== strpos( $html, 'graha-home-support' ), 'Home remains useful when a specialist product group is empty' );
+assert_true( false === strpos( $html, 'graha-home-specialist' ), 'missing CNG group omits the specialist production surface' );
+assert_true( false !== strpos( $html, 'Gunakan katalog atau konsultasi teknis' ), 'missing product group retains a deliberate buyer-orientation fallback path' );
 
 $GLOBALS['products'][6] = array( 'name' => $groups['cng_specialist'], '_graha_home_group' => 'cng_specialist' );
 unset( $GLOBALS['pages']['contact-us'] );
 $templates = new \GrahaSelang\TemplateService( $assets, $nav );
 $html = $templates->enhance_native_content( '<p>Native fallback.</p>' );
-assert_true( 4 === substr_count( $html, '<section class="graha-page-section' ), 'Home does not disappear when Contact destination is unavailable' );
+assert_true( false !== strpos( $html, 'graha-home-orientation' ) && false !== strpos( $html, 'graha-home-anchors' ) && false !== strpos( $html, 'graha-home-support' ) && false !== strpos( $html, 'graha-home-specialist' ), 'Home does not disappear when Contact destination is unavailable' );
 $GLOBALS['pages']['contact-us'] = (object) array( 'ID' => 201, 'post_name' => 'contact-us', 'post_status' => 'publish' );
 
 $GLOBALS['front_page'] = false;

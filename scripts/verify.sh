@@ -28,6 +28,7 @@ php tests/version-consistency.php
 php tests/brand-identity.php
 php tests/frontend-stabilization.php
 php tests/homepage-copy.php
+php tests/home-product-storytelling.php
 php tests/admin-presentation-status.php
 if command -v node >/dev/null 2>&1; then
   echo '== JavaScript syntax =='
