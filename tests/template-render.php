@@ -56,7 +56,7 @@ assert_true( false !== strpos( $inner, '>Beranda</a>' ), 'non-home breadcrumb in
 assert_true( false !== strpos( $inner, 'aria-current="page">Tentang</span>' ), 'breadcrumb identifies current page' );
 assert_true( false === stripos( $inner, 'application/ld+json' ), 'visible breadcrumbs do not emit schema' );
 
-$families = array( 'product_archive','product_category','product_single','application','brand','about','service','technical_rfq','article','legal','search','not_found' );
+$families = array( 'product_archive','product_category','product_single','application','brand','about','service','technical_rfq','article','legal','generic_page','search','not_found' );
 foreach ( $families as $family ) {
 	$prototype = $templates->render_page( $family, array( 'heading' => 'Judul Uji', 'content_html' => '<p>Konten uji eksplisit.</p>' ) );
 	assert_true( '' !== $prototype, "family prototype renders explicitly: {$family}" );

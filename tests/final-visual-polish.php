@@ -59,7 +59,7 @@ ok( false !== strpos( $shell_css, '.graha-site-footer__bottom p' ) && false !== 
 ok( false !== strpos( $shell_css, 'border-block-start: var(--graha-border-width) solid rgb(255 255 255 / 0.12);' ), 'Footer boundary is visibly separated from the preceding contrast surface' );
 
 ok( false !== strpos( $header, 'width="738"' ) && false !== strpos( $header, 'height="174"' ), 'canonical header wordmark reserves its intrinsic ratio to reduce CLS' );
-ok( false !== strpos( $entry, 'Version: 0.7.9' ) && false !== strpos( $kernel, "const VERSION = '0.7.9'" ), 'final visual-polish release version is synchronized at 0.7.9' );
+ok( false !== strpos( $entry, 'Version: 0.8.0' ) && false !== strpos( $kernel, "const VERSION = '0.8.0'" ), 'final visual-polish release version is synchronized at 0.8.0' );
 
 foreach ( array( 'template_redirect', 'add_rewrite_rule', 'wp_redirect', 'wp_safe_redirect', 'wp_insert_post', 'wp_update_post', 'wp_set_object_terms' ) as $forbidden ) {
 	ok( false === strpos( $home_css . $foundation . $shell_css . $header . $hero, $forbidden ), "visual polish introduces no route/data primitive: {$forbidden}" );

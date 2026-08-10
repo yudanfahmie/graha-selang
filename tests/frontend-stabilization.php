@@ -56,8 +56,8 @@ ok( false !== strpos( $navigation, '@media (max-width: 68rem)' ), 'navigation co
 ok( false !== strpos( $shell, 'body.admin-bar .graha-site-header' ), 'sticky header accounts for logged-in WordPress admin bar' );
 ok( false !== strpos( $shell, '.graha-product-grid' ), 'product collection has branded shell styling' );
 
-ok( false !== strpos( $entry, 'Version: 0.7.9' ), 'plugin header version is 0.7.9' );
-ok( false !== strpos( $kernel, "const VERSION = '0.7.9'" ), 'Kernel version is 0.7.9' );
+ok( false !== strpos( $entry, 'Version: 0.8.0' ), 'plugin header version is 0.8.0' );
+ok( false !== strpos( $kernel, "const VERSION = '0.8.0'" ), 'Kernel version is 0.8.0' );
 ok( false !== strpos( $entry, "ProductPresentation.php" ) && false !== strpos( $kernel, 'new ProductPresentation' ), 'product presentation collaborator is wired by the composition root' );
 ok( false !== strpos( $contributing, 'owns registration of native Graha product entities' ), 'CONTRIBUTING documents native Graha product ownership' );
 ok( false === strpos( $contributing, 'WooCommerce remains commerce/product authority' ), 'CONTRIBUTING no longer claims WooCommerce product authority' );

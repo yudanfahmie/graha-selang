@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Graha Selang Site Core
  * Description: WordPress-native presentation foundation for Graha Selang.
- * Version: 0.7.9
+ * Version: 0.8.0
  * Text Domain: graha-selang
  */
 

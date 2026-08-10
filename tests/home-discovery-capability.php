@@ -55,7 +55,7 @@ foreach ( array( 'graha-home-orientation', 'graha-home-anchors', 'graha-home-sup
 	ok( false !== strpos( $content, $d1_marker ), "D1 hierarchy remains intact: {$d1_marker}" );
 }
 ok( 1 === substr_count( $hero, '<h1' ) && 0 === substr_count( $content, '<h1' ), 'Hero remains the sole intended H1 owner' );
-ok( false !== strpos( $entry, 'Version: 0.7.9' ) && false !== strpos( $kernel, "const VERSION = '0.7.9'" ), 'D2 release version is synchronized at 0.7.9' );
+ok( false !== strpos( $entry, 'Version: 0.8.0' ) && false !== strpos( $kernel, "const VERSION = '0.8.0'" ), 'D2 release version is synchronized at 0.8.0' );
 ok( 0 === preg_match( '/https?:\/\//', $home_css ) && false === strpos( $home_css, '@import' ), 'D2 Home CSS has no external frontend dependency' );
 ok( false === stripos( $home_css, 'animation' ) && false === stripos( $home_css, 'parallax' ), 'D2 adds no animation framework or parallax behavior' );
 

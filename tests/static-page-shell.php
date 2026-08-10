@@ -148,12 +148,17 @@ ok( false !== strpos( $about, 'Tentang Kami Graha' ), 'static Page shell uses th
 ok( false !== strpos( $about, 'graha-page--about' ), 'About Page resolves to the about family' );
 ok( false !== strpos( $about, 'Tentang Graha Selang' ), 'empty About Page content still renders the safe bootstrap fallback' );
 
-// An unmapped native Page slug still renders, defaulting to the generic 'legal' family, with real breadcrumb ancestry.
+// An unmapped native Page slug still renders, defaulting to the neutral 'generic_page' family (never 'legal'), with real breadcrumb ancestry.
 $GLOBALS['queried_id'] = 302;
 ob_start(); $templates->output_static_page(); $legal = (string) ob_get_clean();
-ok( false !== strpos( $legal, 'graha-page--legal' ), 'unmapped Page slug defaults to the generic legal family' );
+ok( false !== strpos( $legal, 'graha-page--generic_page' ), 'unmapped Page slug defaults to the neutral generic_page family' );
+ok( false === strpos( $legal, 'graha-page--legal' ), 'unmapped Page is never misclassified as the legal family' );
 ok( false !== strpos( $legal, 'Isi kebijakan yang dipublikasikan.' ), 'unmapped Page keeps its real editor content' );
 ok( false !== strpos( $legal, '>Legal</a>' ), 'unmapped Page breadcrumb includes its real native ancestor' );
+
+// The 'legal' family itself remains available, but only when a Page is deliberately mapped to it -- never as a fallback.
+ob_start(); echo $templates->render_page( 'legal', array( 'heading' => 'Kebijakan Privasi', 'content_html' => '<p>Konten legal yang benar-benar disetujui.</p>' ) ); $deliberate_legal = (string) ob_get_clean();
+ok( false !== strpos( $deliberate_legal, 'graha-page--legal' ), 'the legal family still renders when explicitly selected for an approved legal Page' );
 
 // A draft/unpublished Page never renders as if it were live.
 $GLOBALS['queried_id'] = 303;

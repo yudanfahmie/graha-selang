@@ -12,10 +12,12 @@ final class TemplateService {
 	const BREADCRUMB_HOOK = 'graha_selang_render_breadcrumbs';
 	const FRONT_PAGE_HOOK = 'graha_selang_render_front_page';
 	const STATIC_PAGE_HOOK = 'graha_selang_render_static_page';
+	const SEARCH_HOOK = 'graha_selang_render_search_page';
+	const NOT_FOUND_HOOK = 'graha_selang_render_not_found_page';
 	const SOURCE_META = '_graha_source_identity';
 	const HOME_GROUP_META = '_graha_home_group';
 	const PRODUCT_POST_TYPE = 'graha_product';
-	const FAMILIES = array( 'home','product_archive','product_category','product_single','application','brand','about','service','contact','technical_rfq','article','legal','search','not_found' );
+	const FAMILIES = array( 'home','product_archive','product_category','product_single','application','brand','about','service','contact','technical_rfq','article','legal','generic_page','search','not_found' );
 	const HOME_GROUPS = array(
 		'hydraulic_anchor' => array( 'label' => 'Hydraulic Hose / MORGEN', 'priority' => 'anchor' ),
 		'industrial_anchor' => array( 'label' => 'Industrial Hose & Assembly / HAMMER + SUNFLEX', 'priority' => 'anchor' ),
@@ -24,7 +26,7 @@ final class TemplateService {
 		'fittings_support' => array( 'label' => 'Fittings / Couplings / Accessories', 'priority' => 'support' ),
 		'cng_specialist' => array( 'label' => 'CNG / High-pressure Gas Hose', 'priority' => 'specialist' ),
 	);
-	/** Canonical structural Page slug -> presentation family. Unmapped Pages default to 'legal'. */
+	/** Canonical structural Page slug -> presentation family. Unmapped Pages default to the neutral 'generic_page' family, never 'legal'. */
 	const STATIC_PAGE_FAMILIES = array(
 		'about-us' => 'about',
 		'layanan-kami' => 'service',
@@ -47,6 +49,8 @@ final class TemplateService {
 		add_action( self::BREADCRUMB_HOOK, array( $this, 'output_breadcrumbs' ), 10, 2 );
 		add_action( self::FRONT_PAGE_HOOK, array( $this, 'output_front_page' ) );
 		add_action( self::STATIC_PAGE_HOOK, array( $this, 'output_static_page' ) );
+		add_action( self::SEARCH_HOOK, array( $this, 'output_search_page' ) );
+		add_action( self::NOT_FOUND_HOOK, array( $this, 'output_not_found_page' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'prepare_native_presentation' ), 20 );
 		add_filter( 'template_include', array( $this, 'resolve_native_template' ), 99 );
 		add_filter( 'the_content', array( $this, 'enhance_native_content' ), 30 );
@@ -62,15 +66,17 @@ final class TemplateService {
 	public function prepare_native_presentation() {
 		if ( function_exists( 'is_admin' ) && is_admin() ) return;
 		if ( is_front_page() ) { $this->assets->enqueue_home(); return; }
+		if ( $this->is_native_search() || $this->is_native_not_found() ) { $this->assets->enqueue_shell(); return; }
 		if ( is_singular( 'page' ) ) { $this->assets->enqueue_shell(); return; }
 		if ( is_singular( array( 'post', self::PRODUCT_POST_TYPE ) ) ) $this->assets->enqueue_foundation();
 	}
 
 	/**
 	 * Resolve the real WordPress front page (regardless of latest-posts vs
-	 * static-Page Reading Settings, and regardless of which Page is chosen)
-	 * and any singular Page to their plugin-owned document shells.
-	 * Posts/products keep the active theme's own template and only receive
+	 * static-Page Reading Settings, and regardless of which Page is chosen),
+	 * the native WordPress search results query, the native 404 condition,
+	 * and any singular Page to their plugin-owned document shells. Posts/
+	 * products keep the active theme's own template and only receive
 	 * content-region enhancement.
 	 */
 	public function resolve_native_template( $template ) {
@@ -79,11 +85,29 @@ final class TemplateService {
 			$front = dirname( __DIR__ ) . '/templates/front-page.php';
 			return is_readable( $front ) ? $front : $template;
 		}
+		if ( $this->is_native_search() ) {
+			$search = dirname( __DIR__ ) . '/templates/search.php';
+			return is_readable( $search ) ? $search : $template;
+		}
+		if ( $this->is_native_not_found() ) {
+			$not_found = dirname( __DIR__ ) . '/templates/404.php';
+			return is_readable( $not_found ) ? $not_found : $template;
+		}
 		if ( is_singular( 'page' ) ) {
 			$page_template = dirname( __DIR__ ) . '/templates/page.php';
 			return is_readable( $page_template ) ? $page_template : $template;
 		}
 		return $template;
+	}
+
+	/** Guarded so existing hand-stubbed test doubles without is_search() keep working unaffected. */
+	private function is_native_search() {
+		return function_exists( 'is_search' ) && is_search();
+	}
+
+	/** Guarded so existing hand-stubbed test doubles without is_404() keep working unaffected. */
+	private function is_native_not_found() {
+		return function_exists( 'is_404' ) && is_404();
 	}
 
 	/** Output the Graha shell for the actual WordPress front page. */
@@ -94,6 +118,17 @@ final class TemplateService {
 	/** Output the Graha shell for any native singular Page (About/Services/Contact/RFQ/etc). */
 	public function output_static_page() {
 		echo $this->render_static_page(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/** Output the Graha shell for the native WordPress search results query. */
+	public function output_search_page() {
+		echo $this->render_search_page(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/** Output the Graha shell for the native WordPress 404 condition; preserves the real 404 status. */
+	public function output_not_found_page() {
+		if ( function_exists( 'status_header' ) ) status_header( 404 );
+		echo $this->render_not_found_page(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	public function enhance_native_content( $content ) {
@@ -231,9 +266,15 @@ final class TemplateService {
 
 	private function is_supported_family( $family ) { return in_array( sanitize_key( (string) $family ), self::FAMILIES, true ); }
 
-	/** Presentation family for a native Page slug; unmapped Pages get the generic 'legal' family. */
+	/**
+	 * Presentation family for a native Page slug. Unmapped Pages get the
+	 * neutral 'generic_page' family -- a plain branded wrapper that makes no
+	 * classification claim. 'legal' is reachable only by an explicit slug
+	 * entry in STATIC_PAGE_FAMILIES above; it is never a default/fallback,
+	 * so no unmapped Page is ever misrepresented as legal/privacy content.
+	 */
 	private function family_for_page_slug( $slug ) {
-		return isset( self::STATIC_PAGE_FAMILIES[ $slug ] ) ? self::STATIC_PAGE_FAMILIES[ $slug ] : 'legal';
+		return isset( self::STATIC_PAGE_FAMILIES[ $slug ] ) ? self::STATIC_PAGE_FAMILIES[ $slug ] : 'generic_page';
 	}
 
 	/** Short, non-factual orientation kicker for a static Page family. */
@@ -332,6 +373,92 @@ final class TemplateService {
 			default:
 				echo $editor_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
+		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Branded shell around the real WordPress search query. The query itself
+	 * (matching, ranking, pagination) stays entirely WordPress-native; this
+	 * only reads the already-executed main query's results and renders their
+	 * real title/link/excerpt -- no second search index or custom query.
+	 */
+	private function render_search_page() {
+		$term = function_exists( 'get_search_query' ) ? trim( wp_strip_all_tags( (string) get_search_query() ) ) : '';
+		$heading = '' !== $term
+			? sprintf( __( 'Hasil pencarian: %s', 'graha-selang' ), $term )
+			: __( 'Pencarian', 'graha-selang' );
+		$context = array(
+			'heading'      => $heading,
+			'eyebrow'      => __( 'Pencarian', 'graha-selang' ),
+			'content_html' => $this->render_search_results(),
+		);
+		return $this->render_page( 'search', $context );
+	}
+
+	/** Real matched-post title/link/excerpt from the current native query, plus native pagination and real next-step doors. */
+	private function render_search_results() {
+		$query = isset( $GLOBALS['wp_query'] ) && is_object( $GLOBALS['wp_query'] ) ? $GLOBALS['wp_query'] : null;
+		$posts = $query && isset( $query->posts ) && is_array( $query->posts ) ? $query->posts : array();
+		$urls  = $this->footer_link_context();
+
+		ob_start();
+		if ( ! $posts ) {
+			?><div class="graha-search-empty graha-sparse-state graha-stack">
+				<h2><?php echo esc_html__( 'Tidak ada hasil ditemukan', 'graha-selang' ); ?></h2>
+				<p><?php echo esc_html__( 'Coba kata kunci lain, atau gunakan tautan berikut untuk melanjutkan.', 'graha-selang' ); ?></p>
+			</div><?php
+		} else {
+			?><ul class="graha-search-results graha-stack"><?php
+			foreach ( $posts as $post ) {
+				$post_id = is_object( $post ) && isset( $post->ID ) ? (int) $post->ID : (int) $post;
+				if ( $post_id < 1 ) continue;
+				$title = trim( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
+				$url   = get_permalink( $post_id );
+				if ( '' === $title || ! $url ) continue;
+				$excerpt = function_exists( 'get_the_excerpt' ) ? trim( wp_strip_all_tags( (string) get_the_excerpt( $post_id ) ) ) : '';
+				?><li class="graha-search-result">
+					<h2 class="graha-search-result__title"><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $title ); ?></a></h2>
+					<?php if ( '' !== $excerpt ) : ?><p class="graha-search-result__excerpt"><?php echo esc_html( $excerpt ); ?></p><?php endif; ?>
+				</li><?php
+			}
+			?></ul><?php
+			if ( function_exists( 'get_the_posts_pagination' ) ) {
+				echo wp_kses_post( (string) get_the_posts_pagination( array( 'mid_size' => 1, 'prev_text' => __( 'Sebelumnya', 'graha-selang' ), 'next_text' => __( 'Berikutnya', 'graha-selang' ) ) ) );
+			}
+		}
+		echo $this->render_family_nextsteps( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'graha-search-nextsteps',
+			__( 'Lanjutkan', 'graha-selang' ),
+			array(
+				array( 'icon' => 'box', 'title' => __( 'Produk', 'graha-selang' ), 'copy' => __( 'Telusuri katalog produk Graha Selang.', 'graha-selang' ), 'url' => $urls['products_url'], 'cta' => __( 'Lihat produk', 'graha-selang' ) ),
+				array( 'icon' => 'chat', 'title' => __( 'Hubungi Kami', 'graha-selang' ), 'copy' => __( 'Sampaikan pertanyaan Anda langsung kepada tim kami.', 'graha-selang' ), 'url' => $urls['contact_url'], 'cta' => __( 'Hubungi kami', 'graha-selang' ) ),
+				array( 'icon' => 'tag', 'title' => __( 'Request Quote', 'graha-selang' ), 'copy' => __( 'Ajukan kebutuhan teknis Anda secara langsung.', 'graha-selang' ), 'url' => $urls['rfq_url'], 'cta' => __( 'Ajukan permintaan', 'graha-selang' ) ),
+			)
+		);
+		return (string) ob_get_clean();
+	}
+
+	/** Branded, honestly-linked 404: real HTTP status is set by output_not_found_page(); this only composes the body. */
+	private function render_not_found_page() {
+		$context = array(
+			'heading'      => __( 'Halaman Tidak Ditemukan', 'graha-selang' ),
+			'eyebrow'      => __( '404', 'graha-selang' ),
+			'lead_html'    => '<p>' . esc_html__( 'Halaman yang Anda cari tidak tersedia atau sudah dipindahkan.', 'graha-selang' ) . '</p>',
+			'content_html' => $this->render_not_found_links(),
+		);
+		return $this->render_page( 'not_found', $context );
+	}
+
+	/** Only real destinations; a door with no live URL is omitted, never invented. */
+	private function render_not_found_links() {
+		$urls = $this->footer_link_context();
+		ob_start();
+		graha_render_discovery_grid( array(
+			array( 'icon' => 'arrow', 'title' => __( 'Beranda', 'graha-selang' ), 'copy' => __( 'Kembali ke halaman utama Graha Selang.', 'graha-selang' ), 'url' => home_url( '/' ), 'cta' => __( 'Ke beranda', 'graha-selang' ) ),
+			array( 'icon' => 'box', 'title' => __( 'Produk', 'graha-selang' ), 'copy' => __( 'Telusuri katalog produk yang tersedia.', 'graha-selang' ), 'url' => $urls['products_url'], 'cta' => __( 'Lihat produk', 'graha-selang' ) ),
+			array( 'icon' => 'chat', 'title' => __( 'Hubungi Kami', 'graha-selang' ), 'copy' => __( 'Sampaikan pertanyaan Anda kepada tim kami.', 'graha-selang' ), 'url' => $urls['contact_url'], 'cta' => __( 'Hubungi kami', 'graha-selang' ) ),
+			array( 'icon' => 'tag', 'title' => __( 'Request Quote', 'graha-selang' ), 'copy' => __( 'Ajukan kebutuhan teknis Anda secara langsung.', 'graha-selang' ), 'url' => $urls['rfq_url'], 'cta' => __( 'Ajukan permintaan', 'graha-selang' ) ),
+		) );
 		return (string) ob_get_clean();
 	}
 
