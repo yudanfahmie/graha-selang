@@ -10,6 +10,7 @@ final class AssetService {
 	const FOUNDATION_STYLE        = 'graha-selang-foundation';
 	const NAVIGATION_STYLE        = 'graha-selang-navigation';
 	const SHELL_STYLE             = 'graha-selang-shell';
+	const HOME_STYLE              = 'graha-selang-home';
 	const NAVIGATION_SCRIPT       = 'graha-selang-navigation';
 	const ADMIN_OVERVIEW_STYLE    = 'graha-selang-admin-overview';
 	const ADMIN_MIGRATION_STYLE   = 'graha-selang-admin-migration';
@@ -52,6 +53,7 @@ final class AssetService {
 		wp_register_style( self::FOUNDATION_STYLE, $this->base_url . 'assets/css/foundation.css', array( self::TOKENS_STYLE ), $this->version );
 		wp_register_style( self::NAVIGATION_STYLE, $this->base_url . 'assets/css/navigation.css', array( self::FOUNDATION_STYLE ), $this->version );
 		wp_register_style( self::SHELL_STYLE, $this->base_url . 'assets/css/shell.css', array( self::FOUNDATION_STYLE, self::NAVIGATION_STYLE ), $this->version );
+		wp_register_style( self::HOME_STYLE, $this->base_url . 'assets/css/home.css', array( self::SHELL_STYLE ), $this->version );
 		wp_register_script( self::NAVIGATION_SCRIPT, $this->base_url . 'assets/js/navigation.js', array(), $this->version, true );
 	}
 
@@ -81,6 +83,12 @@ final class AssetService {
 		wp_enqueue_script( self::NAVIGATION_SCRIPT );
 	}
 
+	/** Front-page-only composition layered on the established shell chain. */
+	public function enqueue_home() {
+		$this->enqueue_shell();
+		wp_enqueue_style( self::HOME_STYLE );
+	}
+
 	/** Canonical plugin-owned Graha wordmark URL. */
 	public function canonical_wordmark_url() {
 		return $this->base_url . self::WORDMARK_RELATIVE_PATH;
@@ -106,13 +114,13 @@ final class AssetService {
 		return $this->base_path . 'assets/images/' . ltrim( (string) $filename, '/' );
 	}
 
-	/** Phase C-ready URL for one source-controlled illustration basename. */
+	/** Canonical URL for one source-controlled illustration basename. */
 	public function illustration_url( $filename ) {
 		$filename = basename( trim( (string) $filename ) );
 		return '' === $filename ? '' : $this->base_url . self::ILLUSTRATION_RELATIVE_PATH . rawurlencode( $filename );
 	}
 
-	/** Phase C-ready filesystem path for one source-controlled illustration basename. */
+	/** Canonical filesystem path for one source-controlled illustration basename. */
 	public function illustration_path( $filename ) {
 		$filename = basename( trim( (string) $filename ) );
 		return '' === $filename ? '' : $this->base_path . self::ILLUSTRATION_RELATIVE_PATH . $filename;

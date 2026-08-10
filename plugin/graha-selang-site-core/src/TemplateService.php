@@ -61,7 +61,7 @@ final class TemplateService {
 	 */
 	public function prepare_native_presentation() {
 		if ( function_exists( 'is_admin' ) && is_admin() ) return;
-		if ( is_front_page() ) { $this->assets->enqueue_shell(); return; }
+		if ( is_front_page() ) { $this->assets->enqueue_home(); return; }
 		if ( is_singular( 'page' ) ) { $this->assets->enqueue_shell(); return; }
 		if ( is_singular( array( 'post', self::PRODUCT_POST_TYPE ) ) ) $this->assets->enqueue_foundation();
 	}
@@ -464,23 +464,10 @@ final class TemplateService {
 		$products_url = get_post_type_archive_link( self::PRODUCT_POST_TYPE );
 		if ( ! $products_url ) $products_url = home_url( '/products/' );
 		$rfq_url = $this->published_page_url( 'request-quote' );
+		$hero_illustration_url = $this->assets->illustration_url( 'hero-industrial-system.svg' );
 		ob_start();
 		?><main id="graha-main" class="graha-site-main graha-site-main--home">
-			<section class="graha-hero"><div class="graha-hero__grid graha-container graha-container--wide">
-				<div class="graha-hero__body">
-					<p class="graha-eyebrow graha-hero__eyebrow"><?php echo esc_html__( 'Graha Selang', 'graha-selang' ); ?></p>
-					<h1><?php echo esc_html__( 'Solusi selang industri dan hidrolik untuk kebutuhan lapangan Anda', 'graha-selang' ); ?></h1>
-					<div class="graha-hero__lead"><p><?php echo esc_html__( 'Temukan jalur produk, layanan, dan konsultasi teknis melalui informasi yang dipublikasikan Graha Selang.', 'graha-selang' ); ?></p></div>
-					<div class="graha-hero__actions">
-						<?php graha_render_button( __( 'Lihat Katalog Produk', 'graha-selang' ), $products_url, 'primary', 'graha-button--lg' ); ?>
-						<?php if ( $rfq_url ) : graha_render_button( __( 'Request Quote', 'graha-selang' ), $rfq_url, 'outline', 'graha-button--on-dark graha-button--lg' ); endif; ?>
-					</div>
-				</div>
-				<div class="graha-hero__visual"><div class="graha-media-frame--pattern">
-					<p class="graha-hero__visual-title"><?php echo esc_html__( 'Enam kelompok produk', 'graha-selang' ); ?></p>
-					<ul class="graha-hero__group-list"><?php foreach ( self::HOME_GROUPS as $group ) : ?><li><?php echo graha_ui_icon( 'check' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span><?php echo esc_html( $group['label'] ); ?></span></li><?php endforeach; ?></ul>
-				</div></div>
-			</div></section>
+			<?php include dirname( __DIR__ ) . '/templates/parts/home-hero.php'; ?>
 			<div class="graha-container graha-container--wide graha-stack--large"><article class="graha-page graha-page--home"><?php echo $home_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></article></div>
 		</main><?php
 		$main = (string) ob_get_clean();

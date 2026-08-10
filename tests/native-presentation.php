@@ -118,7 +118,7 @@ assert_true( false !== strpos( $html, 'https://example.test/request-quote/' ), '
 assert_true( false === stripos( $html, 'woocommerce' ), 'Home contains no Woo dependency' );
 
 $templates->prepare_native_presentation();
-assert_true( array( 'graha-selang-tokens', 'graha-selang-foundation', 'graha-selang-navigation', 'graha-selang-shell' ) === $GLOBALS['styles'], 'front page loads complete Graha shell style chain regardless of product readiness' );
+assert_true( array( 'graha-selang-tokens', 'graha-selang-foundation', 'graha-selang-navigation', 'graha-selang-shell', 'graha-selang-home' ) === $GLOBALS['styles'], 'front page loads complete Graha shell style chain regardless of product readiness' );
 $resolved = $templates->resolve_native_template( '/theme/index.php' );
 assert_true( false !== strpos( $resolved, 'templates/front-page.php' ), 'front page resolves to plugin-owned document shell' );
 assert_true( '/theme/index.php' !== $resolved, 'the active theme fallback template is not selected for the front page' );
@@ -138,7 +138,7 @@ assert_true( false !== strpos( $resolved, 'templates/front-page.php' ), 'establi
 assert_true( '/theme/index.php' !== $resolved, 'established posts-front does not fall back to the active theme template' );
 $before_styles = count( $GLOBALS['styles'] );
 $templates->prepare_native_presentation();
-assert_true( count( $GLOBALS['styles'] ) > $before_styles && in_array( 'graha-selang-shell', $GLOBALS['styles'], true ), 'established posts-front STILL enqueues the full Graha shell assets' );
+assert_true( count( $GLOBALS['styles'] ) > $before_styles && in_array( 'graha-selang-shell', $GLOBALS['styles'], true ) && in_array( 'graha-selang-home', $GLOBALS['styles'], true ), 'established posts-front STILL enqueues the full Graha Home asset chain' );
 $posts_front_content = '<article>Native posts index item.</article>';
 $posts_front_home = $templates->enhance_native_content( $posts_front_content );
 assert_true( $posts_front_content !== $posts_front_home, 'established posts-front content is composed into the Graha Homepage rather than passed through untouched' );

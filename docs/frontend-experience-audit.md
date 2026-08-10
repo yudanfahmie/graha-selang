@@ -460,3 +460,17 @@ Accepted implementation contract for release `0.7.4`:
 - future bespoke SVGs remain under `assets/images/illustrations/`. `AssetService::ILLUSTRATION_RELATIVE_PATH`, `illustration_url()`, and `illustration_path()` are the canonical narrow path helpers; no second asset service or embedded/base64 SVG transport is introduced;
 - contrast sections deliberately own foreground, muted text, eyebrow, outline-button, and focus behavior; the existing centralized focus-visible and reduced-motion contracts remain authoritative;
 - no Phase C illustration asset, Hero reconstruction, 10-section Home composition, Footer redesign, route expansion, data mutation, taxonomy change, or external UI dependency is included in this release.
+
+## 17. Phase C accepted implementation contract
+
+Phase A diagnosis and the accepted Phase B foundation remain historical and binding. Phase C implements PASS 2 only: the bespoke illustration family and premium first-viewport Hero. The downstream `native-home.php` journey, Footer reconstruction, and page-family/route work remain later passes.
+
+Accepted implementation contract for release `0.7.5`:
+
+- the canonical source-controlled illustration family now lives at `plugin/graha-selang-site-core/assets/images/illustrations/` and consists of `hero-industrial-system.svg`, `hydraulic-hose.svg`, `industrial-hose.svg`, `ducting-hose.svg`, `pvc-hose.svg`, `fittings-couplings.svg`, `cng-hose.svg`, and `technical-services.svg`;
+- all eight assets use one restrained technical line/duotone grammar: deep-navy structural strokes, Graha-blue system paths/highlights, pale-blue supporting geometry, and white controlled surfaces. They remain text-free, animation-free, raster-free, and externally self-contained; the Hero is an abstract engineered hose-routing system rather than a fake specification/CAD sheet;
+- `templates/parts/home-hero.php` is the actual Hero markup owner. `TemplateService::render_front_page_shell()` prepares only real Product/RFQ destinations plus the canonical Hero illustration URL, then delegates the first-viewport presentation to that partial; the former six-group checklist is removed from the Hero;
+- `assets/css/home.css` now has a justified Home-only role. `AssetService::HOME_STYLE` registers it as a dependency of the existing shell chain, `AssetService::enqueue_home()` is the only public loader, and `TemplateService::prepare_native_presentation()` selects that path only for `is_front_page()`; normal Pages continue to use shell-only assets;
+- `hero-industrial-system.svg` uses an `800 × 640` (`5:4`) intrinsic/viewBox contract. The Hero partial emits it as a normal external `<img>` with explicit dimensions, `loading="eager"`, `fetchpriority="high"`, and `decoding="async"` so the above-fold image is discoverable early and does not introduce avoidable layout shift;
+- the Hero illustration is decorative reinforcement beside equivalent textual meaning and therefore renders with `alt=""` and no focusable SVG behavior. The Hero preserves one intended H1, at most two real-destination CTAs, the centralized on-dark focus treatment, responsive single-column fallback, and the existing reduced-motion contract;
+- supporting category/capability SVGs keep the established 4:3 card-media geometry but are deliberately not wired into the final Home category architecture yet. No Phase D 10-section reconstruction, Footer redesign, route expansion, product/data mutation, taxonomy change, contact/RFQ invention, or external UI dependency is part of this release.

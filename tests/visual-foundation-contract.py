@@ -76,14 +76,14 @@ check('@media (prefers-reduced-motion:reduce)' in foundation and '--graha-motion
 check("ILLUSTRATION_RELATIVE_PATH = 'assets/images/illustrations/'" in assets, 'AssetService owns the future illustration directory')
 check('public function illustration_url(' in assets and 'public function illustration_path(' in assets, 'AssetService exposes narrow Phase C illustration helpers')
 check('basename(' in assets, 'illustration helper reduces input to a safe basename')
-check(not (CSS / 'home.css').exists(), 'Phase B does not add an empty/premature Home stylesheet')
+check((CSS / 'home.css').is_file(), 'Phase C adds Home CSS only after substantial Home-specific composition exists')
 
 for path in CSS.glob('*.css'):
     text = path.read_text(encoding='utf-8')
     check('@import' not in text, f'no CSS import dependency introduced: {path.name}')
     check(re.search(r'https?://', text) is None, f'no external stylesheet/media URL introduced: {path.name}')
 
-check('Version: 0.7.4' in entry, 'plugin header version is 0.7.4')
-check("const VERSION = '0.7.4'" in kernel, 'Kernel runtime version is 0.7.4')
+check('Version: 0.7.5' in entry, 'plugin header version is 0.7.5')
+check("const VERSION = '0.7.5'" in kernel, 'Kernel runtime version is 0.7.5')
 
 print('Visual foundation contract checks passed.')

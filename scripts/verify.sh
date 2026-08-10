@@ -9,6 +9,7 @@ while IFS= read -r file; do php -l "$file"; done < <(find . -type f -name '*.php
 echo '== Repository contract guards =='
 python3 tests/verify_contracts.py
 python3 tests/visual-foundation-contract.py
+python3 tests/hero-illustration-contract.py
 echo '== PHP foundation and migration tests =='
 php tests/navigation-normalization.php
 php tests/navigation-render.php

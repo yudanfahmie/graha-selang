@@ -56,7 +56,7 @@ foreach ( $GLOBALS['hooked']['wp_enqueue_scripts'] as $callback ) {
 }
 
 $expected_version = \GrahaSelang\Kernel::VERSION;
-foreach ( array( 'graha-selang-tokens', 'graha-selang-foundation', 'graha-selang-navigation', 'graha-selang-shell' ) as $handle ) {
+foreach ( array( 'graha-selang-tokens', 'graha-selang-foundation', 'graha-selang-navigation', 'graha-selang-shell', 'graha-selang-home' ) as $handle ) {
 	ok( isset( $GLOBALS['registered'][ $handle ] ) && $expected_version === $GLOBALS['registered'][ $handle ], "public asset '{$handle}' is registered with the live Kernel::VERSION ({$expected_version}), not a stale literal" );
 }
 
