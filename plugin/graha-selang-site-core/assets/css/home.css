@@ -1,4 +1,4 @@
-/* Phase C/D1/D2 Home-only composition. Shared tokens/foundation/shell remain authoritative. */
+/* Phase C/D1/D2 Home-only composition plus final visual polish. Shared tokens/foundation/shell remain authoritative. */
 .graha-site-main--home {
 	padding-block: 0;
 	background: var(--graha-color-canvas);
@@ -6,7 +6,7 @@
 
 .graha-home-hero {
 	overflow: hidden;
-	padding: var(--graha-space-9) 0;
+	padding: var(--graha-space-8) 0;
 	border-radius: 0;
 	background:
 		linear-gradient(145deg, var(--graha-color-primary-dark) 0%, var(--graha-color-primary-dark) 38%, var(--graha-color-primary) 100%);
@@ -60,6 +60,8 @@
 
 .graha-home-hero__visual {
 	position: relative;
+	justify-self: end;
+	inline-size: min(100%, 38rem);
 	min-inline-size: 0;
 	margin: 0;
 	padding: clamp(var(--graha-space-4), 2vw, var(--graha-space-6));
@@ -311,9 +313,10 @@
 	background: var(--graha-color-surface-raised);
 	box-shadow: var(--graha-shadow-soft);
 	text-decoration: none;
+	transition: transform var(--graha-motion-fast) var(--graha-motion-ease), border-color var(--graha-motion-fast) var(--graha-motion-ease);
 }
 
-.graha-home-pathway:hover {
+.graha-home-pathway:focus-visible {
 	border-color: var(--graha-color-border-brand-soft);
 }
 
@@ -382,6 +385,11 @@
 
 .graha-home-trust__links strong {
 	color: var(--graha-color-on-surface);
+	transition: color var(--graha-motion-fast) var(--graha-motion-ease);
+}
+
+.graha-home-trust__links a:focus-visible strong {
+	color: var(--graha-color-primary);
 }
 
 .graha-home-trust__links span {
@@ -427,11 +435,18 @@
 	justify-content: flex-end;
 }
 
-@media (max-width: 64rem) {
-	.graha-home-hero {
-		padding-block: var(--graha-space-8);
+@media (hover: hover) {
+	.graha-home-pathway:hover {
+		transform: translateY(-1px);
+		border-color: var(--graha-color-border-brand-soft);
 	}
 
+	.graha-home-trust__links a:hover strong {
+		color: var(--graha-color-primary);
+	}
+}
+
+@media (max-width: 64rem) {
 	.graha-home-hero__grid {
 		grid-template-columns: minmax(0, 1fr) minmax(21rem, 0.86fr);
 		gap: var(--graha-space-6);
@@ -457,6 +472,7 @@
 
 	.graha-home-specialist__visual,
 	.graha-home-capability__visual {
+		justify-self: center;
 		inline-size: min(100%, 34rem);
 	}
 
@@ -475,6 +491,7 @@
 	}
 
 	.graha-home-hero__visual {
+		justify-self: center;
 		inline-size: min(100%, 38rem);
 	}
 
@@ -493,6 +510,7 @@
 	.graha-home-specialist__visual,
 	.graha-home-capability__visual {
 		max-inline-size: 30rem;
+		margin-inline: auto;
 	}
 }
 

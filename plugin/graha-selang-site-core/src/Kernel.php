@@ -13,7 +13,7 @@ final class Kernel {
 	 * exactly one place code has to change per release. Keep both in sync;
 	 * tests/version-consistency.php guards against them drifting apart.
 	 */
-	const VERSION = '0.7.7';
+	const VERSION = '0.7.8';
 
 	/** @var string */
 	private $plugin_file;

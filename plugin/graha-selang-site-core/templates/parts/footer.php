@@ -3,7 +3,7 @@
  * Global Graha Selang footer: closing CTA band, navigation columns, bottom bar.
  *
  * Included from templates/shell.php inside TemplateService's render scope,
- * which already defines $site_name and $footer_links (real destinations only).
+ * which already defines $site_name, $family, and $footer_links (real destinations only).
  *
  * @package GrahaSelang
  */
@@ -11,6 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $site_name    = isset( $site_name ) ? (string) $site_name : '';
+$family       = isset( $family ) ? (string) $family : '';
 $footer_links = isset( $footer_links ) && is_array( $footer_links ) ? $footer_links : array();
 
 $explore = array_values( array_filter( array(
@@ -22,8 +23,10 @@ $connect = array_values( array_filter( array(
 	! empty( $footer_links['rfq_url'] ) ? array( __( 'Request Quote', 'graha-selang' ), (string) $footer_links['rfq_url'] ) : null,
 	! empty( $footer_links['contact_url'] ) ? array( __( 'Hubungi Kami', 'graha-selang' ), (string) $footer_links['contact_url'] ) : null,
 ) ) );
+$is_home_footer       = 'home' === $family;
+$footer_column_count  = 1 + ( $explore ? 1 : 0 ) + ( $connect ? 1 : 0 );
 ?>
-<?php if ( '' !== $site_name && ! empty( $footer_links['rfq_url'] ) ) : ?>
+<?php if ( ! $is_home_footer && '' !== $site_name && ! empty( $footer_links['rfq_url'] ) ) : ?>
 <div class="graha-footer__cta"><div class="graha-container graha-container--wide graha-footer__cta-inner">
 	<div>
 		<p class="graha-eyebrow graha-eyebrow--on-dark"><?php echo esc_html( $site_name ); ?></p>
@@ -32,7 +35,7 @@ $connect = array_values( array_filter( array(
 	<a class="graha-button graha-button--primary" href="<?php echo esc_url( (string) $footer_links['rfq_url'] ); ?>"><?php echo esc_html__( 'Request Quote', 'graha-selang' ); ?></a>
 </div></div>
 <?php endif; ?>
-<div class="graha-container graha-container--wide graha-footer__grid">
+<div class="graha-container graha-container--wide graha-footer__grid graha-footer__grid--<?php echo esc_attr( (string) $footer_column_count ); ?>">
 	<div class="graha-footer__brand">
 		<?php if ( '' !== $site_name ) : ?><p class="graha-footer__brand-name"><?php echo esc_html( $site_name ); ?></p><?php endif; ?>
 		<p class="graha-footer__tagline"><?php echo esc_html__( 'Pemasok selang industri, hidrolik, dan fitting untuk kebutuhan teknis di lapangan.', 'graha-selang' ); ?></p>
