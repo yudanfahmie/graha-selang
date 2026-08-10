@@ -16,6 +16,7 @@ final class AssetService {
 	const ADMIN_MIGRATION_SCRIPT  = 'graha-selang-admin-migration';
 	const WORDMARK_RELATIVE_PATH  = 'assets/images/graha-selang-logo-text.svg';
 	const MARK_RELATIVE_PATH      = 'assets/images/graha-selang-logo.svg';
+	const ILLUSTRATION_RELATIVE_PATH = 'assets/images/illustrations/';
 	/** Primary self-hosted font subset: preloaded so the swap window stays short. */
 	const FONT_PRELOAD_RELATIVE_PATH = 'assets/fonts/instrument-sans-latin.woff2';
 
@@ -103,6 +104,18 @@ final class AssetService {
 	/** Filesystem path for a committed canonical image derivative. */
 	public function image_path( $filename ) {
 		return $this->base_path . 'assets/images/' . ltrim( (string) $filename, '/' );
+	}
+
+	/** Phase C-ready URL for one source-controlled illustration basename. */
+	public function illustration_url( $filename ) {
+		$filename = basename( trim( (string) $filename ) );
+		return '' === $filename ? '' : $this->base_url . self::ILLUSTRATION_RELATIVE_PATH . rawurlencode( $filename );
+	}
+
+	/** Phase C-ready filesystem path for one source-controlled illustration basename. */
+	public function illustration_path( $filename ) {
+		$filename = basename( trim( (string) $filename ) );
+		return '' === $filename ? '' : $this->base_path . self::ILLUSTRATION_RELATIVE_PATH . $filename;
 	}
 
 	/** URL for the preloaded self-hosted Instrument Sans subset. */

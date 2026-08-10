@@ -445,3 +445,18 @@ This audit does not authorize:
 - a new custom database;
 - copying Gloskin branding, content, routes, models, or visual identity;
 - implementation of the visual changes described above before the corresponding atomic pass is approved.
+
+## 16. Phase B accepted implementation contract
+
+Phase A diagnosis remains historical and binding. Phase B approves and implements only PASS 1 visual foundation; the Hero, final Home composition, Footer, and page-family passes remain later work.
+
+Accepted implementation contract for release `0.7.4`:
+
+- semantic surface roles live in `assets/css/tokens.css`: `--graha-color-canvas`, `--graha-color-surface-soft`, `--graha-color-surface-brand-soft`, `--graha-color-surface-raised`, `--graha-color-surface-contrast`, `--graha-color-border-brand-soft`, and `--graha-color-brand-glow`, plus explicit on-canvas/on-surface/on-contrast foreground roles. They are aliases/derivations of the existing approved Graha palette; primary blue, deep navy, tint, white and neutral literals remain unchanged;
+- the reusable full-width band is `.graha-section`; the outer section owns surface, vertical rhythm, and optional decorative context while `.graha-section__inner` is paired with the existing `.graha-container` and width modifiers for horizontal alignment. Foundation modifiers are `--default`, `--soft`, `--brand-soft`, `--contrast`, `--compact`, `--major`, and optional `--brand-glow`;
+- normal/major spacing uses the existing space-8/space-9 tokens and reduces at the existing mobile breakpoint; no device-specific layout table is introduced;
+- existing category, discovery, capability, and trust primitives consume semantic raised surfaces, precise borders, and restrained hover lift/soft shadow. `.graha-card__visual` / `--illustration` reserves a 4:3 contained external-image/SVG slot for Phase C without creating artwork now;
+- `home.css` is deliberately **not added in Phase B**. No new Home-only composition exists yet, so an extra stylesheet/request would only be placeholder overhead. If later Home work introduces material Home-only styling, `AssetService` remains the only valid loader and conditional ownership must be added then;
+- future bespoke SVGs remain under `assets/images/illustrations/`. `AssetService::ILLUSTRATION_RELATIVE_PATH`, `illustration_url()`, and `illustration_path()` are the canonical narrow path helpers; no second asset service or embedded/base64 SVG transport is introduced;
+- contrast sections deliberately own foreground, muted text, eyebrow, outline-button, and focus behavior; the existing centralized focus-visible and reduced-motion contracts remain authoritative;
+- no Phase C illustration asset, Hero reconstruction, 10-section Home composition, Footer redesign, route expansion, data mutation, taxonomy change, or external UI dependency is included in this release.

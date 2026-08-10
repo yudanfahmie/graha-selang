@@ -55,6 +55,20 @@
 	--graha-color-inverse: #ffffff;
 	--graha-color-inverse-muted: #c7cbe6;
 
+	/* Semantic surface roles: derived aliases only, never a second brand palette. */
+	--graha-color-canvas: var(--graha-color-surface);
+	--graha-color-surface-soft: var(--graha-color-surface-subtle);
+	--graha-color-surface-brand-soft: var(--graha-color-primary-tint);
+	--graha-color-surface-raised: var(--graha-color-surface);
+	--graha-color-surface-contrast: var(--graha-color-primary-dark);
+	--graha-color-border-brand-soft: color-mix(in srgb, var(--graha-color-primary) 24%, var(--graha-color-border));
+	--graha-color-brand-glow: rgb(0 0 184 / 0.08);
+	--graha-color-on-canvas: var(--graha-color-text);
+	--graha-color-on-surface: var(--graha-color-text);
+	--graha-color-on-surface-muted: var(--graha-color-muted);
+	--graha-color-on-contrast: var(--graha-color-inverse);
+	--graha-color-on-contrast-muted: var(--graha-color-inverse-muted);
+
 	--graha-border-width: 1px;
 	--graha-radius-sm: 0.25rem;
 	--graha-radius-md: 0.5rem;
