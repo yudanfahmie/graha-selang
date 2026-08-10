@@ -28,6 +28,7 @@ require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/AssetServi
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/ProductContentService.php';
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/NavigationService.php';
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/TemplateService.php';
+require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/ProductPresentation.php';
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/AdminService.php';
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/SiteLifecycleService.php';
 require_once dirname( __DIR__ ) . '/plugin/graha-selang-site-core/src/Kernel.php';
